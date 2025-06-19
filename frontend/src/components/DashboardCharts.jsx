@@ -68,7 +68,6 @@ const DashboardCharts = () => {
           ))}
         </div>
       </div>
-
       {/* Request Volume Chart */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -90,7 +89,6 @@ const DashboardCharts = () => {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-
       {/* Response Time Chart */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -113,7 +111,6 @@ const DashboardCharts = () => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Provider Distribution */}
         <div className="bg-white p-6 rounded-lg shadow">
@@ -161,8 +158,7 @@ const DashboardCharts = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
+      </div>{" "}
       {/* Token Usage Chart */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -194,7 +190,6 @@ const DashboardCharts = () => {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-
       {/* Cost Analysis */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -217,7 +212,6 @@ const DashboardCharts = () => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-
       {/* Model Performance */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">

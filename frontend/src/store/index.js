@@ -10,13 +10,26 @@ export const useAppStore = create(
     (set, get) => ({
       // UI State
       sidebarOpen: true,
+      settingsModalOpen: false,
+      logDetailsModalOpen: false,
+      selectedLog: null,
       theme: "light",
       loading: false,
-      error: null,
-
-      // WebSocket State
+      error: null, // WebSocket State
       wsConnected: false,
       wsReconnecting: false,
+
+      // Notification Settings
+      notificationSettings: {
+        enabled: true,
+        newRequestNotifications: true,
+        errorNotifications: true,
+        warningNotifications: true,
+        soundEnabled: false,
+        errorThreshold: 5, // Show notification after X consecutive errors
+        latencyThreshold: 5000, // Show notification if latency > X ms
+        costThreshold: 1.0, // Show notification if cost > $X
+      },
 
       // Stats State
       stats: {
@@ -31,10 +44,15 @@ export const useAppStore = create(
         successRateChange: 0,
         errorRate: 0,
         errorRateChange: 0,
-      },
-
-      // Actions
+      }, // Actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      setSettingsModalOpen: (open) => set({ settingsModalOpen: open }),
+      setLogDetailsModalOpen: (open) => set({ logDetailsModalOpen: open }),
+      setSelectedLog: (log) => set({ selectedLog: log }),
+      openLogDetailsModal: (log) =>
+        set({ selectedLog: log, logDetailsModalOpen: true }),
+      closeLogDetailsModal: () =>
+        set({ selectedLog: null, logDetailsModalOpen: false }),
       setTheme: (theme) => set({ theme }),
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
@@ -42,6 +60,13 @@ export const useAppStore = create(
       setWsConnected: (connected) => set({ wsConnected: connected }),
       setWsReconnecting: (reconnecting) =>
         set({ wsReconnecting: reconnecting }),
+
+      // Notification Actions
+      updateNotificationSettings: (settings) =>
+        set((state) => ({
+          notificationSettings: { ...state.notificationSettings, ...settings },
+        })),
+
       setStats: (stats) => set({ stats }), // Fetch stats
       fetchStats: async () => {
         try {
@@ -60,7 +85,6 @@ export const useAppStore = create(
             console.warn("Unexpected API response structure:", response);
             overview = response; // fallback to treating the whole response as overview
           }
-
           const transformedStats = {
             totalRequests: overview.totalRequests || 0,
             requestsChange: 0,
@@ -72,7 +96,12 @@ export const useAppStore = create(
             successRate: overview.successRate || 0,
             successRateChange: 0,
             errorRate: overview.errorRate || 0,
-            errorRateChange: 0,
+            errorRateChange: 0, // Add token usage data
+            tokenUsage: {
+              total: overview.totalTokens || 0,
+              prompt: overview.promptTokens || 0,
+              completion: overview.completionTokens || 0,
+            },
           };
 
           set({ stats: transformedStats });
@@ -296,7 +325,7 @@ export const useStatsStore = create(
         set({ loading: true, error: null });
 
         try {
-          // Fetch stats (we know this works)
+          // Fetch stats
           const statsResponse = await ApiService.get("/analytics/stats");
 
           // Fetch usage data
@@ -320,26 +349,32 @@ export const useStatsStore = create(
             );
           } catch (err) {
             console.warn("Performance endpoint failed:", err.message);
-          } // Transform the data to match what charts expect
-          const transformedRequestVolume =
-            usageResponse?.data?.hourlyStats?.map((item) => ({
-              timestamp: item.createdAt,
-              requests: item.requests,
-              errors: item.errors || 0,
-            })) || [];
-          const transformedResponseTime =
-            performanceResponse?.data?.latencyDistribution?.map((item) => ({
-              timestamp: item.model || "Unknown",
-              duration: item.avgDuration,
-              model: item.model,
-            })) || []; // Transform provider stats to provider distribution format
-          const transformedProviderDistribution =
-            statsResponse.data?.providerStats?.map((provider) => ({
-              name: provider,
-              value: 1, // We don't have individual counts, so set to 1 for now
-            })) || [{ name: "ollama", value: 10 }]; // Default with our actual data
+          }
 
-          // Transform status distribution (we know all our requests are successful)
+          // Transform data with null checks
+          const transformedRequestVolume = (
+            usageResponse?.data?.hourlyStats || []
+          ).map((item) => ({
+            timestamp: item.createdAt || new Date().toISOString(),
+            requests: item.requests || 0,
+            errors: item.errors || 0,
+          }));
+
+          const transformedResponseTime = (
+            performanceResponse?.data?.latencyDistribution || []
+          ).map((item) => ({
+            timestamp: item.model || "Unknown",
+            duration: item.avgDuration || 0,
+            model: item.model || "Unknown",
+          }));
+
+          const transformedProviderDistribution = (
+            statsResponse.data?.providerStats || []
+          ).map((provider) => ({
+            name: provider || "Unknown",
+            value: 1,
+          }));
+
           const transformedStatusDistribution = [
             {
               status: "success",
@@ -349,53 +384,44 @@ export const useStatsStore = create(
               status: "error",
               count: statsResponse.data?.overview?.errorRequests || 0,
             },
-          ]; // Transform token usage over time (create realistic data based on our known stats)
-          const totalTokensFromStats =
-            statsResponse.data?.overview?.totalTokens || 0;
-          const totalRequests =
-            statsResponse.data?.overview?.totalRequests || 0;
-          const avgTokensPerRequest =
-            totalRequests > 0
-              ? Math.floor(totalTokensFromStats / totalRequests)
-              : 50;
+          ];
 
-          const transformedTokenUsage =
-            usageResponse?.data?.hourlyStats?.map((item, index) => {
-              const baseTokens = avgTokensPerRequest * item.requests;
-              const inputTokens = Math.floor(baseTokens * 0.3); // ~30% input
-              const outputTokens = Math.floor(baseTokens * 0.7); // ~70% output
-              return {
-                timestamp: item.createdAt,
-                inputTokens: inputTokens,
-                outputTokens: outputTokens,
-                totalTokens: inputTokens + outputTokens,
-              };
-            }) || []; // Transform cost analysis (show estimated costs if using paid providers)
-          const transformedCostAnalysis =
-            usageResponse?.data?.hourlyStats?.map((item, index) => {
-              const tokens = avgTokensPerRequest * item.requests;
-              // Check if the provider is Ollama - if so, cost should be 0
-              const primaryProvider =
-                statsResponse.data?.overview?.providers[0] || "ollama";
-              const isOllama = primaryProvider.toLowerCase() === "ollama";
-              const estimatedCost = isOllama ? 0 : tokens * 0.00001; // Only apply cost for non-Ollama providers
+          const transformedTokenUsage = (
+            usageResponse?.data?.hourlyStats || []
+          ).map((item) => ({
+            timestamp: item.createdAt || new Date().toISOString(),
+            inputTokens: item.promptTokens || 0,
+            outputTokens: item.completionTokens || 0,
+          }));
 
-              return {
-                timestamp: item.createdAt,
-                cost: estimatedCost,
-                actualCost: isOllama ? 0 : estimatedCost, // Ollama is free
-                savedCost: isOllama ? tokens * 0.00001 : 0, // Calculate savings for Ollama
-              };
-            }) || [];
+          const transformedCostAnalysis = (
+            usageResponse?.data?.hourlyStats || []
+          ).map((item) => ({
+            timestamp: item.createdAt || new Date().toISOString(),
+            cost: item.totalCost || 0,
+          }));
 
-          // Transform model performance from performance response
-          const transformedModelPerformance =
-            performanceResponse?.data?.latencyDistribution?.map((item) => ({
-              model: item.model,
-              avgDuration: item.avgDuration,
-              successRate: item.successRate,
-              requestCount: item.requestCount,
-            })) || []; // Set the data with proper transformations
+          const transformedModelPerformance = (
+            performanceResponse?.data?.latencyDistribution || []
+          ).map((item) => ({
+            model: item.model || "Unknown",
+            avgDuration: item.avgDuration || 0,
+            successRate: item.successRate || 0,
+            requestCount: item.requestCount || 0,
+          }));
+
+          let overview = {};
+          if (
+            statsResponse.success &&
+            statsResponse.data &&
+            statsResponse.data.overview
+          ) {
+            overview = statsResponse.data.overview;
+          } else if (statsResponse.overview) {
+            overview = statsResponse.overview;
+          }
+
+          // Set the data with all proper transformations and null checks
           set({
             stats: {
               ...statsResponse.data,
@@ -408,7 +434,7 @@ export const useStatsStore = create(
               modelPerformance: transformedModelPerformance,
               errorRate: [],
             },
-            overview: statsResponse.data?.overview,
+            overview: overview,
             providerStats: statsResponse.data?.providerStats || [],
             costAnalysis: transformedCostAnalysis,
             recentActivity: [],

@@ -1,0 +1,17 @@
+{
+  "requestId": "test-req-001",
+  "prompt": "What is the capital of France?",
+  "provider": "ollama",
+  "model": "mistral:latest",
+  "completion": "The capital of France is Paris.",
+  "status": "success",
+  "latency": 1500,
+  "tokenUsage": {
+    "promptTokens": 10,
+    "completionTokens": 15,
+    "totalTokens": 25
+  },
+  "cost": {
+    "totalCost": 0
+  }
+}

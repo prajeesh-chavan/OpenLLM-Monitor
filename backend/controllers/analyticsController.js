@@ -54,11 +54,12 @@ const getStats = async (req, res) => {
           avgResponseTime: { $avg: "$latency" },
           totalCost: { $sum: "$cost.totalCost" },
           totalTokens: { $sum: "$tokenUsage.totalTokens" },
+          promptTokens: { $sum: "$tokenUsage.promptTokens" },
+          completionTokens: { $sum: "$tokenUsage.completionTokens" },
           providers: { $addToSet: "$provider" },
         },
       },
     ]);
-
     const result = stats[0] || {
       totalRequests: 0,
       successfulRequests: 0,
@@ -66,6 +67,8 @@ const getStats = async (req, res) => {
       avgResponseTime: 0,
       totalCost: 0,
       totalTokens: 0,
+      promptTokens: 0,
+      completionTokens: 0,
       providers: [],
     };
 
@@ -91,6 +94,8 @@ const getStats = async (req, res) => {
           avgDuration: Math.round(result.avgResponseTime || 0),
           totalCost: Math.round(result.totalCost * 10000) / 10000,
           totalTokens: result.totalTokens,
+          promptTokens: result.promptTokens,
+          completionTokens: result.completionTokens,
           activeProviders: result.providers.length,
         },
         providerStats: result.providers,
@@ -155,7 +160,6 @@ const getRequestVolume = async (req, res) => {
           $dateToString: { format: "%Y-%m-%d %H:00", date: "$createdAt" },
         };
     }
-
     const volume = await Log.aggregate([
       {
         $match: {
@@ -167,6 +171,9 @@ const getRequestVolume = async (req, res) => {
           _id: groupBy,
           requests: { $sum: 1 },
           errors: { $sum: { $cond: [{ $eq: ["$status", "error"] }, 1, 0] } },
+          totalTokens: { $sum: "$tokenUsage.totalTokens" },
+          promptTokens: { $sum: "$tokenUsage.promptTokens" },
+          completionTokens: { $sum: "$tokenUsage.completionTokens" },
         },
       },
       {
@@ -177,20 +184,29 @@ const getRequestVolume = async (req, res) => {
           createdAt: "$_id",
           requests: 1,
           errors: 1,
+          totalTokens: 1,
+          promptTokens: 1,
+          completionTokens: 1,
           _id: 0,
         },
       },
     ]);
-
     res.json({
       success: true,
       data: {
         hourlyStats: volume,
         requestVolume: volume.length,
-        tokenUsage: volume.reduce(
-          (acc, curr) => acc + (curr.totalTokens || 0),
-          0
-        ),
+        tokenUsage: {
+          total: volume.reduce((acc, curr) => acc + (curr.totalTokens || 0), 0),
+          prompt: volume.reduce(
+            (acc, curr) => acc + (curr.promptTokens || 0),
+            0
+          ),
+          completion: volume.reduce(
+            (acc, curr) => acc + (curr.completionTokens || 0),
+            0
+          ),
+        },
         timeRange,
         generatedAt: new Date().toISOString(),
       },

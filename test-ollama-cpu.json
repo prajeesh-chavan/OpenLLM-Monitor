@@ -1,5 +1,8 @@
 {
   "model": "phi3:mini",
   "prompt": "What is the capital of France?",
-  "stream": false
+  "stream": false,
+  "options": {
+    "num_gpu": 0
+  }
 }

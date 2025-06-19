@@ -57,19 +57,17 @@ services:
       - openllm-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
   # Frontend (Optional - for full stack development)
   frontend:
     build:
-      context: 
-        ./frontend
+      context: ./frontend
     container_name: openllm-monitor-frontend
     restart: always
     ports:
       - "3000:80"
     environment:
       VITE_API_URL: http://backend:3001/api
-      VITE_WS_URL: http://localhost:3000
+      VITE_WS_URL: ws://localhost:3000
     depends_on:
       - backend
     networks:

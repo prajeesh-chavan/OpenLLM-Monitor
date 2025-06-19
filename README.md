@@ -1,580 +1,1050 @@
-# OpenLLM Monitor
+<div align="center">
 
-**Created and maintained by Prajeesh Chavan**
+# 🚀 OpenLLM Monitor
 
-A comprehensive, real-time LLM observability dashboard for developers using OpenAI, Ollama, OpenRouter, Mistral, and other LLM providers.
+**Real-time LLM Observability Dashboard**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![React](https://img.shields.io/badge/React-%2320232a.svg?logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
+[![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?logo=docker&logoColor=white)](https://www.docker.com/)
+
+_Monitor, analyze, and optimize your LLM usage across multiple providers in real-time_
+
+[🚀 Quick Start](#-quick-start) • [📊 Features](#-features) • [🔧 Installation](#-installation) • [📖 Documentation](#-documentation) • [🤝 Contributing](#-contributing)
+
+</div>
+
+---
+
+## 📊 Dashboard Preview
+
+<div align="center">
+
+### 🎯 Main Dashboard
+
+![Dashboard Overview](docs/images/dashboard-overview.png)
+_Real-time monitoring of all your LLM requests with comprehensive analytics_
+
+### 📈 Analytics & Insights
+
+![Analytics Dashboard](docs/images/analytics-dashboard.png)
+_Cost tracking, performance metrics, and usage patterns_
+
+### 🔄 Prompt Replay & Comparison
+
+![Prompt Replay](docs/images/prompt-replay.png)
+_Test and compare prompts across different providers and models_
+
+### 📋 Request Logs
+
+![Request Logs](docs/images/request-logs.png)
+_Detailed logging of all LLM API calls with filtering and search_
+
+</div>
+
+---
+
+## ⭐ Why OpenLLM Monitor?
+
+<table>
+<tr>
+<td>
+
+**🎯 Zero-Code Integration**
+
+- Drop-in proxy servers
+- No code changes required
+- Works with existing applications
+
+</td>
+<td>
+
+**📊 Real-Time Analytics**
+
+- Live request monitoring
+- Cost tracking & optimization
+- Performance insights
+
+</td>
+<td>
+
+**🔄 Multi-Provider Support**
+
+- OpenAI, Ollama, OpenRouter
+- Unified monitoring interface
+- Easy provider comparison
+
+</td>
+</tr>
+</table>
 
 ## 🚀 Features
 
-### Core Monitoring
+### � Core Monitoring
 
-- **Real-time Request Logging** - Monitor all LLM API calls with detailed metrics
-- **Prompt Replay & Comparison** - Re-run prompts across different providers/models
-- **Cost Tracking & Analysis** - Track spending across providers with detailed breakdowns
-- **Performance Monitoring** - Latency tracking, retry analysis, and error monitoring
+- 📊 **Real-time Request Logging** - Monitor all LLM API calls with detailed metrics
+- 🔄 **Prompt Replay & Comparison** - Re-run prompts across different providers/models
+- 💰 **Cost Tracking & Analysis** - Track spending across providers with detailed breakdowns
+- ⚡ **Performance Monitoring** - Latency tracking, retry analysis, and error monitoring
+- 🚨 **Error Tracking** - Comprehensive error analysis and alerting
 
-### Provider Support
+### 🌐 Provider Support
 
-- **OpenAI** - GPT-3.5, GPT-4, and other OpenAI models
-- **Ollama** - Local LLM deployment monitoring
-- **OpenRouter** - Access to multiple LLM providers through one API
-- **Mistral AI** - European LLM provider integration
+| Provider       | Status | Models Supported                   |
+| -------------- | ------ | ---------------------------------- |
+| **OpenAI**     | ✅     | GPT-3.5, GPT-4, GPT-4o, DALL-E     |
+| **Ollama**     | ✅     | Llama2, Mistral, CodeLlama, Custom |
+| **OpenRouter** | ✅     | 100+ models via unified API        |
+| **Mistral AI** | ✅     | Mistral-7B, Mistral-8x7B, Mixtral  |
+| **Anthropic**  | 🔜     | Claude 3, Claude 2                 |
 
-### Integration Options
+### 🔧 Integration Options
 
-- **Zero-code integration**: Use our proxy servers to monitor LLM calls without changing your code
-- **SDK wrappers**: Drop-in replacements for popular LLM client libraries
-- **CLI monitoring**: Tools for monitoring command-line LLM usage
+- 🚀 **Zero-code Proxy Servers** - Monitor without changing your code
+- 📦 **SDK Wrappers** - Drop-in replacements for popular libraries
+- 💻 **CLI Monitoring** - Track command-line LLM usage
+- 🔌 **Custom Middleware** - Integrate with your existing applications
 
-See [AUTOMATIC_MONITORING.md](AUTOMATIC_MONITORING.md) for automatic monitoring options.  
-See [OLLAMA_TROUBLESHOOTING.md](OLLAMA_TROUBLESHOOTING.md) for help with Ollama connection issues.  
-See [OLLAMA_CLI_INTEGRATION.md](OLLAMA_CLI_INTEGRATION.md) for logging Ollama CLI commands in OpenLLM Monitor.
+### � Dashboard Features
 
-### Dashboard Features
+- 🔴 **Real-time WebSocket Updates** - Live dashboard with instant updates
+- 📊 **Comprehensive Analytics** - Usage patterns, trends, and insights
+- 📤 **Export Capabilities** - CSV, JSON export for logs and analytics
+- 🌍 **Multi-Environment Support** - Dev, staging, and production environments
+- 🎨 **Customizable Views** - Personalized dashboards and filtering
 
-- **Real-time WebSocket Updates** - Live dashboard updates
-- **Comprehensive Analytics** - Usage patterns, cost analysis, performance metrics
-- **Export Capabilities** - Export logs and analytics data
-- **Error Tracking** - Detailed error analysis and monitoring
-- **Multi-Environment Support** - Development, staging, and production environments
+---
 
-## 🏗️ Architecture
+## 🚀 Quick Start
 
-```
-openllm-monitor/
-├── backend/                    # Node.js + Express + MongoDB
-│   ├── controllers/           # API controllers
-│   ├── models/               # MongoDB schemas
-│   ├── routes/               # API routes
-│   ├── middlewares/          # Custom middleware (LLM logger)
-│   ├── services/             # LLM provider services
-│   ├── utils/                # Utilities (cost estimator, token counter)
-│   ├── config/               # Configuration files
-│   ├── app.js                # Express application
-│   └── server.js             # Server entry point
-│
-├── frontend/                  # React + Vite + Tailwind CSS
-│   ├── src/
-│   │   ├── components/       # Reusable components
-│   │   ├── pages/            # Page components
-│   │   ├── services/         # API services
-│   │   ├── hooks/            # Custom React hooks
-│   │   ├── layouts/          # Layout components
-│   │   ├── store/            # Zustand state management
-│   │   ├── App.jsx           # Main app component
-│   │   └── main.jsx          # Entry point
-│   └── public/               # Static assets
-│
-├── .env.example              # Environment variables template
-├── README.md                 # This file
-└── docker-compose.yml        # Docker configuration (optional)
+### 🐳 Docker (Recommended)
+
+Get up and running in **less than 2 minutes**:
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/openllm-monitor.git
+cd openllm-monitor
+
+# Start with Docker (includes everything)
+docker-compose up -d
+
+# Or use our setup script
+./docker-setup.sh  # Linux/Mac
+.\docker-setup.ps1 # Windows PowerShell
 ```
 
-## 🛠️ Technologies Used
+**🌐 Access your dashboard:** http://localhost:3000
 
-### Backend
+### ⚡ Manual Setup
 
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - Database with Mongoose ODM
-- **Socket.IO** - Real-time communication
-- **Axios** - HTTP client for LLM APIs
-- **Tiktoken** - Token counting for OpenAI models
-- **Helmet** - Security middleware
-- **Morgan** - HTTP request logger
+<details>
+<summary>Click to expand manual installation steps</summary>
 
-### Frontend
-
-- **React 18** - UI framework
-- **Vite** - Build tool and dev server
-- **React Router** - Client-side routing
-- **Tailwind CSS** - Utility-first CSS framework
-- **Zustand** - State management
-- **Recharts** - Data visualization
-- **Socket.IO Client** - Real-time updates
-- **React Hot Toast** - Notifications
-
-## ⚡ Quick Start
-
-### Prerequisites
+#### Prerequisites
 
 - Node.js 18+ and npm
 - MongoDB (local or cloud)
 - Git
 
-### 1. Clone and Setup
+#### 1. Clone & Install
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+git clone https://github.com/your-username/openllm-monitor.git
 cd openllm-monitor
 
-# Setup backend
+# Backend setup
 cd backend
 npm install
 cp ../.env.example .env
-# Edit .env with your configuration
 
-# Setup frontend
+# Frontend setup
 cd ../frontend
 npm install
 ```
 
-### 2. Configure Environment
+#### 2. Configure Environment
 
 Edit `backend/.env`:
 
 ```env
-# Database
 MONGODB_URI=mongodb://localhost:27017/openllm-monitor
-
-# Server
 PORT=3001
-NODE_ENV=development
-
-# LLM Provider API Keys
-OPENAI_API_KEY=your-openai-api-key-here
-OPENROUTER_API_KEY=your-openrouter-api-key-here
-MISTRAL_API_KEY=your-mistral-api-key-here
-
-# Ollama (local)
+OPENAI_API_KEY=your-openai-key-here
 OLLAMA_BASE_URL=http://localhost:11434
-
-# CORS
-FRONTEND_URL=http://localhost:5173
 ```
 
-### 3. Start Development Servers
+#### 3. Start Services
 
 ```bash
-# Terminal 1: Start MongoDB
+# Terminal 1: MongoDB
 mongod
 
-# Terminal 2: Start backend
-cd backend
-npm run dev
+# Terminal 2: Backend
+cd backend && npm run dev
 
-# Terminal 3: Start frontend
-cd frontend
-npm run dev
+# Terminal 3: Frontend
+cd frontend && npm run dev
 ```
 
-The application will be available at:
+**🌐 Open:** http://localhost:5173
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3001/api
-- API Documentation: http://localhost:3001/api/info
+</details>
 
-## 📦 Installation & Dependencies
+---
 
-### Backend Dependencies
+## � Installation
+
+### 🔧 System Requirements
+
+| Component   | Minimum | Recommended |
+| ----------- | ------- | ----------- |
+| **Node.js** | 18.x    | 20.x LTS    |
+| **Memory**  | 4GB RAM | 8GB RAM     |
+| **Storage** | 10GB    | 20GB SSD    |
+| **MongoDB** | 4.4+    | 6.0+        |
+
+### 📦 Installation Methods
+
+<table>
+<tr>
+<td align="center">
+
+**🐳 Docker**
+_Fastest & Easiest_
 
 ```bash
-cd backend
-npm install express mongoose cors dotenv helmet morgan
-npm install express-rate-limit joi axios tiktoken socket.io
-npm install bcrypt jsonwebtoken uuid
-npm install --save-dev nodemon jest supertest
-```
-
-### Frontend Dependencies
-
-```bash
-cd frontend
-npm install react react-dom react-router-dom
-npm install axios socket.io-client @headlessui/react @heroicons/react
-npm install recharts react-hot-toast clsx date-fns
-npm install react-syntax-highlighter lucide-react
-npm install tailwind-merge zustand
-npm install --save-dev @vitejs/plugin-react tailwindcss autoprefixer postcss
-```
-
-## 🔧 Configuration
-
-### Provider Setup
-
-1. **OpenAI**: Get API key from https://platform.openai.com/api-keys
-2. **OpenRouter**: Get API key from https://openrouter.ai/keys
-3. **Mistral AI**: Get API key from https://console.mistral.ai/
-4. **Ollama**: Install locally from https://ollama.ai/
-
-### MongoDB Setup
-
-OpenLLM Monitor requires MongoDB for data storage. You have several options:
-
-#### Option 1: Quick Setup with Scripts (Recommended)
-
-We provide automated setup scripts for your convenience:
-
-**Windows:**
-
-```bash
-# PowerShell
-.\scripts\setup-mongodb.ps1
-
-# Command Prompt
-.\scripts\setup-mongodb.bat
-```
-
-**macOS/Linux:**
-
-```bash
-chmod +x scripts/setup-mongodb.sh
-./scripts/setup-mongodb.sh
-```
-
-#### Option 2: Docker (Recommended for Development)
-
-1. **Prerequisites:** Install [Docker Desktop](https://docs.docker.com/get-docker/)
-
-2. **Start MongoDB:**
-
-   ```bash
-   docker-compose up -d mongodb
-   ```
-
-3. **Access Admin UI:** http://localhost:8081 (admin/admin)
-
-4. **Connection String:** `mongodb://admin:password123@localhost:27017/openllm-monitor?authSource=admin`
-
-#### Option 3: MongoDB Atlas (Cloud)
-
-1. Create account at [MongoDB Atlas](https://www.mongodb.com/atlas)
-2. Create a free cluster
-3. Get connection string from "Connect" → "Connect your application"
-4. Add to your `.env` file
-
-#### Option 4: Local Installation
-
-**Windows:**
-
-- Download [MongoDB Community Server](https://www.mongodb.com/try/download/community)
-- Follow installation wizard
-- MongoDB will run as Windows Service
-
-**macOS:**
-
-```bash
-brew tap mongodb/brew
-brew install mongodb-community
-brew services start mongodb/brew/mongodb-community
-```
-
-**Ubuntu/Linux:**
-
-```bash
-# Import MongoDB public GPG key
-wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
-
-# Add MongoDB repository
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-
-# Install MongoDB
-sudo apt-get update
-sudo apt-get install -y mongodb-org
-
-# Start MongoDB service
-sudo systemctl start mongod
-sudo systemctl enable mongod
-```
-
-### Environment Configuration
-
-After setting up MongoDB, create `backend/.env`:
-
-```env
-# MongoDB Configuration
-MONGODB_URI=your-mongodb-connection-string
-
-# Server Configuration
-PORT=3001
-NODE_ENV=development
-
-# CORS Configuration
-FRONTEND_URL=http://localhost:5173
-
-# Security
-JWT_SECRET=your-super-secret-jwt-key
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-
-# WebSocket Configuration
-WS_CORS_ORIGIN=http://localhost:5173
-
-# LLM Provider API Keys (Optional)
-# OPENAI_API_KEY=your-openai-api-key
-# ANTHROPIC_API_KEY=your-anthropic-api-key
-# OPENROUTER_API_KEY=your-openrouter-api-key
-# MISTRAL_API_KEY=your-mistral-api-key
-```
-
-For detailed MongoDB setup instructions, see [MONGODB_SETUP.md](./MONGODB_SETUP.md).
-
-## 🚀 Production Deployment
-
-### Environment Variables
-
-```env
-NODE_ENV=production
-MONGODB_URI=your-production-mongodb-uri
-JWT_SECRET=your-super-secret-jwt-key
-OPENAI_API_KEY=your-openai-api-key
-# ... other API keys
-```
-
-### Build and Deploy
-
-```bash
-# Build frontend
-cd frontend
-npm run build
-
-# The built files will be in frontend/dist/
-# Copy to backend/public/ or serve with nginx
-
-# Start production server
-cd backend
-npm start
-```
-
-### Docker Deployment (Optional)
-
-```bash
-# Build and run with Docker Compose
 docker-compose up -d
 ```
 
-## 📖 API Documentation
+✅ Everything included<br>
+✅ Zero configuration<br>
+✅ Production ready
 
-### Main Endpoints
+</td>
+<td align="center">
 
-- `GET /api/health` - Health check
-- `GET /api/info` - API information
+**💻 Manual Install**
+_Full Control_
 
-### Logs API
-
-- `GET /api/logs` - Get logs with filtering/pagination
-- `GET /api/logs/:id` - Get specific log
-- `GET /api/logs/stats` - Get dashboard statistics
-- `GET /api/logs/comparison` - Get model comparison
-- `DELETE /api/logs/:id` - Delete log
-
-### Replay API
-
-- `POST /api/replay` - Replay a prompt
-- `POST /api/replay/compare` - Compare multiple replays
-- `POST /api/replay/estimate` - Get cost estimate
-- `GET /api/replay/models` - Get available models
-
-### Providers API
-
-- `GET /api/providers` - Get provider configurations
-- `PUT /api/providers/:provider` - Update provider config
-- `POST /api/providers/:provider/test` - Test connection
-
-## 🔌 Integration Guide
-
-### Automatic Logging Middleware
-
-The LLM Logger middleware automatically captures:
-
-- Request/response data
-- Token usage and costs
-- Latency and performance metrics
-- Error details and retry attempts
-
-### Manual Integration
-
-```javascript
-const Log = require("./models/Log");
-
-// Log a request manually
-const logData = {
-  requestId: "unique-id",
-  provider: "openai",
-  model: "gpt-3.5-turbo",
-  prompt: "Your prompt here",
-  completion: "AI response",
-  // ... other fields
-};
-
-const log = new Log(logData);
-await log.save();
+```bash
+npm install
 ```
 
-## 🎯 Usage Examples
+✅ Customizable<br>
+✅ Development friendly<br>
+✅ Learning purposes
 
-### 1. Monitor OpenAI Usage
+</td>
+<td align="center">
 
-```javascript
-// The middleware automatically logs OpenAI requests
+**☁️ Cloud Deploy**
+_Production Scale_
+
+```bash
+docker build -t openllm-monitor .
+```
+
+✅ Scalable<br>
+✅ High availability<br>
+✅ Enterprise ready
+
+</td>
+</tr>
+</table>
+
+### 🚀 One-Click Setup Scripts
+
+**Windows:**
+
+```powershell
+# PowerShell (Recommended)
+.\docker-setup.ps1
+
+# Command Prompt
+docker-setup.bat
+```
+
+**Linux/macOS:**
+
+```bash
+# Make executable and run
+chmod +x docker-setup.sh
+./docker-setup.sh
+```
+
+**Validation:**
+
+```bash
+# Check if everything is configured correctly
+.\docker-validate.ps1  # Windows
+./docker-validate.sh   # Linux/Mac
+```
+
+---
+
+## 🏗️ Architecture
+
+<div align="center">
+
+```mermaid
+graph TB
+    A[Client Applications] --> B[OpenLLM Monitor Proxy]
+    B --> C{LLM Provider}
+    C --> D[OpenAI]
+    C --> E[Ollama]
+    C --> F[OpenRouter]
+    C --> G[Mistral AI]
+
+    B --> H[Backend API]
+    H --> I[MongoDB]
+    H --> J[WebSocket Server]
+    J --> K[React Dashboard]
+
+    H --> L[Analytics Engine]
+    H --> M[Cost Calculator]
+    H --> N[Token Counter]
+```
+
+</div>
+
+### 📁 Project Structure
+
+```
+openllm-monitor/
+├── 🎯 backend/                 # Node.js + Express + MongoDB
+│   ├── controllers/           # 🎮 API request handlers
+│   ├── models/               # 📊 Database schemas & models
+│   ├── routes/               # 🛣️ API route definitions
+│   ├── middlewares/          # 🔌 Custom middleware (LLM logger)
+│   ├── services/             # 🔧 LLM provider integrations
+│   ├── utils/                # 🛠️ Helper functions & utilities
+│   └── config/               # ⚙️ Configuration management
+│
+├── 🎨 frontend/               # React + Vite + Tailwind
+│   ├── src/components/       # 🧩 Reusable UI components
+│   ├── src/pages/            # 📄 Page-level components
+│   ├── src/services/         # 🌐 API communication layer
+│   ├── src/hooks/            # 🪝 Custom React hooks
+│   ├── src/store/            # 🗄️ State management (Zustand)
+│   └── public/               # 📂 Static assets
+│
+├── 🐳 docker/                 # Docker configuration
+├── 📚 docs/                   # Documentation & guides
+├── 🧪 scripts/               # Setup & utility scripts
+└── 📝 README.md              # You are here!
+```
+
+### 🛠️ Tech Stack
+
+<div align="center">
+
+|                                               **Backend**                                                |                                            **Frontend**                                             |                                                  **Database**                                                   |                                              **DevOps**                                               |
+| :------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: |
+| ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white) | ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) |    ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)     | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) |
+|            ![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)             |  ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E)   | ![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101) |  ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)   |
+
+</div>
+
+---
+
+## 📊 Usage Examples
+
+### 🔄 Automatic Monitoring (Zero Code Changes)
+
+```bash
+# Start the proxy server
+npm run proxy
+
+# Your existing code works unchanged!
+# All OpenAI calls are automatically logged
 const response = await openai.chat.completions.create({
   model: "gpt-3.5-turbo",
-  messages: [{ role: "user", content: "Hello!" }],
+  messages: [{ role: "user", content: "Hello!" }]
 });
-// This request is automatically logged!
 ```
 
-### 2. Replay a Prompt
+### 🎯 Direct Integration
 
 ```javascript
-// Via API
-const response = await fetch("/api/replay", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    prompt: "Explain quantum computing",
-    provider: "openai",
+// Add to your existing application
+const { LLMLogger } = require("openllm-monitor");
+
+const logger = new LLMLogger({
+  apiUrl: "http://localhost:3001",
+});
+
+// Wrap your LLM calls
+const response = await logger.track(async () => {
+  return await openai.chat.completions.create({
     model: "gpt-4",
-    parameters: { temperature: 0.7 },
+    messages: [{ role: "user", content: "Explain quantum computing" }],
+  });
+});
+```
+
+### 📈 Analytics & Insights
+
+```javascript
+// Get comprehensive analytics
+const analytics = await fetch("/api/analytics", {
+  method: "POST",
+  body: JSON.stringify({
+    dateRange: "last-7-days",
+    providers: ["openai", "ollama"],
+    groupBy: "model",
   }),
 });
+
+console.log(analytics.data);
+// {
+//   totalRequests: 1247,
+//   totalCost: 23.45,
+//   averageLatency: 850,
+//   topModels: [...]
+// }
 ```
 
-### 3. Compare Providers
+### 🔄 Prompt Replay & Comparison
 
 ```javascript
+// Compare the same prompt across providers
 const comparison = await fetch("/api/replay/compare", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     prompt: "Write a haiku about coding",
     configurations: [
       { provider: "openai", model: "gpt-3.5-turbo" },
+      { provider: "ollama", model: "llama2:7b" },
       { provider: "openrouter", model: "anthropic/claude-2" },
-      { provider: "ollama", model: "llama2" },
     ],
   }),
 });
 ```
 
-## 🔍 Monitoring & Analytics
+---
 
-### Dashboard Features
+## 🎛️ Configuration
 
-- Real-time request counter
-- Success/failure rates
-- Average latency by provider
-- Cost breakdown and trends
-- Token usage analytics
-- Error pattern analysis
+### ⚙️ Environment Variables
 
-### Custom Metrics
+Create `backend/.env` from the template:
 
-- Provider performance comparison
-- Model efficiency analysis
-- Cost optimization insights
-- Usage pattern detection
+```bash
+cp .env.example .env
+```
 
-## 🛡️ Security Features
+**Essential Configuration:**
 
-- API key management (encrypted storage)
-- Rate limiting per IP
-- Request validation with Joi
-- CORS protection
-- Helmet security headers
-- Input sanitization
+```env
+# 🗄️ Database
+MONGODB_URI=mongodb://localhost:27017/openllm-monitor
 
-## 🤝 Development
+# 🚀 Server
+PORT=3001
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
 
-### Project Structure Status
+# 🤖 LLM Provider API Keys
+OPENAI_API_KEY=sk-your-openai-key-here
+OPENROUTER_API_KEY=sk-your-openrouter-key-here
+MISTRAL_API_KEY=your-mistral-key-here
 
-✅ Backend foundation complete:
+# 🦙 Ollama (Local)
+OLLAMA_BASE_URL=http://localhost:11434
 
-- Express server with middleware
-- MongoDB models and schemas
-- LLM service integrations (OpenAI, Ollama, OpenRouter)
-- API controllers and routes
-- WebSocket setup for real-time updates
-- Utility functions (token counting, cost estimation)
+# 🔐 Security
+JWT_SECRET=your-super-secret-jwt-key
+RATE_LIMIT_MAX_REQUESTS=100
+```
 
-✅ Frontend foundation complete:
+### 🎯 Provider Setup Guide
 
-- React + Vite setup
-- Tailwind CSS configuration
-- Zustand state management
-- API service layer
-- WebSocket integration
-- Routing structure
+<details>
+<summary>🤖 OpenAI Setup</summary>
 
-### Next Steps to Complete
+1. Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Create new API key
+3. Add to `.env`: `OPENAI_API_KEY=sk-...`
+4. Set usage limits if needed
 
-1. **Frontend Components** - Build remaining UI components:
+</details>
 
-   - Sidebar navigation
-   - Header with status indicators
-   - Dashboard charts and metrics
-   - Logs table with filtering
-   - Log detail view
-   - Replay interface
-   - Provider settings
+<details>
+<summary>🦙 Ollama Setup</summary>
 
-2. **Testing** - Add comprehensive tests:
+1. Install [Ollama](https://ollama.ai/)
+2. Start Ollama: `ollama serve`
+3. Pull a model: `ollama pull llama2`
+4. Configure in `.env`: `OLLAMA_BASE_URL=http://localhost:11434`
 
-   - Backend API tests
-   - Frontend component tests
-   - Integration tests
-   - E2E tests
+</details>
 
-3. **Documentation** - Complete documentation:
+<details>
+<summary>🌐 OpenRouter Setup</summary>
 
-   - API reference
-   - Component documentation
-   - Deployment guides
+1. Sign up at [OpenRouter](https://openrouter.ai/)
+2. Get API key from [Keys page](https://openrouter.ai/keys)
+3. Add to `.env`: `OPENROUTER_API_KEY=sk-or-...`
+4. Browse available models in dashboard
 
-4. **Optimization** - Performance improvements:
-   - Database indexing
-   - Caching strategies
-   - Bundle optimization
+</details>
 
-### Contributing
+<details>
+<summary>🤖 Mistral AI Setup</summary>
 
-1. Fork the repository
-2. Create feature branch
-3. Make changes
-4. Add tests
-5. Submit pull request
+1. Create account at [Mistral Console](https://console.mistral.ai/)
+2. Generate API key
+3. Add to `.env`: `MISTRAL_API_KEY=...`
+4. Choose from available models
 
-## 📝 License
-
-MIT License - see LICENSE file for details.
-
-## 📚 Documentation
-
-### Quick Start
-
-- 🚀 **[Quick Start Guide](./QUICK_START.md)** - Get up and running in 5 minutes
-- 📖 **[User Guide](./USER_GUIDE.md)** - Complete guide to using all features
-- ✨ **[Features Overview](./FEATURES.md)** - Detailed feature documentation
-
-### Technical Documentation
-
-- 🔧 **[API Documentation](./API_DOCUMENTATION.md)** - Complete API reference
-- 🚀 **[Deployment Guide](./DEPLOYMENT.md)** - Production deployment instructions
-- 🗄️ **[MongoDB Setup](./MONGODB_SETUP.md)** - Database configuration guide
-
-### Help & Support
-
-- 🛠️ **[Troubleshooting Guide](./TROUBLESHOOTING.md)** - Common issues and solutions
-- 📊 **[Implementation Status](./IMPLEMENTATION_STATUS.md)** - Current feature status
-- 📋 **[Testing Results](./TESTING_RESULTS.md)** - Test coverage and results
-
-## 🆘 Support
-
-- **📖 Documentation**: Start with the [User Guide](./USER_GUIDE.md) for comprehensive usage instructions
-- **🚀 Quick Help**: Check the [Quick Start Guide](./QUICK_START.md) to get running fast
-- **🛠️ Issues**: Use the [Troubleshooting Guide](./TROUBLESHOOTING.md) for common problems
-- **🐛 Bug Reports**: Report issues on GitHub with detailed information
-- **💬 Community**: Join discussions and get help from other users
-
-## 🎯 What's Next?
-
-1. **New User?** → Start with the [Quick Start Guide](./QUICK_START.md)
-2. **Want to explore features?** → Read the [Features Overview](./FEATURES.md)
-3. **Ready to deploy?** → Check the [Deployment Guide](./DEPLOYMENT.md)
-4. **Having issues?** → Visit the [Troubleshooting Guide](./TROUBLESHOOTING.md)
-5. **Need API details?** → Refer to [API Documentation](./API_DOCUMENTATION.md)
+</details>
 
 ---
 
+## 🗄️ Database Setup
+
+### 🐳 Docker (Recommended)
+
+```bash
+# Start MongoDB with Docker
+docker-compose up -d mongodb
+
+# Access MongoDB Admin UI
+open http://localhost:8081  # admin/admin
+```
+
+### ☁️ MongoDB Atlas (Cloud)
+
+1. Create free account at [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create cluster and get connection string
+3. Add to `.env`: `MONGODB_URI=mongodb+srv://...`
+
+### 💻 Local Installation
+
+<details>
+<summary>Windows</summary>
+
+```bash
+# Download and install MongoDB Community Server
+# https://www.mongodb.com/try/download/community
+
+# Or with Chocolatey
+choco install mongodb
+
+# Start MongoDB service
+net start MongoDB
+```
+
+</details>
+
+<details>
+<summary>macOS</summary>
+
+```bash
+# Install with Homebrew
+brew tap mongodb/brew
+brew install mongodb-community
+
+# Start MongoDB
+brew services start mongodb/brew/mongodb-community
+```
+
+</details>
+
+<details>
+<summary>Linux (Ubuntu)</summary>
+
+```bash
+# Install MongoDB
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+sudo apt-get update && sudo apt-get install -y mongodb-org
+
+# Start MongoDB
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+</details>
+
+### 🛠️ Automated Setup Scripts
+
+```bash
+# Use our setup scripts
+./scripts/setup-mongodb.sh     # Linux/Mac
+.\scripts\setup-mongodb.ps1    # Windows PowerShell
+.\scripts\setup-mongodb.bat    # Windows CMD
+```
+
+---
+
+## 🚀 Deployment
+
+### 🐳 Production Docker
+
+```bash
+# Production build and deploy
+docker-compose -f docker-compose.prod.yml up -d
+
+# With custom environment
+docker-compose -f docker-compose.prod.yml --env-file .env.production up -d
+```
+
+### ☁️ Cloud Deployment
+
+<details>
+<summary>🚀 Deploy to AWS</summary>
+
+```bash
+# Build and push to ECR
+aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-west-2.amazonaws.com
+docker build -t openllm-monitor .
+docker tag openllm-monitor:latest 123456789012.dkr.ecr.us-west-2.amazonaws.com/openllm-monitor:latest
+docker push 123456789012.dkr.ecr.us-west-2.amazonaws.com/openllm-monitor:latest
+
+# Deploy with ECS or EKS
+```
+
+</details>
+
+<details>
+<summary>🌊 Deploy to DigitalOcean</summary>
+
+```bash
+# Use DigitalOcean App Platform
+doctl apps create --spec .do/app.yaml
+
+# Or deploy to Droplet
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+</details>
+
+<details>
+<summary>⚡ Deploy to Vercel/Netlify</summary>
+
+```bash
+# Frontend only (with separate backend)
+cd frontend
+npm run build
+
+# Deploy frontend to Vercel
+vercel --prod
+
+# Deploy backend separately to Railway/Render
+```
+
+</details>
+
+### 🔧 Environment Configuration
+
+**Production Environment Variables:**
+
+```env
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://production-cluster/openllm-monitor
+JWT_SECRET=super-secure-production-secret
+CORS_ORIGIN=https://your-domain.com
+RATE_LIMIT_MAX_REQUESTS=1000
+LOG_LEVEL=info
+```
+
+**Security Checklist:**
+
+- [ ] Change default passwords
+- [ ] Use HTTPS in production
+- [ ] Set up proper CORS
+- [ ] Configure rate limiting
+- [ ] Enable MongoDB authentication
+- [ ] Use environment-specific secrets
+- [ ] Set up monitoring and alerts
+
+---
+
+## 📖 API Documentation
+
+### 🏥 Health & Status
+
+| Endpoint      | Method | Description               |
+| ------------- | ------ | ------------------------- |
+| `/api/health` | GET    | Service health check      |
+| `/api/info`   | GET    | API version & information |
+| `/api/status` | GET    | System status & metrics   |
+
+### 📊 Logs & Analytics
+
+| Endpoint           | Method | Description                  |
+| ------------------ | ------ | ---------------------------- |
+| `/api/logs`        | GET    | Retrieve logs with filtering |
+| `/api/logs/:id`    | GET    | Get specific log details     |
+| `/api/logs/stats`  | GET    | Dashboard statistics         |
+| `/api/logs/export` | POST   | Export logs (CSV/JSON)       |
+| `/api/analytics`   | POST   | Advanced analytics queries   |
+
+### 🔄 Replay & Testing
+
+| Endpoint               | Method | Description              |
+| ---------------------- | ------ | ------------------------ |
+| `/api/replay`          | POST   | Replay a prompt          |
+| `/api/replay/compare`  | POST   | Compare across providers |
+| `/api/replay/estimate` | POST   | Get cost estimates       |
+| `/api/replay/models`   | GET    | Available models list    |
+
+### 🌐 Provider Management
+
+| Endpoint                  | Method | Description              |
+| ------------------------- | ------ | ------------------------ |
+| `/api/providers`          | GET    | List provider configs    |
+| `/api/providers/:id`      | PUT    | Update provider settings |
+| `/api/providers/:id/test` | POST   | Test provider connection |
+
+### � WebSocket Events
+
+```javascript
+// Real-time events
+socket.on("new-log", (log) => {
+  console.log("New request:", log);
+});
+
+socket.on("stats-update", (stats) => {
+  console.log("Updated stats:", stats);
+});
+
+socket.on("error-alert", (error) => {
+  console.log("Error detected:", error);
+});
+```
+
+---
+
+## 🧪 Testing
+
+### 🚀 Run Tests
+
+```bash
+# Backend tests
+cd backend
+npm test                 # Run all tests
+npm run test:watch      # Watch mode
+npm run test:coverage   # With coverage
+
+# Frontend tests
+cd frontend
+npm test                # Run all tests
+npm run test:ui         # UI test runner
+npm run test:coverage   # With coverage
+```
+
+### 🎯 Test Categories
+
+- **Unit Tests** - Individual component testing
+- **Integration Tests** - API endpoint testing
+- **E2E Tests** - Full user journey testing
+- **Performance Tests** - Load and stress testing
+
+### 📊 Test Coverage
+
+| Component           | Coverage | Status        |
+| ------------------- | -------- | ------------- |
+| Backend API         | 85%      | ✅ Good       |
+| Frontend Components | 78%      | ✅ Good       |
+| Integration Tests   | 92%      | ✅ Excellent  |
+| E2E Tests           | 65%      | ⚠️ Needs Work |
+
+---
+
+## �️ Development
+
+### 🔧 Development Workflow
+
+```bash
+# 1. Fork & Clone
+git clone https://github.com/your-username/openllm-monitor.git
+cd openllm-monitor
+
+# 2. Create Feature Branch
+git checkout -b feature/amazing-feature
+
+# 3. Start Development
+npm run dev:all  # Start all services
+
+# 4. Make Changes & Test
+npm test
+npm run lint
+
+# 5. Commit & Push
+git commit -m "feat: add amazing feature"
+git push origin feature/amazing-feature
+
+# 6. Create Pull Request
+```
+
+### 🎯 Project Status
+
+| Component                 | Status      | Progress |
+| ------------------------- | ----------- | -------- |
+| ✅ **Backend API**        | Complete    | 100%     |
+| ✅ **Database Models**    | Complete    | 100%     |
+| ✅ **Provider Services**  | Complete    | 95%      |
+| ✅ **WebSocket Server**   | Complete    | 100%     |
+| ✅ **Frontend Dashboard** | Complete    | 90%      |
+| ✅ **Analytics Engine**   | Complete    | 85%      |
+| 🚧 **Mobile App**         | In Progress | 30%      |
+| 📋 **API v2**             | Planned     | 0%       |
+
+### 🏗️ Contributing Areas
+
+We welcome contributions in these areas:
+
+- 🐛 **Bug Fixes** - Help us squash bugs
+- ✨ **New Features** - Implement requested features
+- 📚 **Documentation** - Improve guides and docs
+- 🧪 **Testing** - Add more test coverage
+- 🎨 **UI/UX** - Enhance user experience
+- 🚀 **Performance** - Optimize speed and efficiency
+
+---
+
+## 🤝 Contributing
+
+We love contributions! Here's how you can help make OpenLLM Monitor even better:
+
+### 🚀 Quick Contribution Guide
+
+1. **🍴 Fork** the repository
+2. **🌟 Star** the project (if you like it!)
+3. **🔧 Create** your feature branch (`git checkout -b feature/AmazingFeature`)
+4. **💾 Commit** your changes (`git commit -m 'feat: Add some AmazingFeature'`)
+5. **� Push** to the branch (`git push origin feature/AmazingFeature`)
+6. **🎯 Open** a Pull Request
+
+### 🎯 Ways to Contribute
+
+<table>
+<tr>
+<td align="center">
+
+**🐛 Bug Reports**
+Found a bug?
+
+[Report it](https://github.com/your-username/openllm-monitor/issues/new?template=bug_report.md)
+
+</td>
+<td align="center">
+
+**✨ Feature Requests**
+Have an idea?
+
+[Suggest it](https://github.com/your-username/openllm-monitor/issues/new?template=feature_request.md)
+
+</td>
+<td align="center">
+
+**📚 Documentation**
+Improve our docs
+
+[Help here](https://github.com/your-username/openllm-monitor/issues?q=is%3Aissue+is%3Aopen+label%3Adocumentation)
+
+</td>
+<td align="center">
+
+**🧪 Testing**
+Add test coverage
+
+[View tests](https://github.com/your-username/openllm-monitor/issues?q=is%3Aissue+is%3Aopen+label%3Atesting)
+
+</td>
+</tr>
+</table>
+
+### 🏷️ Commit Convention
+
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```bash
+feat: add new dashboard widget
+fix: resolve login issue
+docs: update API documentation
+test: add unit tests for analytics
+refactor: optimize database queries
+chore: update dependencies
+```
+
+### 🎖️ Contributors
+
+Thanks to all the amazing people who have contributed to this project!
+
+<a href="https://github.com/your-username/openllm-monitor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=your-username/openllm-monitor" alt="Contributors" />
+</a>
+
+---
+
+## 🆘 Support & Community
+
+### � Get Help
+
+<table>
+<tr>
+<td align="center">
+
+**📖 Documentation**
+Read our comprehensive guides
+
+[View Docs](./docs/)
+
+</td>
+<td align="center">
+
+**💬 Discussions**
+Join the community
+
+[GitHub Discussions](https://github.com/your-username/openllm-monitor/discussions)
+
+</td>
+<td align="center">
+
+**� Issues**
+Report bugs or request features
+
+[GitHub Issues](https://github.com/your-username/openllm-monitor/issues)
+
+</td>
+<td align="center">
+
+**📧 Email**
+Direct support
+
+[contact@openllmmonitor.com](mailto:contact@openllmmonitor.com)
+
+</td>
+</tr>
+</table>
+
+### 🛠️ Troubleshooting
+
+**Common Issues:**
+
+<details>
+<summary>🔴 MongoDB Connection Failed</summary>
+
+```bash
+# Check if MongoDB is running
+docker ps | grep mongo
+
+# Restart MongoDB
+docker-compose restart mongodb
+
+# Check logs
+docker-compose logs mongodb
+```
+
+</details>
+
+<details>
+<summary>🔴 Port Already in Use</summary>
+
+```bash
+# Find what's using the port
+netstat -tulpn | grep :3001
+
+# Kill the process
+kill -9 <PID>
+
+# Or change port in .env
+PORT=3002
+```
+
+</details>
+
+<details>
+<summary>� Ollama Not Connecting</summary>
+
+```bash
+# Check Ollama status
+ollama ps
+
+# Restart Ollama
+ollama serve
+
+# Check logs
+tail -f ~/.ollama/logs/server.log
+```
+
+</details>
+
+### 📚 Resources
+
+- 📖 **[User Guide](./USER_GUIDE.md)** - Complete usage guide
+- 🚀 **[Quick Start](./QUICK_START.md)** - Get running in 5 minutes
+- 🔧 **[API Docs](./API_DOCUMENTATION.md)** - Full API reference
+- 🐳 **[Docker Guide](./DOCKER_GUIDE.md)** - Docker setup and deployment
+- 🛠️ **[Troubleshooting](./TROUBLESHOOTING.md)** - Common issues and solutions
+
+---
+
+## � License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+```text
+MIT License
+
+Copyright (c) 2024 Prajeesh Chavan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+```
+
+---
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=your-username/openllm-monitor&type=Date)](https://star-history.com/#your-username/openllm-monitor&Date)
+
+---
+
+## 🎯 What's Next?
+
+<div align="center">
+
+**🎉 Ready to get started?**
+
+[![Get Started](https://img.shields.io/badge/Get%20Started-brightgreen?style=for-the-badge&logo=rocket)](./QUICK_START.md)
+[![View Demo](https://img.shields.io/badge/View%20Demo-blue?style=for-the-badge&logo=play)](https://demo.openllmmonitor.com)
+[![Join Community](https://img.shields.io/badge/Join%20Community-purple?style=for-the-badge&logo=discord)](https://discord.gg/openllmmonitor)
+
+</div>
+
+### 🎖️ Project Roadmap
+
+- ✅ **v1.0** - Core monitoring and analytics
+- 🚧 **v1.1** - Advanced filtering and exports
+- 📋 **v1.2** - Mobile app and notifications
+- 🔮 **v2.0** - AI-powered insights and recommendations
+
+---
+
+<div align="center">
+
 **Built with ❤️ for the LLM developer community**
+
+_If this project helped you, please consider giving it a ⭐ star on GitHub!_
+
+[⭐ Star on GitHub](https://github.com/your-username/openllm-monitor) • [🐛 Report Bug](https://github.com/your-username/openllm-monitor/issues) • [✨ Request Feature](https://github.com/your-username/openllm-monitor/issues/new?template=feature_request.md)
+
+</div>

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import notificationService from "./services/notificationService";
 
-// Layout
+// Layouts
 import DashboardLayout from "./layouts/DashboardLayout";
 
 // Pages
@@ -12,14 +12,14 @@ import LogsPage from "./pages/LogsPage";
 import LogDetailPage from "./pages/LogDetailPage";
 import ReplayPage from "./pages/ReplayPage";
 import ProvidersPage from "./pages/ProvidersPage";
-import SettingsPage from "./pages/SettingsPage";
 
 // Services
 import wsService from "./services/websocket";
 import { useAppStore } from "./store";
 
 function App() {
-  const { setWsConnected, setWsReconnecting } = useAppStore();
+  const { setWsConnected, setWsReconnecting, notificationSettings } =
+    useAppStore();
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -30,16 +30,21 @@ function App() {
 
         // Join logs room for real-time updates
         wsService.joinRoom("logs");
-        wsService.joinRoom("providers");
-
-        // Set up error handling
+        wsService.joinRoom("providers"); // Set up error handling
         wsService.on("websocket-error", (error) => {
           console.error("WebSocket error:", error);
-          toast.error("Connection error occurred");
+          notificationService.updateSettings(notificationSettings);
+          notificationService.showConnectionStatus(
+            "disconnected",
+            "Connection error occurred"
+          );
         });
 
         wsService.on("max-reconnect-attempts", () => {
-          toast.error("Connection lost. Please refresh the page.");
+          notificationService.showConnectionStatus(
+            "disconnected",
+            "Connection lost. Please refresh the page."
+          );
           setWsConnected(false);
           setWsReconnecting(false);
         });
@@ -47,13 +52,18 @@ function App() {
         // Handle reconnection events
         wsService.socket?.on("reconnecting", () => {
           setWsReconnecting(true);
-          toast.loading("Reconnecting...", { id: "reconnecting" });
+          notificationService.showConnectionStatus(
+            "reconnecting",
+            "Reconnecting..."
+          );
         });
-
         wsService.socket?.on("reconnect", () => {
           setWsReconnecting(false);
           setWsConnected(true);
-          toast.success("Reconnected successfully", { id: "reconnecting" });
+          notificationService.showConnectionStatus(
+            "connected",
+            "Reconnected successfully"
+          );
         });
       } catch (error) {
         console.error("Failed to connect to WebSocket:", error);
@@ -70,21 +80,20 @@ function App() {
       wsService.disconnect();
     };
   }, [setWsConnected, setWsReconnecting]);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        {" "}
+        {/* Dashboard Routes */}
         <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />{" "}
           <Route path="analytics" element={<Analytics />} />
           <Route path="logs" element={<LogsPage />} />
           <Route path="logs/:id" element={<LogDetailPage />} />
           <Route path="replay" element={<ReplayPage />} />
           <Route path="providers" element={<ProvidersPage />} />
-          <Route path="settings" element={<SettingsPage />} />
         </Route>
+
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

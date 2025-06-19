@@ -55,7 +55,7 @@ const StatCards = ({ stats: propStats }) => {
     {
       title: "Total Cost",
       value: safeStats.totalCost
-        ? `$${safeStats.totalCost.toFixed(2)}`
+        ? `$${(safeStats.totalCost || 0).toFixed(2)}`
         : "$0.00",
       change: safeStats.costChange,
       icon: CurrencyDollarIcon,
@@ -105,7 +105,7 @@ const StatCards = ({ stats: propStats }) => {
     return (
       <span className={`text-sm font-medium ${color}`}>
         {prefix}
-        {change.toFixed(1)}%
+        {(change || 0).toFixed(1)}%
       </span>
     );
   };

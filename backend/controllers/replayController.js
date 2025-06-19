@@ -100,12 +100,12 @@ class ReplayController {
       });
     }
   }
-
   /**
    * Replay a prompt from an existing log entry
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
-   */ async replayFromLog(req, res) {
+   */
+  async replayFromLog(req, res) {
     try {
       const { logId } = req.params;
       const {

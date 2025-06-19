@@ -174,6 +174,134 @@ class MistralService {
   }
 
   /**
+   * Send a prompt to Mistral AI (unified interface)
+   * @param {Object} params - Request parameters
+   * @returns {Promise<Object>} Response with metadata
+   */
+  async sendPrompt(params) {
+    const {
+      prompt,
+      model = "mistral-small",
+      systemMessage = "",
+      temperature = 0.7,
+      maxTokens = null,
+      topP = 1.0,
+      requestId,
+    } = params;
+
+    // Get API key from environment or config
+    const apiKey = process.env.MISTRAL_API_KEY;
+    if (!apiKey) {
+      return {
+        requestId,
+        provider: "mistral",
+        model,
+        prompt,
+        completion: "",
+        systemMessage,
+        parameters: {
+          temperature,
+          maxTokens,
+          topP,
+        },
+        tokenUsage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+        cost: {
+          promptCost: 0,
+          completionCost: 0,
+          totalCost: 0,
+          currency: "USD",
+        },
+        latency: 0,
+        retryHistory: [],
+        status: "error",
+        error: {
+          message: "Mistral API key not configured",
+          code: "MISSING_API_KEY",
+          details: {},
+        },
+      };
+    }
+
+    // Prepare messages for chat completion
+    const messages = [];
+    if (systemMessage) {
+      messages.push({ role: "system", content: systemMessage });
+    }
+    messages.push({ role: "user", content: prompt });
+
+    // Call the existing chatCompletion method
+    const result = await this.chatCompletion(
+      {
+        model,
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+        top_p: topP,
+      },
+      apiKey
+    );
+
+    // Transform the response to match the expected format
+    if (result.success) {
+      const completion = result.response.choices?.[0]?.message?.content || "";
+
+      return {
+        requestId,
+        provider: "mistral",
+        model,
+        prompt,
+        completion,
+        systemMessage,
+        parameters: {
+          temperature,
+          maxTokens,
+          topP,
+        },
+        tokenUsage: {
+          promptTokens: result.metadata.tokenUsage.prompt,
+          completionTokens: result.metadata.tokenUsage.completion,
+          totalTokens: result.metadata.tokenUsage.total,
+        },
+        cost: result.metadata.cost,
+        latency: result.metadata.duration,
+        retryHistory: [],
+        status: "success",
+        rawResponse: result.response,
+        finishReason: result.response.choices?.[0]?.finish_reason || "stop",
+      };
+    } else {
+      return {
+        requestId,
+        provider: "mistral",
+        model,
+        prompt,
+        completion: "",
+        systemMessage,
+        parameters: {
+          temperature,
+          maxTokens,
+          topP,
+        },
+        tokenUsage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+        cost: {
+          promptCost: 0,
+          completionCost: 0,
+          totalCost: 0,
+          currency: "USD",
+        },
+        latency: result.metadata.duration,
+        retryHistory: [],
+        status: "error",
+        error: {
+          message: result.error.message,
+          code: result.error.code,
+          details: result.error,
+        },
+      };
+    }
+  }
+
+  /**
    * Stream chat completion (for future implementation)
    */
   async streamChatCompletion(params, apiKey, onChunk) {
