@@ -129,7 +129,7 @@ Get up and running in **less than 2 minutes**:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/openllm-monitor.git
+git clone https://github.com/prajeesh-chavan/openllm-monitor.git
 cd openllm-monitor
 
 # Start with Docker (includes everything)
@@ -156,7 +156,7 @@ docker-compose up -d
 #### 1. Clone & Install
 
 ```bash
-git clone https://github.com/your-username/openllm-monitor.git
+git clone https://github.com/prajeesh-chavan/openllm-monitor.git
 cd openllm-monitor
 
 # Backend setup
@@ -766,7 +766,7 @@ npm run test:coverage   # With coverage
 
 ```bash
 # 1. Fork & Clone
-git clone https://github.com/your-username/openllm-monitor.git
+git clone https://github.com/prajeesh-chavan/openllm-monitor.git
 cd openllm-monitor
 
 # 2. Create Feature Branch
@@ -834,7 +834,7 @@ We love contributions! Here's how you can help make OpenLLM Monitor even better:
 **🐛 Bug Reports**
 Found a bug?
 
-[Report it](https://github.com/your-username/openllm-monitor/issues/new?template=bug_report.md)
+[Report it](https://github.com/prajeesh-chavan/openllm-monitor/issues/new?template=bug_report.md)
 
 </td>
 <td align="center">
@@ -842,7 +842,7 @@ Found a bug?
 **✨ Feature Requests**
 Have an idea?
 
-[Suggest it](https://github.com/your-username/openllm-monitor/issues/new?template=feature_request.md)
+[Suggest it](https://github.com/prajeesh-chavan/openllm-monitor/issues/new?template=feature_request.md)
 
 </td>
 <td align="center">
@@ -850,7 +850,7 @@ Have an idea?
 **📚 Documentation**
 Improve our docs
 
-[Help here](https://github.com/your-username/openllm-monitor/issues?q=is%3Aissue+is%3Aopen+label%3Adocumentation)
+[Help here](https://github.com/prajeesh-chavan/openllm-monitor/issues?q=is%3Aissue+is%3Aopen+label%3Adocumentation)
 
 </td>
 <td align="center">
@@ -858,7 +858,7 @@ Improve our docs
 **🧪 Testing**
 Add test coverage
 
-[View tests](https://github.com/your-username/openllm-monitor/issues?q=is%3Aissue+is%3Aopen+label%3Atesting)
+[View tests](https://github.com/prajeesh-chavan/openllm-monitor/issues?q=is%3Aissue+is%3Aopen+label%3Atesting)
 
 </td>
 </tr>
@@ -881,8 +881,8 @@ chore: update dependencies
 
 Thanks to all the amazing people who have contributed to this project!
 
-<a href="https://github.com/your-username/openllm-monitor/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=your-username/openllm-monitor" alt="Contributors" />
+<a href="https://github.com/prajeesh-chavan/openllm-monitor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=prajeesh-chavan/openllm-monitor" alt="Contributors" />
 </a>
 
 ---
@@ -906,7 +906,7 @@ Read our comprehensive guides
 **💬 Discussions**
 Join the community
 
-[GitHub Discussions](https://github.com/your-username/openllm-monitor/discussions)
+[GitHub Discussions](https://github.com/prajeesh-chavan/openllm-monitor/discussions)
 
 </td>
 <td align="center">
@@ -914,7 +914,7 @@ Join the community
 **� Issues**
 Report bugs or request features
 
-[GitHub Issues](https://github.com/your-username/openllm-monitor/issues)
+[GitHub Issues](https://github.com/prajeesh-chavan/openllm-monitor/issues)
 
 </td>
 <td align="center">
@@ -1068,7 +1068,7 @@ This project represents **months of dedicated development** and continuous impro
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=your-username/openllm-monitor&type=Date)](https://star-history.com/#your-username/openllm-monitor&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=prajeesh-chavan/openllm-monitor&type=Date)](https://star-history.com/#prajeesh-chavan/openllm-monitor&Date)
 
 ---
 
