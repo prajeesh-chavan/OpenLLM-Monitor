@@ -1,0 +1,42 @@
+# Node
+node_modules/
+
+# Build output
+frontend/dist/
+backend/dist/
+
+# Environment files
+.env
+.env.*
+backend/.env
+frontend/.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Misc
+*.log
+
+# Ignore lock files if you prefer
+# package-lock.json
+yarn.lock
+
+# Test coverage
+coverage/
+
+# Docker
+*.local
+
+# Ignore by default, but keep .env.example
+!*.env.example

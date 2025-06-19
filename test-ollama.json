@@ -1,0 +1,8 @@
+{
+  "prompt": "Hello, how are you?",
+  "provider": "ollama",
+  "model": "mistral",
+  "systemMessage": "",
+  "temperature": 0.7,
+  "maxTokens": null
+}

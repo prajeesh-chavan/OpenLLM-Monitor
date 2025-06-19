@@ -1,0 +1,95 @@
+import React, { useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+
+// Layout
+import DashboardLayout from "./layouts/DashboardLayout";
+
+// Pages
+import Dashboard from "./pages/Dashboard";
+import Analytics from "./pages/Analytics";
+import LogsPage from "./pages/LogsPage";
+import LogDetailPage from "./pages/LogDetailPage";
+import ReplayPage from "./pages/ReplayPage";
+import ProvidersPage from "./pages/ProvidersPage";
+import SettingsPage from "./pages/SettingsPage";
+
+// Services
+import wsService from "./services/websocket";
+import { useAppStore } from "./store";
+
+function App() {
+  const { setWsConnected, setWsReconnecting } = useAppStore();
+
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const initializeWebSocket = async () => {
+      try {
+        await wsService.connect();
+        setWsConnected(true);
+
+        // Join logs room for real-time updates
+        wsService.joinRoom("logs");
+        wsService.joinRoom("providers");
+
+        // Set up error handling
+        wsService.on("websocket-error", (error) => {
+          console.error("WebSocket error:", error);
+          toast.error("Connection error occurred");
+        });
+
+        wsService.on("max-reconnect-attempts", () => {
+          toast.error("Connection lost. Please refresh the page.");
+          setWsConnected(false);
+          setWsReconnecting(false);
+        });
+
+        // Handle reconnection events
+        wsService.socket?.on("reconnecting", () => {
+          setWsReconnecting(true);
+          toast.loading("Reconnecting...", { id: "reconnecting" });
+        });
+
+        wsService.socket?.on("reconnect", () => {
+          setWsReconnecting(false);
+          setWsConnected(true);
+          toast.success("Reconnected successfully", { id: "reconnecting" });
+        });
+      } catch (error) {
+        console.error("Failed to connect to WebSocket:", error);
+        setWsConnected(false);
+        // Don't show error toast on initial connection failure
+        // as the app should work without WebSocket
+      }
+    };
+
+    initializeWebSocket();
+
+    // Cleanup on unmount
+    return () => {
+      wsService.disconnect();
+    };
+  }, [setWsConnected, setWsReconnecting]);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Routes>
+        {" "}
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="logs" element={<LogsPage />} />
+          <Route path="logs/:id" element={<LogDetailPage />} />
+          <Route path="replay" element={<ReplayPage />} />
+          <Route path="providers" element={<ProvidersPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </div>
+  );
+}
+
+export default App;
