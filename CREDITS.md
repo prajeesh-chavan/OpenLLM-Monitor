@@ -5,9 +5,9 @@
 **Prajeesh Chavan**
 
 - 🌐 Portfolio: [https://prajeeshchavan.vercel.app](https://prajeeshchavan.vercel.app)
-- 💼 LinkedIn: [linkedin.com/in/prajeesh-chavan](https://linkedin.com/in/prajeesh-chavan)
+- 💼 LinkedIn: [linkedin.com/in/prajeeshchavan](https://linkedin.com/in/prajeeshchavan)
 - 🐱 GitHub: [github.com/prajeesh-chavan](https://github.com/prajeesh-chavan)
-- 🐦 Twitter: [twitter.com/prajeesh-chavan](https://twitter.com/prajeesh-chavan)
+- 🐦 Twitter: [twitter.com/prajeeshchavan](https://twitter.com/prajeeshchavan)
 
 ### 🎯 Role & Contributions
 
