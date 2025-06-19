@@ -210,4 +210,4 @@ sudo openllm-monitor-system start --providers openai,ollama,anthropic
 | Docker Network     | ✅     | ✅     | ✅        | ✅      | ✅         |
 | System-wide        | ✅     | ✅     | ✅        | ✅      | ✅         |
 
-For implementation details, see the [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) document.
+For implementation details, see the [DEVELOPMENT.md](DEVELOPMENT.md) document.

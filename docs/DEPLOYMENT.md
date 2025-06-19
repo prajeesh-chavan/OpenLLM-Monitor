@@ -98,7 +98,7 @@ cp .env.example .env
 docker-compose up -d
 
 # Production deployment
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker/docker-compose.prod.yml up -d
 ```
 
 ### 4. Access Application
@@ -311,37 +311,124 @@ vercel env add VITE_WS_URL production
 
 ## Database Setup
 
-### MongoDB Atlas (Cloud)
+### Option 1: MongoDB Atlas (Cloud - Recommended)
 
 1. **Create Atlas Account**
-
-   - Go to https://cloud.mongodb.com
-   - Create account and new cluster
+   - Go to https://www.mongodb.com/atlas
+   - Create a free account and cluster
+   - Get connection string from "Connect" → "Connect your application"
 
 2. **Configure Database**
-
    - Create database: `openllm-monitor`
    - Create user with read/write access
-   - Whitelist IP addresses
+   - Whitelist your IP addresses or allow access from anywhere (0.0.0.0/0)
 
-3. **Get Connection String**
+3. **Connection String Format**
    ```
    mongodb+srv://username:password@cluster.mongodb.net/openllm-monitor
    ```
 
-### Local MongoDB
+### Option 2: Local MongoDB Installation
 
-1. **Install MongoDB**
+#### Windows:
+1. Download MongoDB Community Server from https://www.mongodb.com/try/download/community
+2. Run the installer and follow the setup wizard
+3. Install MongoDB as a Windows Service
+4. MongoDB will start automatically on system boot
 
-   - Follow platform-specific instructions
-   - Start MongoDB service
+#### macOS (using Homebrew):
+```bash
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb/community
+```
 
-2. **Create Database**
-   ```bash
-   mongosh
-   use openllm-monitor
-   db.createCollection("logs")
-   ```
+#### Ubuntu/Debian:
+```bash
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+### Option 3: Docker MongoDB
+
+#### Using Docker Compose:
+```yaml
+version: "3.8"
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: openllm-monitor-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: openllm-monitor
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
+```
+
+#### Using Docker Command:
+```bash
+docker run -d \
+  --name openllm-monitor-mongodb \
+  -p 27017:27017 \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=password123 \
+  -e MONGO_INITDB_DATABASE=openllm-monitor \
+  -v mongodb_data:/data/db \
+  mongo:6.0
+```
+
+### MongoDB Configuration Examples
+
+#### For Atlas:
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/openllm-monitor
+```
+
+#### For Local Installation:
+```env
+MONGODB_URI=mongodb://localhost:27017/openllm-monitor
+```
+
+#### For Docker with Authentication:
+```env
+MONGODB_URI=mongodb://admin:password123@localhost:27017/openllm-monitor?authSource=admin
+```
+
+### Testing MongoDB Connection
+
+After setup, test the connection:
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+Look for: "Connected to MongoDB successfully"
+
+### MongoDB GUI Tools (Optional)
+
+- **MongoDB Compass**: Official GUI tool from MongoDB
+- **Robo 3T**: Lightweight MongoDB management tool  
+- **Studio 3T**: Professional MongoDB IDE
+
+### MongoDB Troubleshooting
+
+1. **Connection Issues**: Check firewall settings and MongoDB service status
+2. **Authentication Errors**: Verify username/password in connection string
+3. **Network Access**: For Atlas, add your IP to the whitelist
+4. **Port Conflicts**: Ensure port 27017 is not being used by other services
 
 ## Environment Configuration
 

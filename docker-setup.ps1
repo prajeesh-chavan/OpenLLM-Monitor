@@ -32,7 +32,7 @@ if (!(Test-Path "data\mongodb")) { New-Item -ItemType Directory -Path "data\mong
 # Stop any existing containers
 Write-Host "🛑 Stopping existing containers..." -ForegroundColor Yellow
 docker-compose down --remove-orphans 2>$null
-docker-compose -f docker-compose-with-ollama.yml down --remove-orphans 2>$null
+docker-compose -f docker/docker-compose-with-ollama.yml down --remove-orphans 2>$null
 
 # Pull latest images
 Write-Host "📥 Pulling latest Docker images..." -ForegroundColor Cyan
@@ -50,10 +50,9 @@ switch ($choice) {
     "1" {
         Write-Host "🏗️ Starting with standard configuration..." -ForegroundColor Green
         docker-compose up -d --build
-    }
-    "2" {
+    }    "2" {
         Write-Host "🏗️ Starting with Ollama in Docker..." -ForegroundColor Green
-        docker-compose -f docker-compose-with-ollama.yml up -d --build
+        docker-compose -f docker/docker-compose-with-ollama.yml up -d --build
     }
     default {
         Write-Host "❌ Invalid choice. Defaulting to standard configuration..." -ForegroundColor Red

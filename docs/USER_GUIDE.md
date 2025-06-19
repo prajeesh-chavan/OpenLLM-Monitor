@@ -628,7 +628,7 @@ Navigate to **Settings** → **Providers**:
 - 📖 [README.md](./README.md) - Setup and installation
 - 🔧 [API Documentation](./API_DOCUMENTATION.md) - API reference
 - 🚀 [Deployment Guide](./DEPLOYMENT.md) - Production deployment
-- 📊 [Implementation Status](./IMPLEMENTATION_STATUS.md) - Feature status
+- 📊 [Development Guide](./DEVELOPMENT.md) - Development status and testing
 
 ---
 

@@ -1,0 +1,104 @@
+{
+  "seedConfig": {
+    "dataGeneration": {
+      "daysBack": 30,
+      "baseVolumeWeekday": 50,
+      "baseVolumeWeekend": 20,
+      "volumeVariation": {
+        "min": -10,
+        "max": 30
+      }
+    },
+    "providerDistribution": {
+      "openai": 0.45,
+      "ollama": 0.25,
+      "openrouter": 0.2,
+      "mistral": 0.1
+    },
+    "useCaseDistribution": {
+      "code-generation": 0.3,
+      "data-analysis": 0.2,
+      "customer-support": 0.15,
+      "creative-writing": 0.1,
+      "education": 0.1,
+      "business-strategy": 0.1,
+      "translation": 0.05
+    },
+    "errorRates": {
+      "rateLimit": 0.05,
+      "authentication": 0.02,
+      "timeout": 0.03,
+      "modelOverload": 0.02,
+      "contentPolicy": 0.01
+    },
+    "requestPatterns": {
+      "streamingProbability": 0.3,
+      "retryProbability": 0.08,
+      "maxRetries": 3
+    },
+    "userSimulation": {
+      "totalUsers": 50,
+      "activeUserRatio": 0.7,
+      "powerUserRatio": 0.2
+    }
+  },
+  "demoScenarios": [
+    {
+      "name": "High-Volume Production",
+      "description": "Simulates a busy production environment",
+      "overrides": {
+        "daysBack": 60,
+        "baseVolumeWeekday": 100,
+        "baseVolumeWeekend": 40
+      }
+    },
+    {
+      "name": "Development Environment",
+      "description": "Lighter load for development testing",
+      "overrides": {
+        "daysBack": 14,
+        "baseVolumeWeekday": 20,
+        "baseVolumeWeekend": 5
+      }
+    },
+    {
+      "name": "OpenAI Focused",
+      "description": "Primarily OpenAI usage pattern",
+      "overrides": {
+        "providerDistribution": {
+          "openai": 0.8,
+          "ollama": 0.1,
+          "openrouter": 0.07,
+          "mistral": 0.03
+        }
+      }
+    },
+    {
+      "name": "Local Models Focus",
+      "description": "Emphasis on local Ollama models",
+      "overrides": {
+        "providerDistribution": {
+          "openai": 0.2,
+          "ollama": 0.6,
+          "openrouter": 0.15,
+          "mistral": 0.05
+        }
+      }
+    },
+    {
+      "name": "Coding Assistant",
+      "description": "Focused on code generation use cases",
+      "overrides": {
+        "useCaseDistribution": {
+          "code-generation": 0.6,
+          "data-analysis": 0.15,
+          "customer-support": 0.05,
+          "creative-writing": 0.05,
+          "education": 0.1,
+          "business-strategy": 0.03,
+          "translation": 0.02
+        }
+      }
+    }
+  ]
+}

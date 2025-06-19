@@ -134,6 +134,67 @@ docker run -d -p 27017:27017 --name mongodb mongo:latest
 
 ✅ **WebSocket**: Dashboard should show "Connected" status
 
+## ✅ Verification Checklist
+
+After setup, verify everything is working correctly:
+
+### 1. Services Running
+
+- [ ] Frontend accessible at http://localhost:3000
+- [ ] Backend API responding at http://localhost:3001/api/health
+- [ ] MongoDB connected (check logs)
+- [ ] WebSocket connection established
+
+### 2. Dashboard Features
+
+- [ ] Dashboard loads without errors
+- [ ] Real-time updates working
+- [ ] Navigation between pages works
+- [ ] No console errors in browser
+
+### 3. API Functionality
+
+- [ ] Can view existing logs
+- [ ] Can create new test requests
+- [ ] Analytics data displays correctly
+- [ ] Provider configurations accessible
+
+### 4. Database
+
+- [ ] MongoDB collections created
+- [ ] Sample data visible
+- [ ] Queries performing well
+- [ ] Indexes created properly
+
+## 🧪 Test Commands
+
+```bash
+# Test backend health
+curl http://localhost:3001/api/health
+
+# Test API info
+curl http://localhost:3001/api/info
+
+# Test logs endpoint
+curl http://localhost:3001/api/logs
+
+# Test provider endpoint
+curl http://localhost:3001/api/providers
+```
+
+### Expected Health Response
+
+A healthy API should return:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": "1.0.0",
+  "database": "connected"
+}
+```
+
 ## What's Next?
 
 ### 1. Configure Providers

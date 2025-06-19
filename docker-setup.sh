@@ -25,7 +25,7 @@ chmod 755 logs
 # Stop any existing containers
 echo "🛑 Stopping existing containers..."
 docker-compose down --remove-orphans 2>/dev/null || true
-docker-compose -f docker-compose-with-ollama.yml down --remove-orphans 2>/dev/null || true
+docker-compose -f docker/docker-compose-with-ollama.yml down --remove-orphans 2>/dev/null || true
 
 # Pull latest images
 echo "📥 Pulling latest Docker images..."
@@ -47,7 +47,7 @@ case $choice in
         ;;
     2)
         echo "🏗️ Starting with Ollama in Docker..."
-        docker-compose -f docker-compose-with-ollama.yml up -d --build
+        docker-compose -f docker/docker-compose-with-ollama.yml up -d --build
         ;;
     *)
         echo "❌ Invalid choice. Defaulting to standard configuration..."

@@ -1,5 +1,0 @@
-{
-  "model": "phi3:mini",
-  "prompt": "What is the capital of France?",
-  "stream": false
-}

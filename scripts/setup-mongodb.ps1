@@ -183,4 +183,4 @@ Write-Host "   1. cd backend && npm install" -ForegroundColor White
 Write-Host "   2. npm start" -ForegroundColor White
 Write-Host "   3. Open another terminal: cd frontend && npm run dev" -ForegroundColor White
 Write-Host ""
-Write-Host "📖 For more information, see MONGODB_SETUP.md" -ForegroundColor White
+Write-Host "📖 For more information, see docs/DEPLOYMENT.md (Database Setup section)" -ForegroundColor White

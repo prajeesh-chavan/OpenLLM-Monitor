@@ -1,0 +1,25 @@
+{
+  "name": "openllm-monitor-seed",
+  "version": "1.0.0",
+  "description": "Seed data generator for OpenLLM Monitor",
+  "main": "seed-data.js",
+  "scripts": {
+    "seed": "node seed-data.js",
+    "seed:install": "npm install",
+    "seed:run": "npm install && node seed-data.js"
+  },
+  "dependencies": {
+    "mongoose": "^7.5.0",
+    "@faker-js/faker": "^8.0.0"
+  },
+  "keywords": [
+    "openllm",
+    "monitor",
+    "seed",
+    "data",
+    "llm",
+    "analytics"
+  ],
+  "author": "Prajeesh Chavan",
+  "license": "MIT"
+}

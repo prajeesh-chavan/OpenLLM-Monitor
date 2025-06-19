@@ -35,8 +35,8 @@ chmod +x docker-setup.sh
 1. **Choose your configuration:**
 
    - `docker-compose.yml` - Standard setup (requires Ollama on host)
-   - `docker-compose-with-ollama.yml` - Includes Ollama in Docker
-   - `docker-compose.prod.yml` - Production setup with health checks
+   - `docker/docker-compose-with-ollama.yml` - Includes Ollama in Docker
+   - `docker/docker-compose.prod.yml` - Production setup with health checks
 
 2. **Start the services:**
 
@@ -45,21 +45,21 @@ chmod +x docker-setup.sh
 docker-compose up -d --build
 
 # With Ollama
-docker-compose -f docker-compose-with-ollama.yml up -d --build
+docker-compose -f docker/docker-compose-with-ollama.yml up -d --build
 
 # Production setup
-docker-compose -f docker-compose.prod.yml up -d --build
+docker-compose -f docker/docker-compose.prod.yml up -d --build
 ```
 
 ## Configuration Files
 
 ### Docker Compose Files
 
-| File                             | Purpose                    | Use Case                                  |
-| -------------------------------- | -------------------------- | ----------------------------------------- |
-| `docker-compose.yml`             | Standard development setup | When Ollama runs on host machine          |
-| `docker-compose-with-ollama.yml` | Complete setup with Ollama | Self-contained environment                |
-| `docker-compose.prod.yml`        | Production setup           | Production deployments with health checks |
+| File                                    | Purpose                    | Use Case                                  |
+| --------------------------------------- | -------------------------- | ----------------------------------------- |
+| `docker-compose.yml`                    | Standard development setup | When Ollama runs on host machine          |
+| `docker/docker-compose-with-ollama.yml` | Complete setup with Ollama | Self-contained environment                |
+| `docker/docker-compose.prod.yml`        | Production setup           | Production deployments with health checks |
 
 ### Environment Configuration
 
@@ -140,7 +140,7 @@ docker-compose exec backend npm run test
 ### Data Volumes
 
 - `mongodb_data` - MongoDB database files
-- `ollama_data` - Ollama models and data (when using docker-compose-with-ollama.yml)
+- `ollama_data` - Ollama models and data (when using docker/docker-compose-with-ollama.yml)
 
 ### Log Files
 

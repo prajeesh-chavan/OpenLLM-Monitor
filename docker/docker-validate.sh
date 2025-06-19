@@ -51,11 +51,11 @@ echo "Checking Docker configuration files..."
 
 # Check if required files exist
 required_files=(
-    "docker-compose.yml"
+    "../docker-compose.yml"
     "docker-compose-with-ollama.yml"
-    "backend/Dockerfile"
-    "frontend/Dockerfile"
-    "scripts/init-mongo.js"
+    "../backend/Dockerfile"
+    "../frontend/Dockerfile"
+    "../scripts/init-mongo.js"
 )
 
 for file in "${required_files[@]}"; do
@@ -211,4 +211,4 @@ else
 fi
 
 echo ""
-echo "For detailed setup instructions, see: DOCKER_GUIDE.md"
+echo "For detailed setup instructions, see: ../docs/DOCKER_GUIDE.md"

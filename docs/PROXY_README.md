@@ -88,7 +88,7 @@ openllm-monitor/
 For comprehensive documentation on all integration methods, see:
 
 - [Automatic Monitoring Documentation](AUTOMATIC_MONITORING.md)
-- [Ollama CLI Integration Guide](OLLAMA_CLI_INTEGRATION.md)
+- [Ollama Integration Guide](OLLAMA_GUIDE.md)
 
 ## Getting Started
 

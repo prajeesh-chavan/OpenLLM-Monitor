@@ -123,6 +123,32 @@ _Detailed logging of all LLM API calls with filtering and search_
 
 ## 🚀 Quick Start
 
+### 🌱 Demo Data Generation (New!)
+
+**Want to showcase your system immediately?** Generate comprehensive seed data:
+
+```powershell
+# Windows PowerShell (Recommended)
+cd "scripts"
+.\generate-seed-data.ps1
+
+# Or use Node.js directly
+cd scripts
+npm install
+node seed-data.js
+```
+
+**✨ What you get:**
+
+- 🔢 **1,000+ realistic LLM requests** across 30 days
+- 🏢 **Multi-provider coverage** (OpenAI, Ollama, Mistral, OpenRouter)
+- 🎪 **7 diverse use cases** (coding, analysis, support, creative, etc.)
+- 📊 **Analytics-ready data** for impressive demos
+- 💰 **Cost tracking** with real pricing models
+- ⚡ **Performance metrics** and error patterns
+
+[📖 **Complete Seed Data Guide**](./scripts/COMPLETE_SEED_GUIDE.md) | [⚙️ **Advanced Configuration**](./scripts/seed-config.json)
+
 ### 🐳 Docker (Recommended)
 
 Get up and running in **less than 2 minutes**:
@@ -283,8 +309,8 @@ chmod +x docker-setup.sh
 
 ```bash
 # Check if everything is configured correctly
-.\docker-validate.ps1  # Windows
-./docker-validate.sh   # Linux/Mac
+.\docker\docker-validate.ps1  # Windows
+./docker/docker-validate.sh   # Linux/Mac
 ```
 
 ---
@@ -591,10 +617,10 @@ sudo systemctl enable mongod
 
 ```bash
 # Production build and deploy
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker/docker-compose.prod.yml up -d
 
 # With custom environment
-docker-compose -f docker-compose.prod.yml --env-file .env.production up -d
+docker-compose -f docker/docker-compose.prod.yml --env-file .env.production up -d
 ```
 
 ### ☁️ Cloud Deployment
@@ -622,7 +648,7 @@ docker push 123456789012.dkr.ecr.us-west-2.amazonaws.com/openllm-monitor:latest
 doctl apps create --spec .do/app.yaml
 
 # Or deploy to Droplet
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker/docker-compose.prod.yml up -d
 ```
 
 </details>
@@ -983,10 +1009,10 @@ tail -f ~/.ollama/logs/server.log
 ### 📚 Resources
 
 - 📖 **[User Guide](./USER_GUIDE.md)** - Complete usage guide
-- 🚀 **[Quick Start](./QUICK_START.md)** - Get running in 5 minutes
-- 🔧 **[API Docs](./API_DOCUMENTATION.md)** - Full API reference
-- 🐳 **[Docker Guide](./DOCKER_GUIDE.md)** - Docker setup and deployment
-- 🛠️ **[Troubleshooting](./TROUBLESHOOTING.md)** - Common issues and solutions
+- 🚀 **[Quick Start](./docs/QUICK_START.md)** - Get running in 5 minutes
+- 🔧 **[API Docs](./docs/API_DOCUMENTATION.md)** - Full API reference
+- 🐳 **[Docker Guide](./docs/DOCKER_GUIDE.md)** - Docker setup and deployment
+- 🛠️ **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ---
 

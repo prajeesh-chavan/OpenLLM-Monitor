@@ -30,7 +30,7 @@ if not exist "data\mongodb" mkdir data\mongodb
 REM Stop any existing containers
 echo 🛑 Stopping existing containers...
 docker-compose down --remove-orphans >nul 2>&1
-docker-compose -f docker-compose-with-ollama.yml down --remove-orphans >nul 2>&1
+docker-compose -f docker/docker-compose-with-ollama.yml down --remove-orphans >nul 2>&1
 
 REM Pull latest images
 echo 📥 Pulling latest Docker images...
@@ -49,7 +49,7 @@ if "%choice%"=="1" (
     docker-compose up -d --build
 ) else if "%choice%"=="2" (
     echo 🏗️ Starting with Ollama in Docker...
-    docker-compose -f docker-compose-with-ollama.yml up -d --build
+    docker-compose -f docker/docker-compose-with-ollama.yml up -d --build
 ) else (
     echo ❌ Invalid choice. Defaulting to standard configuration...
     docker-compose up -d --build

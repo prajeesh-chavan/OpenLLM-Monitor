@@ -62,11 +62,11 @@ Write-Host "Checking Docker configuration files..." -ForegroundColor White
 
 # Check if required files exist
 $requiredFiles = @(
-    "docker-compose.yml",
+    "..\docker-compose.yml",
     "docker-compose-with-ollama.yml",
-    "backend\Dockerfile",
-    "frontend\Dockerfile",
-    "scripts\init-mongo.js"
+    "..\backend\Dockerfile",
+    "..\frontend\Dockerfile",
+    "..\scripts\init-mongo.js"
 )
 
 foreach ($file in $requiredFiles) {
@@ -249,4 +249,4 @@ if ($ValidationPassed) {
 }
 
 Write-Host ""
-Write-Host "For detailed setup instructions, see: DOCKER_GUIDE.md" -ForegroundColor Cyan
+Write-Host "For detailed setup instructions, see: ..\docs\DOCKER_GUIDE.md" -ForegroundColor Cyan
