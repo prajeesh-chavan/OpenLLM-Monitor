@@ -12,6 +12,10 @@
 
 _Monitor, analyze, and optimize your LLM usage across multiple providers in real-time_
 
+**Created and Developed by [Prajeesh Chavan](https://prajeeshchavan.vercel.app)**  
+_Full-Stack Developer & AI Enthusiast_  
+📄 [View Full Credits & Project Journey](./CREDITS.md)
+
 [🚀 Quick Start](#-quick-start) • [📊 Features](#-features) • [🔧 Installation](#-installation) • [📖 Documentation](#-documentation) • [🤝 Contributing](#-contributing)
 
 </div>
@@ -990,10 +994,12 @@ tail -f ~/.ollama/logs/server.log
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
+**Copyright (c) 2024-2025 Prajeesh Chavan**
+
 ```text
 MIT License
 
-Copyright (c) 2024 Prajeesh Chavan
+Copyright (c) 2024-2025 Prajeesh Chavan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1009,6 +1015,54 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ```
+
+---
+
+## 👨‍💻 About the Creator
+
+<div align="center">
+
+### Prajeesh Chavan
+
+_Full-Stack Developer & AI Enthusiast_
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=for-the-badge&logo=todoist&logoColor=white)](https://prajeeshchavan.vercel.app)
+[![Blog](https://img.shields.io/badge/Blog-FF9800?style=for-the-badge&logo=medium&logoColor=white)](https://prajeeshchavan.medium.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/prajeeshchavan)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/prajeesh-chavan)
+[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/prajeeshchavan)
+
+</div>
+
+**About Me:**
+I'm a passionate full-stack developer with expertise in modern web technologies and AI/ML systems. I built OpenLLM Monitor to solve the real-world challenge of monitoring and optimizing LLM usage across different providers. This project represents my commitment to creating tools that help developers work more efficiently with AI technologies.
+
+**Skills & Technologies:**
+
+- 🚀 Full-Stack Development (React, Node.js, MongoDB)
+- 🤖 AI/ML Integration & LLM Applications
+- 🐳 DevOps & Cloud Deployment (Docker, AWS)
+- 📊 Data Analytics & Visualization
+- 🔧 System Architecture & API Design
+
+**Connect with me** if you have questions about the project, want to collaborate, or discuss opportunities!
+
+### 🚀 Project Journey
+
+This project represents **months of dedicated development** and continuous improvement. Here's what makes it special:
+
+- **🔬 Research-Driven**: Extensive research into LLM monitoring needs and best practices
+- **🏗️ Built from Scratch**: Every component carefully designed and implemented
+- **🎯 Problem-Solving**: Addresses real-world challenges faced by LLM developers
+- **📈 Continuous Evolution**: Regular updates and feature enhancements
+- **🌍 Community-First**: Open source with detailed documentation and support
+
+**If you find this project valuable, please:**
+
+- ⭐ **Star the repository** to show your support
+- 🤝 **Connect with me** on LinkedIn or Twitter
+- 💬 **Share your feedback** or suggestions
+- 🎯 **Consider hiring me** for your next project!
 
 ---
 
@@ -1041,10 +1095,14 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 <div align="center">
 
-**Built with ❤️ for the LLM developer community**
+**Built with ❤️ by [Prajeesh Chavan](https://prajeeshchavan.vercel.app) for the LLM developer community**
 
-_If this project helped you, please consider giving it a ⭐ star on GitHub!_
+_This project is the result of extensive research, development, and testing to provide the best LLM monitoring experience. If this project helped you, please consider giving it a ⭐ star on GitHub and connecting with me!_
 
-[⭐ Star on GitHub](https://github.com/your-username/openllm-monitor) • [🐛 Report Bug](https://github.com/your-username/openllm-monitor/issues) • [✨ Request Feature](https://github.com/your-username/openllm-monitor/issues/new?template=feature_request.md)
+[![⭐ Star on GitHub](https://img.shields.io/github/stars/prajeesh-chavan/openllm-monitor?style=social)](https://github.com/prajeesh-chavan/openllm-monitor)
+[![🐛 Report Bug](https://img.shields.io/badge/Report-Bug-red?style=flat-square)](https://github.com/prajeesh-chavan/openllm-monitor/issues)
+[![✨ Request Feature](https://img.shields.io/badge/Request-Feature-blue?style=flat-square)](https://github.com/prajeesh-chavan/openllm-monitor/issues/new?template=feature_request.md)
+
+**Creator:** [Prajeesh Chavan](https://prajeeshchavan.vercel.app) • **License:** MIT • **Year:** 2024-2025
 
 </div>
