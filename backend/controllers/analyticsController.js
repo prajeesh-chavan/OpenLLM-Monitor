@@ -49,7 +49,20 @@ const getStats = async (req, res) => {
             $sum: { $cond: [{ $eq: ["$status", "success"] }, 1, 0] },
           },
           errorRequests: {
+            $sum: { $cond: [{ $ne: ["$status", "success"] }, 1, 0] },
+          },
+          rateLimitedRequests: {
+            $sum: { $cond: [{ $eq: ["$status", "rate_limited"] }, 1, 0] },
+          },
+          timeoutRequests: {
+            $sum: { $cond: [{ $eq: ["$status", "timeout"] }, 1, 0] },
+          },
+          generalErrorRequests: {
             $sum: { $cond: [{ $eq: ["$status", "error"] }, 1, 0] },
+          },
+          totalRetryAttempts: { $sum: "$retryAttempts" },
+          requestsWithRetries: {
+            $sum: { $cond: [{ $gt: ["$retryAttempts", 0] }, 1, 0] },
           },
           avgResponseTime: { $avg: "$latency" },
           totalCost: { $sum: "$cost.totalCost" },
@@ -64,6 +77,11 @@ const getStats = async (req, res) => {
       totalRequests: 0,
       successfulRequests: 0,
       errorRequests: 0,
+      rateLimitedRequests: 0,
+      timeoutRequests: 0,
+      generalErrorRequests: 0,
+      totalRetryAttempts: 0,
+      requestsWithRetries: 0,
       avgResponseTime: 0,
       totalCost: 0,
       totalTokens: 0,
@@ -82,6 +100,11 @@ const getStats = async (req, res) => {
       result.totalRequests > 0
         ? (result.errorRequests / result.totalRequests) * 100
         : 0;
+
+    const retryRate =
+      result.totalRequests > 0
+        ? (result.requestsWithRetries / result.totalRequests) * 100
+        : 0;
     res.json({
       success: true,
       data: {
@@ -91,12 +114,26 @@ const getStats = async (req, res) => {
           errorRequests: result.errorRequests,
           successRate: Math.round(successRate * 100) / 100,
           errorRate: Math.round(errorRate * 100) / 100,
+          retryRate: Math.round(retryRate * 100) / 100,
           avgDuration: Math.round(result.avgResponseTime || 0),
           totalCost: Math.round(result.totalCost * 10000) / 10000,
           totalTokens: result.totalTokens,
           promptTokens: result.promptTokens,
           completionTokens: result.completionTokens,
           activeProviders: result.providers.length,
+          // Additional error breakdown
+          rateLimitedRequests: result.rateLimitedRequests,
+          timeoutRequests: result.timeoutRequests,
+          generalErrorRequests: result.generalErrorRequests,
+          // Retry statistics
+          totalRetryAttempts: result.totalRetryAttempts,
+          requestsWithRetries: result.requestsWithRetries,
+          avgRetriesPerFailedRequest:
+            result.requestsWithRetries > 0
+              ? Math.round(
+                  (result.totalRetryAttempts / result.requestsWithRetries) * 100
+                ) / 100
+              : 0,
         },
         providerStats: result.providers,
         modelStats: [],
@@ -170,7 +207,7 @@ const getRequestVolume = async (req, res) => {
         $group: {
           _id: groupBy,
           requests: { $sum: 1 },
-          errors: { $sum: { $cond: [{ $eq: ["$status", "error"] }, 1, 0] } },
+          errors: { $sum: { $cond: [{ $ne: ["$status", "success"] }, 1, 0] } },
           totalTokens: { $sum: "$tokenUsage.totalTokens" },
           promptTokens: { $sum: "$tokenUsage.promptTokens" },
           completionTokens: { $sum: "$tokenUsage.completionTokens" },

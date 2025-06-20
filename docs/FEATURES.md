@@ -114,6 +114,31 @@ OpenLLM Monitor provides comprehensive observability for your LLM applications w
 - **Provider Cost Comparison**: See cost differences before choosing
 - **Budget Planning**: Plan spending with accurate estimates
 
+## 🧪 Direct Model Testing
+
+### Interactive Testing Interface
+
+- **Dedicated Testing Page**: Separate interface for testing prompts without existing logs
+- **Multiple Test Configurations**: Run several test configurations simultaneously
+- **Example Prompt Library**: Pre-built prompts for different use cases (creative writing, code review, etc.)
+- **Saved Prompt Management**: Save and reuse frequently tested prompts
+- **Real-time Validation**: Validate configurations before running tests
+
+### Advanced Testing Features
+
+- **Compare Mode**: Side-by-side comparison of multiple models
+- **Cost Estimation**: Preview costs before running expensive tests
+- **Parameter Tuning**: Fine-tune temperature, max tokens, and system messages
+- **Performance Metrics**: Detailed analysis of response time, token usage, and costs
+- **Batch Testing**: Test multiple configurations with a single click
+
+### Testing Workflow Integration
+
+- **Seamless Monitoring**: All tests automatically logged and tracked
+- **Analytics Integration**: Test results appear in performance dashboards
+- **Error Tracking**: Failed tests captured with detailed error information
+- **Export Capabilities**: Save test results for further analysis
+
 ## ⚙️ Provider Management
 
 ### Multi-Provider Support

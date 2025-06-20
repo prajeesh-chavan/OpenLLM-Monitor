@@ -26,6 +26,15 @@
 - **🎯 First Release**: [Date of first release]
 - **📈 Continuous Improvement**: Ongoing development and enhancements
 
+## 🚀 Recent Feature Additions
+
+### ✨ Test Models Page (December 2024)
+- **Direct Model Testing**: Added dedicated interface for testing prompts without existing logs
+- **Multi-Provider Comparison**: Compare responses across different LLM providers
+- **Example Prompt Library**: Pre-built prompts for various use cases
+- **Cost Estimation**: Preview testing costs before execution
+- **Enhanced API**: New testing endpoints with validation and comparison features
+
 ## 💡 Project Inspiration
 
 This project was born out of the real-world need for comprehensive LLM monitoring and observability. As AI applications become more prevalent, developers need better tools to monitor, analyze, and optimize their LLM usage across different providers.

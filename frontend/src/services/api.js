@@ -231,6 +231,26 @@ export class ApiService {
   static async getAnalyticsErrors(params = {}) {
     return api.get("/analytics/errors", { params });
   }
+  // Test API
+  static async testPrompt(params = {}) {
+    return api.post("/test/prompt", params, { timeout: 120000 }); // 2 minutes
+  }
+
+  static async compareModels(params = {}) {
+    return api.post("/test/compare", params, { timeout: 180000 }); // 3 minutes for comparisons
+  }
+
+  static async getTestModels() {
+    return api.get("/test/models");
+  }
+
+  static async getTestCostEstimate(params = {}) {
+    return api.post("/test/estimate", params);
+  }
+
+  static async validateTestConfig(params = {}) {
+    return api.post("/test/validate", params);
+  }
 }
 
 export default ApiService;

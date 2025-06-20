@@ -8,6 +8,7 @@ import {
   PlayIcon,
   ServerIcon,
   HomeIcon,
+  BeakerIcon,
 } from "@heroicons/react/24/outline";
 
 const navigation = [
@@ -15,6 +16,7 @@ const navigation = [
   { name: "Logs", href: "/logs", icon: DocumentTextIcon },
   { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
   { name: "Replay", href: "/replay", icon: PlayIcon },
+  { name: "Test Models", href: "/test", icon: BeakerIcon },
   { name: "Providers", href: "/providers", icon: ServerIcon },
   { name: "Settings", href: "/settings", icon: CogIcon },
 ];

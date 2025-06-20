@@ -94,6 +94,15 @@ _Detailed logging of all LLM API calls with filtering and search_
 - � **Detailed Diagnostics** - In-depth alert analysis with actionable recommendations
 - 📈 **Trend Monitoring** - Continuous tracking of key performance metrics
 
+### 🧪 Model Testing & Experimentation
+
+- 🔬 **Direct Model Testing** - Test prompts directly without existing logs
+- 🔄 **Multi-Model Comparison** - Compare responses across different providers and models
+- 📝 **Prompt Library** - Save and manage frequently used test prompts
+- ⚡ **Quick Examples** - Pre-built prompts for different use cases
+- 💰 **Cost Estimation** - Preview costs before running expensive tests
+- 📊 **Performance Benchmarking** - Compare latency, quality, and costs
+
 ### 📊 Core Monitoring
 
 - 📊 **Real-time Request Logging** - Monitor all LLM API calls with detailed metrics

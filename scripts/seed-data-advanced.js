@@ -111,7 +111,7 @@ try {
 // MongoDB connection
 const MONGODB_URI =
   process.env.MONGODB_URI ||
-  "mongodb+srv://prajeeshchavan:23072004@cluster0.arjzpru.mongodb.net/openllm-monitor?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb://admin:password123@localhost:27017/openllm-monitor?authSource=admin";
 
 // Import the Log model (same as before)
 const logSchema = new mongoose.Schema(

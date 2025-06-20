@@ -1,0 +1,5 @@
+{
+  "prompt": "Hello, how are you?",
+  "provider": "ollama",
+  "model": "llama3.2"
+}

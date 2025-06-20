@@ -18,10 +18,20 @@ app.use(bodyParser.json());
 
 // Logging middleware
 app.use(async (req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+
   // Only process Ollama API requests
   if (req.url.includes("/api/")) {
+    console.log(`[PROXY] Processing API request: ${req.method} ${req.url}`);
+
     // Create a copy of the request body so we don't interfere with the proxy
-    const originalBody = JSON.parse(JSON.stringify(req.body));
+    let originalBody = {};
+    try {
+      originalBody = req.body ? JSON.parse(JSON.stringify(req.body)) : {};
+    } catch (error) {
+      console.error("Error parsing request body:", error.message);
+      originalBody = {};
+    }
     const startTime = Date.now();
 
     // Store the original send function

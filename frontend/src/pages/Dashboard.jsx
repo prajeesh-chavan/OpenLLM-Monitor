@@ -1,4 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  BeakerIcon,
+  PlayIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+} from "@heroicons/react/24/outline";
 import SummaryStatsPanel from "../components/SummaryStatsPanel";
 import VisualizationSection from "../components/VisualizationSection";
 import LogTable from "../components/LogTable";
@@ -79,7 +86,71 @@ const Dashboard = () => {
       {/* Live Feed Mode */}
       <LiveFeedMode onNewLog={handleLiveFeedLog} />
       {/* Summary Stats Panel */}
-      <SummaryStatsPanel /> {/* Visualization Section and Replay Zone */}
+      <SummaryStatsPanel />
+      
+      {/* Quick Actions */}
+      <div className="px-3 sm:px-6 py-4">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Link
+              to="/test"
+              className="flex flex-col items-center p-4 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors group"
+            >
+              <div className="p-2 bg-emerald-100 rounded-lg mb-2 group-hover:bg-emerald-200 transition-colors">
+                <BeakerIcon className="h-6 w-6 text-emerald-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-900">Test Models</span>
+              <span className="text-xs text-gray-500 text-center mt-1">
+                Test prompts directly
+              </span>
+            </Link>
+            
+            <Link
+              to="/replay"
+              className="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors group"
+            >
+              <div className="p-2 bg-purple-100 rounded-lg mb-2 group-hover:bg-purple-200 transition-colors">
+                <PlayIcon className="h-6 w-6 text-purple-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-900">Replay</span>
+              <span className="text-xs text-gray-500 text-center mt-1">
+                Debug logged requests
+              </span>
+            </Link>
+            
+            <Link
+              to="/analytics"
+              className="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors group"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg mb-2 group-hover:bg-blue-200 transition-colors">
+                <ChartBarIcon className="h-6 w-6 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-900">Analytics</span>
+              <span className="text-xs text-gray-500 text-center mt-1">
+                View detailed metrics
+              </span>
+            </Link>
+            
+            <Link
+              to="/providers"
+              className="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors group"
+            >
+              <div className="p-2 bg-gray-100 rounded-lg mb-2 group-hover:bg-gray-200 transition-colors">
+                <Cog6ToothIcon className="h-6 w-6 text-gray-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-900">Providers</span>
+              <span className="text-xs text-gray-500 text-center mt-1">
+                Manage connections
+              </span>
+            </Link>
+          </div>
+        </div>
+      </div>
+      
+      {/* Visualization Section and Replay Zone */}
       <div className="flex flex-col lg:flex-row">
         {/* Left side - Charts */}
         <div className="flex-1">
@@ -112,6 +183,37 @@ const Dashboard = () => {
             Close
           </div>
         </div>
+      </div>
+      {/* Quick Actions - Hidden on mobile */}
+      <div className="hidden lg:flex justify-between p-4 bg-white shadow-md rounded-lg border border-gray-200 mb-4">
+        <Link
+          to="/tests"
+          className="flex-1 flex items-center justify-center p-2 mx-2 text-sm font-medium text-center text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-all"
+        >
+          <BeakerIcon className="w-5 h-5 mr-2" />
+          Test Runner
+        </Link>
+        <Link
+          to="/replay"
+          className="flex-1 flex items-center justify-center p-2 mx-2 text-sm font-medium text-center text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-all"
+        >
+          <PlayIcon className="w-5 h-5 mr-2" />
+          Replay Zone
+        </Link>
+        <Link
+          to="/analytics"
+          className="flex-1 flex items-center justify-center p-2 mx-2 text-sm font-medium text-center text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 transition-all"
+        >
+          <ChartBarIcon className="w-5 h-5 mr-2" />
+          Analytics
+        </Link>
+        <Link
+          to="/settings"
+          className="flex-1 flex items-center justify-center p-2 mx-2 text-sm font-medium text-center text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all"
+        >
+          <Cog6ToothIcon className="w-5 h-5 mr-2" />
+          Settings
+        </Link>
       </div>
     </div>
   );

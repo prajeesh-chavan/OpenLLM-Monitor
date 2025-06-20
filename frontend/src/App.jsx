@@ -11,6 +11,7 @@ import Analytics from "./pages/Analytics";
 import LogsPage from "./pages/LogsPage";
 import LogDetailPage from "./pages/LogDetailPage";
 import ReplayPage from "./pages/ReplayPage";
+import TestModelsPage from "./pages/TestModelsPage";
 import ProvidersPage from "./pages/ProvidersPage";
 
 // Services
@@ -83,14 +84,14 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        {/* Dashboard Routes */}
-        <Route path="/" element={<DashboardLayout />}>
+        {/* Dashboard Routes */}        <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />{" "}
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="logs" element={<LogsPage />} />
           <Route path="logs/:id" element={<LogDetailPage />} />
           <Route path="replay" element={<ReplayPage />} />
+          <Route path="test" element={<TestModelsPage />} />
           <Route path="providers" element={<ProvidersPage />} />
         </Route>
 

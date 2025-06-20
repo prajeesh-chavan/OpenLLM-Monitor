@@ -9,8 +9,13 @@
     "seed:run": "npm install && node seed-data.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.0.0",
+    "axios": "^1.10.0",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5",
     "mongoose": "^7.5.0",
-    "@faker-js/faker": "^8.0.0"
+    "openai": "^5.5.1"
   },
   "keywords": [
     "openllm",
