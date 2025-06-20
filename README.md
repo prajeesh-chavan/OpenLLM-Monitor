@@ -28,23 +28,24 @@ _Full-Stack Developer & AI Enthusiast_
 
 ### 🎯 Main Dashboard
 
-![Dashboard Overview](docs/images/dashboard-overview.png)
+![Dashboard Overview](docs/images/OpenLLM-Dashboard.png)
 _Real-time monitoring of all your LLM requests with comprehensive analytics_
-
-### 📈 Analytics & Insights
-
-![Analytics Dashboard](docs/images/analytics-dashboard.png)
-_Cost tracking, performance metrics, and usage patterns_
-
-### 🔄 Prompt Replay & Comparison
-
-![Prompt Replay](docs/images/prompt-replay.png)
-_Test and compare prompts across different providers and models_
 
 ### 📋 Request Logs
 
-![Request Logs](docs/images/request-logs.png)
+![Request Logs](docs/images/OpenLLM-Logs.png)
 _Detailed logging of all LLM API calls with filtering and search_
+
+### 📋 Logs Details
+
+![Request Logs](docs/images/OpenLLM-LogTable.png)
+_Detailed logging of all LLM API calls with filtering and search_
+
+### 🔄 Prompt Replay & Comparison
+
+![Prompt Replay](docs/images/OpenLLM-Replay.png)
+_Test and compare prompts across different providers and models_
+
 
 </div>
 
