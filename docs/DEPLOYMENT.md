@@ -314,11 +314,13 @@ vercel env add VITE_WS_URL production
 ### Option 1: MongoDB Atlas (Cloud - Recommended)
 
 1. **Create Atlas Account**
+
    - Go to https://www.mongodb.com/atlas
    - Create a free account and cluster
    - Get connection string from "Connect" → "Connect your application"
 
 2. **Configure Database**
+
    - Create database: `openllm-monitor`
    - Create user with read/write access
    - Whitelist your IP addresses or allow access from anywhere (0.0.0.0/0)
@@ -331,12 +333,14 @@ vercel env add VITE_WS_URL production
 ### Option 2: Local MongoDB Installation
 
 #### Windows:
+
 1. Download MongoDB Community Server from https://www.mongodb.com/try/download/community
 2. Run the installer and follow the setup wizard
 3. Install MongoDB as a Windows Service
 4. MongoDB will start automatically on system boot
 
 #### macOS (using Homebrew):
+
 ```bash
 brew tap mongodb/brew
 brew install mongodb-community
@@ -344,6 +348,7 @@ brew services start mongodb/community
 ```
 
 #### Ubuntu/Debian:
+
 ```bash
 wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
@@ -356,6 +361,7 @@ sudo systemctl enable mongod
 ### Option 3: Docker MongoDB
 
 #### Using Docker Compose:
+
 ```yaml
 version: "3.8"
 services:
@@ -377,6 +383,7 @@ volumes:
 ```
 
 #### Using Docker Command:
+
 ```bash
 docker run -d \
   --name openllm-monitor-mongodb \
@@ -391,16 +398,19 @@ docker run -d \
 ### MongoDB Configuration Examples
 
 #### For Atlas:
+
 ```env
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/openllm-monitor
 ```
 
 #### For Local Installation:
+
 ```env
 MONGODB_URI=mongodb://localhost:27017/openllm-monitor
 ```
 
 #### For Docker with Authentication:
+
 ```env
 MONGODB_URI=mongodb://admin:password123@localhost:27017/openllm-monitor?authSource=admin
 ```
@@ -420,7 +430,7 @@ Look for: "Connected to MongoDB successfully"
 ### MongoDB GUI Tools (Optional)
 
 - **MongoDB Compass**: Official GUI tool from MongoDB
-- **Robo 3T**: Lightweight MongoDB management tool  
+- **Robo 3T**: Lightweight MongoDB management tool
 - **Studio 3T**: Professional MongoDB IDE
 
 ### MongoDB Troubleshooting

@@ -18,6 +18,21 @@ import notificationService from "../services/notificationService";
 const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
   const [selectedLog, setSelectedLog] = useState(log);
   const { notificationSettings } = useAppStore();
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   // Update selectedLog when log prop changes
   useEffect(() => {
     if (log) {

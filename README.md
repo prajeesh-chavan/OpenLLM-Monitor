@@ -86,7 +86,15 @@ _Detailed logging of all LLM API calls with filtering and search_
 
 ## 🚀 Features
 
-### � Core Monitoring
+### 🔔 Smart Alerts & Monitoring
+
+- 🚨 **Intelligent Alert System** - Proactive monitoring with real-time notifications
+- 📊 **Performance Alerts** - Latency, error rate, and retry monitoring with detailed analysis
+- 💰 **Cost Alerts** - Budget threshold notifications with comprehensive insights
+- � **Detailed Diagnostics** - In-depth alert analysis with actionable recommendations
+- 📈 **Trend Monitoring** - Continuous tracking of key performance metrics
+
+### 📊 Core Monitoring
 
 - 📊 **Real-time Request Logging** - Monitor all LLM API calls with detailed metrics
 - 🔄 **Prompt Replay & Comparison** - Re-run prompts across different providers/models

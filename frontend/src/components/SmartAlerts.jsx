@@ -5,17 +5,33 @@ import {
   CheckCircleIcon,
   XMarkIcon,
   BellIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import { useAppStore } from "../store";
 
 const SmartAlerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [showAlerts, setShowAlerts] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { stats } = useAppStore();
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showDetailModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showDetailModal]);
 
   useEffect(() => {
     if (!stats) return;
-
     const newAlerts = []; // Check for retry rate spike
     if ((stats.retryRate || 0) > 20) {
       newAlerts.push({
@@ -26,8 +42,16 @@ const SmartAlerts = () => {
           1
         )}% in the last hour. This might indicate provider issues.`,
         timestamp: new Date(),
-        action: "View Logs",
-        actionUrl: "/logs?status=retry",
+        details: {
+          currentRate: `${(stats.retryRate || 0).toFixed(1)}%`,
+          threshold: "20%",
+          impact: "Increased response times and costs",
+          suggestions: [
+            "Check provider status and connectivity",
+            "Review timeout configurations",
+            "Consider using fallback providers",
+          ],
+        },
       });
     }
 
@@ -41,8 +65,16 @@ const SmartAlerts = () => {
           1
         )}%. Most errors are from provider timeouts.`,
         timestamp: new Date(),
-        action: "Check Providers",
-        actionUrl: "/providers",
+        details: {
+          currentRate: `${(stats.errorRate || 0).toFixed(1)}%`,
+          threshold: "15%",
+          impact: "Failed requests affecting user experience",
+          suggestions: [
+            "Review recent error patterns",
+            "Check provider health status",
+            "Implement circuit breaker patterns",
+          ],
+        },
       });
     }
 
@@ -56,8 +88,16 @@ const SmartAlerts = () => {
           2
         )} today. Consider monitoring usage.`,
         timestamp: new Date(),
-        action: "View Analytics",
-        actionUrl: "/analytics",
+        details: {
+          currentCost: `$${(stats.totalCost || 0).toFixed(2)}`,
+          threshold: "$50.00",
+          impact: "Budget threshold exceeded",
+          suggestions: [
+            "Review high-cost requests",
+            "Optimize prompt lengths",
+            "Consider cheaper model alternatives",
+          ],
+        },
       });
     }
 
@@ -71,8 +111,18 @@ const SmartAlerts = () => {
           (stats.avgResponseTime || 0) / 1000
         ).toFixed(1)}s. This is above the recommended 2s threshold.`,
         timestamp: new Date(),
-        action: "View Performance",
-        actionUrl: "/analytics?tab=performance",
+        details: {
+          currentLatency: `${((stats.avgResponseTime || 0) / 1000).toFixed(
+            1
+          )}s`,
+          threshold: "2.0s",
+          impact: "Slower user experience",
+          suggestions: [
+            "Check network connectivity",
+            "Review model selection",
+            "Consider request batching",
+          ],
+        },
       });
     }
 
@@ -104,9 +154,15 @@ const SmartAlerts = () => {
         return "bg-blue-50 border-blue-200 text-blue-800";
     }
   };
-
   const dismissAlert = (alertId) => {
     setAlerts(alerts.filter((alert) => alert.id !== alertId));
+  };
+  const toggleAlertExpansion = (alertId) => {
+    const alert = alerts.find((a) => a.id === alertId);
+    if (alert) {
+      setSelectedAlert(alert);
+      setShowDetailModal(true);
+    }
   };
 
   const formatTimeAgo = (timestamp) => {
@@ -139,7 +195,6 @@ const SmartAlerts = () => {
           </span>
         )}
       </button>
-
       {/* Alerts Panel */}
       {showAlerts && (
         <div className="absolute right-0 top-full mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
@@ -160,12 +215,13 @@ const SmartAlerts = () => {
           <div className="max-h-80 overflow-y-auto">
             {alerts.length > 0 ? (
               <div className="space-y-1">
+                {" "}
                 {alerts.map((alert) => (
                   <div
                     key={alert.id}
-                    className={`p-4 border-l-4 ${getAlertStyles(
+                    className={`border-l-4 ${getAlertStyles(
                       alert.type
-                    )} relative`}
+                    )} relative p-4`}
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0">
@@ -184,18 +240,18 @@ const SmartAlerts = () => {
                         <p className="text-sm mt-1 text-opacity-90">
                           {alert.message}
                         </p>
+
                         <div className="flex items-center justify-between mt-2">
                           <span className="text-xs opacity-75">
                             {formatTimeAgo(alert.timestamp)}
                           </span>
-                          {alert.action && (
-                            <a
-                              href={alert.actionUrl}
-                              className="text-xs font-medium hover:underline"
-                            >
-                              {alert.action} →
-                            </a>
-                          )}
+                          <button
+                            onClick={() => toggleAlertExpansion(alert.id)}
+                            className="flex items-center space-x-1 text-xs font-medium hover:underline text-blue-600 transition-colors"
+                          >
+                            <span>Show Details</span>
+                            <ChevronRightIcon className="h-3 w-3" />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -226,14 +282,141 @@ const SmartAlerts = () => {
             </div>
           )}
         </div>
-      )}
-
+      )}{" "}
       {/* Overlay to close alerts when clicking outside */}
       {showAlerts && (
         <div
           className="fixed inset-0 z-40"
           onClick={() => setShowAlerts(false)}
         />
+      )}
+      {/* Alert Details Modal */}
+      {showDetailModal && selectedAlert && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              onClick={() => setShowDetailModal(false)}
+            ></div>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div
+                    className={`mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10 ${
+                      selectedAlert.type === "error"
+                        ? "bg-red-100"
+                        : selectedAlert.type === "warning"
+                        ? "bg-yellow-100"
+                        : selectedAlert.type === "success"
+                        ? "bg-green-100"
+                        : "bg-blue-100"
+                    }`}
+                  >
+                    {getAlertIcon(selectedAlert.type)}
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">
+                      {selectedAlert.title}
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 mb-4">
+                        {selectedAlert.message}
+                      </p>
+
+                      {selectedAlert.details && (
+                        <div className="space-y-4">
+                          {/* Metrics */}
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <h4 className="text-sm font-medium text-gray-900 mb-3">
+                              Current Metrics
+                            </h4>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-600">
+                                  Current:
+                                </span>
+                                <div className="text-gray-900 font-semibold">
+                                  {selectedAlert.details.currentRate ||
+                                    selectedAlert.details.currentCost ||
+                                    selectedAlert.details.currentLatency}
+                                </div>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-600">
+                                  Threshold:
+                                </span>
+                                <div className="text-gray-900 font-semibold">
+                                  {selectedAlert.details.threshold}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Impact */}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-2">
+                              Impact
+                            </h4>
+                            <p className="text-sm text-gray-700 bg-orange-50 p-3 rounded-md border-l-4 border-orange-200">
+                              {selectedAlert.details.impact}
+                            </p>
+                          </div>
+
+                          {/* Suggestions */}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-2">
+                              Recommendations
+                            </h4>
+                            <ul className="text-sm text-gray-700 space-y-2">
+                              {selectedAlert.details.suggestions.map(
+                                (suggestion, index) => (
+                                  <li
+                                    key={index}
+                                    className="flex items-start bg-blue-50 p-3 rounded-md"
+                                  >
+                                    <span className="text-blue-500 mr-2 font-bold">
+                                      •
+                                    </span>
+                                    <span>{suggestion}</span>
+                                  </li>
+                                )
+                              )}
+                            </ul>{" "}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setShowDetailModal(false)}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => {
+                    dismissAlert(selectedAlert.id);
+                    setShowDetailModal(false);
+                  }}
+                >
+                  Dismiss Alert
+                </button>
+              </div>
+            </div>{" "}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -5,6 +5,7 @@ This comprehensive guide covers Ollama setup, integration, and troubleshooting w
 ## Overview
 
 OpenLLM Monitor supports Ollama integration in two ways:
+
 1. **Host-based**: Ollama runs on your host machine, OpenLLM Monitor connects to it
 2. **Containerized**: Both Ollama and OpenLLM Monitor run in Docker containers
 
@@ -13,11 +14,13 @@ OpenLLM Monitor supports Ollama integration in two ways:
 ### Option 1: Ollama on Host Machine (Recommended)
 
 1. **Install Ollama on your host:**
+
    - Download from https://ollama.ai/
    - Install and start the service
    - Pull a model: `ollama pull llama2`
 
 2. **Configure OpenLLM Monitor:**
+
    - Use the standard `docker-compose.yml`
    - Ollama URL is automatically configured as `http://host.docker.internal:11434`
 
@@ -31,6 +34,7 @@ OpenLLM Monitor supports Ollama integration in two ways:
 For a completely self-contained Docker environment:
 
 1. **Use the Ollama-enabled compose file:**
+
    ```bash
    docker-compose -f docker/docker-compose-with-ollama.yml up -d
    ```
@@ -45,6 +49,7 @@ For a completely self-contained Docker environment:
 ### Why Direct CLI Commands Aren't Logged
 
 When you run Ollama commands directly:
+
 ```bash
 echo "Hello, how are you?" | ollama run mistral
 ```
@@ -56,14 +61,16 @@ The command bypasses OpenLLM Monitor's logging middleware since it communicates 
 We provide a proxy script that routes Ollama commands through OpenLLM Monitor:
 
 1. **Setup:**
+
    - Ensure OpenLLM Monitor is running
    - The proxy script is located in `scripts/ollama-monitor.bat`
 
 2. **Usage:**
+
    ```bash
    # Windows
    scripts\ollama-monitor.bat run mistral "Hello, how are you?"
-   
+
    # Or pipe input
    echo "Hello, how are you?" | scripts\ollama-monitor.bat run mistral
    ```
@@ -99,6 +106,7 @@ console.log(result.completion);
 ### Solution 3: Use the Web Interface
 
 The simplest option:
+
 1. Open dashboard at http://localhost:3000
 2. Navigate to the Replay page
 3. Select "ollama" as provider and choose your model
@@ -114,6 +122,7 @@ This indicates the backend cannot connect to Ollama.
 #### For Host-based Ollama:
 
 1. **Verify Ollama is running:**
+
    ```bash
    curl http://localhost:11434/api/version
    ```
@@ -129,6 +138,7 @@ This indicates the backend cannot connect to Ollama.
 #### For Containerized Setup:
 
 1. **Use the Ollama compose file:**
+
    ```bash
    docker-compose -f docker/docker-compose-with-ollama.yml up -d
    ```
@@ -162,12 +172,14 @@ docker exec openllm-monitor-backend curl -s http://ollama:11434/api/version
 If still having issues:
 
 1. **Check Ollama logs:**
+
    ```bash
    docker logs openllm-monitor-ollama  # For containerized
    ollama logs                         # For host-based
    ```
 
 2. **Check backend logs:**
+
    ```bash
    docker logs openllm-monitor-backend
    ```
@@ -199,11 +211,13 @@ For regular Ollama CLI usage in your workflow:
 ## Environment Configuration
 
 ### Host-based Ollama:
+
 ```env
 OLLAMA_BASE_URL=http://host.docker.internal:11434
 ```
 
 ### Containerized Ollama:
+
 ```env
 OLLAMA_BASE_URL=http://ollama:11434
 ```
@@ -211,6 +225,7 @@ OLLAMA_BASE_URL=http://ollama:11434
 ## Available Models
 
 After setup, you can use any Ollama model:
+
 - `llama2`, `llama2:13b`, `llama2:70b`
 - `mistral`, `mistral:7b`
 - `codellama`, `codellama:13b`
@@ -218,6 +233,7 @@ After setup, you can use any Ollama model:
 - And many more from the Ollama library
 
 Pull models with:
+
 ```bash
 # Host-based
 ollama pull model-name

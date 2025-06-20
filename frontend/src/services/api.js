@@ -220,9 +220,16 @@ export class ApiService {
   static async getAnalyticsUsage(params = {}) {
     return api.get("/analytics/usage", { params });
   }
-
   static async getAnalyticsPerformance(params = {}) {
     return api.get("/analytics/performance", { params });
+  }
+
+  static async getAnalyticsCosts(params = {}) {
+    return api.get("/analytics/costs", { params });
+  }
+
+  static async getAnalyticsErrors(params = {}) {
+    return api.get("/analytics/errors", { params });
   }
 }
 

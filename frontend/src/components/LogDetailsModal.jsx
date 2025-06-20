@@ -12,6 +12,20 @@ import {
 import { formatDistanceToNow } from "date-fns";
 
 const LogDetailsModal = ({ isOpen, onClose, log }) => {
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   // Listen for close-modals event from keyboard shortcuts
   useEffect(() => {
     const handleCloseModals = () => {

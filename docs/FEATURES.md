@@ -31,7 +31,37 @@ OpenLLM Monitor provides comprehensive observability for your LLM applications w
 - **Real-time Filtering**: Results update as you type
 - **Saved Filters**: Remember your favorite filter combinations
 
-## 📈 Analytics & Insights
+## � Smart Alerts & Notifications
+
+### Intelligent Alert System
+
+- **Real-time Monitoring**: Continuous analysis of key performance metrics
+- **Proactive Alerts**: Get notified before issues become critical
+- **Contextual Notifications**: Alerts include impact analysis and recommendations
+- **Smart Thresholds**: Pre-configured thresholds for optimal monitoring
+
+### Alert Types
+
+- **Retry Rate Alerts**: Detects connectivity issues when retry rates exceed 20%
+- **Error Rate Monitoring**: Alerts when error rates go above 15%
+- **Cost Threshold Alerts**: Notifications when daily spending exceeds $50
+- **Latency Warnings**: Alerts for response times above 2 seconds
+
+### Alert Analysis
+
+- **Detailed Insights**: Each alert provides comprehensive analysis including current metrics vs thresholds
+- **Impact Assessment**: Understanding how alerts affect your system performance
+- **Actionable Recommendations**: Specific steps to address identified issues
+- **Historical Context**: Timestamps and trend information for better decision making
+
+### Notification Features
+
+- **Detailed Modal View**: Comprehensive alert information with metrics, impact analysis, and recommendations
+- **Alert Management**: Individual dismissal or bulk clearing of alerts
+- **Visual Indicators**: Color-coded alerts and notification badges
+- **Real-time Updates**: Alerts update automatically as system conditions change
+
+## �📈 Analytics & Insights
 
 ### Usage Analytics
 

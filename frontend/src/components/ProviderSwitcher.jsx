@@ -28,6 +28,21 @@ const ProviderSwitcher = () => {
     baseUrl: "",
   });
   const [testingWithKey, setTestingWithKey] = useState(false);
+
+  // Lock body scroll when any modal is open
+  useEffect(() => {
+    if (showAddProvider || showConfigModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showAddProvider, showConfigModal]);
+
   useEffect(() => {
     console.log("ProviderSwitcher: Fetching providers...");
     fetchProviders();

@@ -673,6 +673,133 @@ Test connection to a specific provider.
 }
 ```
 
+## Analytics API
+
+The Analytics API provides comprehensive insights into LLM usage patterns, costs, and performance metrics.
+
+### GET /analytics/stats
+
+Get overall analytics statistics.
+
+**Query Parameters:**
+
+- `timeRange` (optional): Time range for analysis (`1h`, `24h`, `7d`, `30d`)
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "overview": {
+      "totalRequests": 1250,
+      "successfulRequests": 1200,
+      "errorRequests": 50,
+      "successRate": 96.0,
+      "errorRate": 4.0,
+      "avgDuration": 1850,
+      "totalCost": 25.75,
+      "totalTokens": 125000,
+      "promptTokens": 85000,
+      "completionTokens": 40000,
+      "activeProviders": 3
+    },
+    "timeRange": "24h",
+    "generatedAt": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+### GET /analytics/costs
+
+Get cost analytics breakdown.
+
+**Query Parameters:**
+
+- `timeRange` (optional): Time range for analysis
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "totalCost": 25.75,
+    "costByProvider": [
+      {
+        "_id": "openai",
+        "cost": 18.5,
+        "requests": 850,
+        "avgCost": 0.0218
+      },
+      {
+        "_id": "ollama",
+        "cost": 0.0,
+        "requests": 300,
+        "avgCost": 0.0
+      }
+    ],
+    "costTrend": [],
+    "timeRange": "24h"
+  }
+}
+```
+
+### GET /analytics/performance
+
+Get performance analytics.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "modelPerformance": [
+      {
+        "model": "gpt-3.5-turbo",
+        "provider": "openai",
+        "requestCount": 450,
+        "avgDuration": 1250,
+        "successRate": 98.2,
+        "avgCost": 0.015,
+        "totalTokens": 45000
+      }
+    ],
+    "timeRange": "24h"
+  }
+}
+```
+
+### GET /analytics/errors
+
+Get error analytics.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "errorRate": 4.2,
+    "totalErrors": 52,
+    "errorsByType": [
+      {
+        "_id": "RATE_LIMIT",
+        "count": 25,
+        "errorMessages": ["Rate limit exceeded"]
+      },
+      {
+        "_id": "TIMEOUT",
+        "count": 15,
+        "errorMessages": ["Request timeout"]
+      }
+    ],
+    "timeRange": "24h"
+  }
+}
+```
+
 ## Error Responses
 
 All endpoints may return error responses in the following format:

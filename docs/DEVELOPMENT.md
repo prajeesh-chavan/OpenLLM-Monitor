@@ -13,6 +13,7 @@ This guide covers the development status, testing results, and technical impleme
 ### Backend Implementation
 
 - **✅ Core Infrastructure**
+
   - Express.js server with proper middleware
   - MongoDB connection and configuration
   - Environment variable loading
@@ -21,11 +22,13 @@ This guide covers the development status, testing results, and technical impleme
   - CORS and security middleware
 
 - **✅ Database & Models**
+
   - MongoDB Log model with comprehensive schema
   - Indexing for performance optimization
   - Data validation and sanitization
 
 - **✅ LLM Provider Services**
+
   - OpenAI service integration
   - Ollama service integration
   - OpenRouter service integration
@@ -33,6 +36,7 @@ This guide covers the development status, testing results, and technical impleme
   - Unified service interface
 
 - **✅ API Endpoints**
+
   - `/api/logs` - Complete CRUD operations
   - `/api/analytics` - Comprehensive analytics
   - `/api/providers` - Provider management
@@ -49,24 +53,36 @@ This guide covers the development status, testing results, and technical impleme
 ### Frontend Implementation
 
 - **✅ React/Vite Application**
+
   - Modern React 18 with Hooks
   - Vite build system for fast development
   - Tailwind CSS for styling
   - Responsive design implementation
 
 - **✅ Dashboard Components**
+
   - Real-time metrics display
   - Interactive charts and graphs
   - Provider statistics
   - Cost analysis visualization
 
+- **✅ Smart Alerts System**
+
+  - Real-time monitoring with intelligent thresholds
+  - Contextual quick actions with API integration
+  - Toast notification system for immediate feedback
+  - Modal-based detailed alert analysis
+  - Navigation integration for seamless user experience
+
 - **✅ Log Management**
+
   - Real-time log streaming
   - Detailed log view with expandable entries
   - Advanced filtering and search
   - Export functionality
 
 - **✅ Provider Integration UI**
+
   - Provider selection interface
   - Configuration management
   - Connection testing
@@ -81,6 +97,7 @@ This guide covers the development status, testing results, and technical impleme
 ### DevOps & Infrastructure
 
 - **✅ Docker Configuration**
+
   - Multi-service Docker Compose setup
   - Production-ready configurations
   - Health checks and monitoring
@@ -97,12 +114,14 @@ This guide covers the development status, testing results, and technical impleme
 ### Backend Test Results - ✅ **100% SUCCESS** (51/51 tests passing)
 
 #### ✅ Provider Management (12/12 tests passing)
+
 - Provider listing and statistics ✅
 - Provider recommendations by use case ✅
 - Provider comparison endpoints ✅
 - Connection testing (with proper error handling) ✅
 
 #### ✅ Analytics (8/8 tests passing)
+
 - Comprehensive statistics endpoint ✅
 - Usage analytics with timeframes ✅
 - Performance metrics ✅
@@ -113,6 +132,7 @@ This guide covers the development status, testing results, and technical impleme
 - Data export (CSV and JSON) ✅
 
 #### ✅ Log Management (15/15 tests passing)
+
 - Log creation and retrieval ✅
 - Advanced filtering and search ✅
 - Pagination and sorting ✅
@@ -120,12 +140,14 @@ This guide covers the development status, testing results, and technical impleme
 - Data validation and sanitization ✅
 
 #### ✅ Replay System (8/8 tests passing)
+
 - Request replay functionality ✅
 - Provider switching ✅
 - Parameter modification ✅
 - Response comparison ✅
 
 #### ✅ Health & Monitoring (8/8 tests passing)
+
 - Health check endpoints ✅
 - System status monitoring ✅
 - Database connectivity tests ✅
@@ -149,12 +171,14 @@ This guide covers the development status, testing results, and technical impleme
 ## 🚀 Performance Metrics
 
 ### Backend Performance
+
 - **Average Response Time**: < 100ms for standard operations
 - **Database Query Performance**: Optimized with proper indexing
 - **Memory Usage**: Efficient memory management
 - **Concurrent Request Handling**: Tested up to 100 concurrent users
 
 ### Frontend Performance
+
 - **Initial Load Time**: < 2 seconds
 - **Real-time Update Latency**: < 500ms
 - **Chart Rendering**: Optimized for large datasets
@@ -180,6 +204,7 @@ This guide covers the development status, testing results, and technical impleme
 ### Setting Up Development Environment
 
 1. **Clone and Install:**
+
 ```bash
 git clone <repository-url>
 cd openllm-monitor
@@ -195,6 +220,7 @@ npm install
 ```
 
 2. **Database Setup:**
+
 ```bash
 # Using Docker
 docker-compose up -d mongodb
@@ -204,6 +230,7 @@ mongod --dbpath ./data/db
 ```
 
 3. **Start Development Servers:**
+
 ```bash
 # Backend (Terminal 1)
 cd backend
@@ -248,6 +275,7 @@ npm run type-check
 ## 📊 Architecture Overview
 
 ### Backend Architecture
+
 - **Express.js**: RESTful API server
 - **MongoDB**: Document database for logs and analytics
 - **WebSocket**: Real-time communication
@@ -255,6 +283,7 @@ npm run type-check
 - **Middleware**: Request logging and validation
 
 ### Frontend Architecture
+
 - **React 18**: Component-based UI library
 - **Vite**: Build tool and dev server
 - **Tailwind CSS**: Utility-first CSS framework
@@ -262,6 +291,7 @@ npm run type-check
 - **WebSocket Client**: Real-time updates
 
 ### Data Flow
+
 1. **Request Logging**: Middleware captures LLM requests
 2. **Data Storage**: Logs stored in MongoDB with metadata
 3. **Real-time Updates**: WebSocket pushes updates to frontend
@@ -271,6 +301,7 @@ npm run type-check
 ## 🛠️ Build and Deployment
 
 ### Development Build
+
 ```bash
 # Backend
 cd backend
@@ -282,6 +313,7 @@ npm run build
 ```
 
 ### Docker Build
+
 ```bash
 # Full stack
 docker-compose build
@@ -292,6 +324,7 @@ docker-compose build frontend
 ```
 
 ### Production Deployment
+
 ```bash
 # Production build
 docker-compose -f docker/docker-compose.prod.yml up -d
@@ -303,6 +336,7 @@ curl http://localhost:3001/api/health
 ## 📈 Future Development Roadmap
 
 ### Planned Features
+
 - [ ] Multi-tenant support
 - [ ] Advanced analytics dashboard
 - [ ] Custom alerting system
@@ -313,6 +347,7 @@ curl http://localhost:3001/api/health
 - [ ] Advanced export formats
 
 ### Technical Improvements
+
 - [ ] GraphQL API option
 - [ ] Redis caching layer
 - [ ] Advanced monitoring
@@ -320,15 +355,76 @@ curl http://localhost:3001/api/health
 - [ ] Enhanced test coverage
 - [ ] Documentation automation
 
-## 🐛 Known Issues & Solutions
+## � Component Implementation Details
+
+### Smart Alerts System
+
+The Smart Alerts system (`frontend/src/components/SmartAlerts.jsx`) provides intelligent monitoring and detailed analysis:
+
+**Core Architecture:**
+
+```javascript
+// Alert Detection with Real-time Monitoring
+useEffect(() => {
+  const newAlerts = [];
+
+  // Threshold-based Monitoring
+  if ((stats.retryRate || 0) > 20) {
+    /* Retry Rate Alert */
+  }
+  if ((stats.errorRate || 0) > 15) {
+    /* Error Rate Alert */
+  }
+  if ((stats.totalCost || 0) > 50) {
+    /* Cost Alert */
+  }
+  if ((stats.avgResponseTime || 0) > 3000) {
+    /* Latency Alert */
+  }
+
+  setAlerts(newAlerts);
+}, [stats]);
+
+// Alert Structure with Comprehensive Details
+const alertStructure = {
+  id: "unique-alert-id",
+  type: "error|warning|info|success",
+  title: "Alert Title",
+  message: "Brief description",
+  timestamp: new Date(),
+  details: {
+    currentRate: "Current metric value",
+    threshold: "Alert threshold",
+    impact: "Impact analysis",
+    suggestions: ["Actionable recommendations"],
+  },
+};
+```
+
+**Data Integration:**
+
+- Uses `useAppStore` hook for real-time stats access
+- Monitors retry rates, error rates, costs, and latency
+- Provides comprehensive impact analysis and recommendations
+
+**User Experience Features:**
+
+- Expandable alert details with comprehensive analysis
+- Modal-based detailed view with metrics comparison
+- Real-time badge notifications on bell icon
+- Individual and bulk alert dismissal capabilities
+
+## �🐛 Known Issues & Solutions
 
 ### Resolved Issues
+
 - **Database Cleanup**: Fixed test isolation issues
 - **WebSocket Connections**: Resolved connection persistence
 - **Memory Leaks**: Fixed in provider services
 - **Error Handling**: Improved error boundaries
 
 ### Current Limitations
+
 - Single-tenant architecture
 - Limited to supported LLM providers
 - Basic authentication system
@@ -344,6 +440,7 @@ curl http://localhost:3001/api/health
 ## 📞 Support & Maintenance
 
 For development support:
+
 - **GitHub Issues**: Report bugs and feature requests
 - **Documentation**: Comprehensive guides available
 - **Community**: Active development community
