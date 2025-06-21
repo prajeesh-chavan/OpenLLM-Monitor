@@ -32,7 +32,8 @@ router.get("/info", (req, res) => {
     data: {
       name: "OpenLLM Monitor API",
       version: "1.0.0",
-      description: "Real-time LLM observability dashboard API",      endpoints: {
+      description: "Real-time LLM observability dashboard API",
+      endpoints: {
         logs: "/api/logs",
         replay: "/api/replay",
         test: "/api/test",

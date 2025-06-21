@@ -53,9 +53,7 @@ describe("Test Controller", () => {
 
   describe("GET /api/test/models", () => {
     it("should return available models", async () => {
-      const response = await request(app)
-        .get("/api/test/models")
-        .expect(200);
+      const response = await request(app).get("/api/test/models").expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty("openai");

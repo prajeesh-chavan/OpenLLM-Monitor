@@ -23,7 +23,7 @@ class TestController {
   }
   /**
    * Test a prompt directly with specified provider and model
-   */  async testPrompt(req, res) {
+   */ async testPrompt(req, res) {
     try {
       const {
         prompt,
@@ -44,7 +44,9 @@ class TestController {
       }
 
       const startTime = Date.now();
-      const requestId = `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const requestId = `test-${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
 
       // Prepare the request parameters
       const requestParams = {
@@ -52,10 +54,11 @@ class TestController {
         model,
         systemMessage,
         temperature,
-        maxTokens,        stream,
+        maxTokens,
+        stream,
       };
 
-      let service;      // Select appropriate service based on provider
+      let service; // Select appropriate service based on provider
       switch (provider.toLowerCase()) {
         case "openai":
           service = this.services.openai;
@@ -73,7 +76,8 @@ class TestController {
           return res.status(400).json({
             success: false,
             error: `Unsupported provider: ${provider}`,
-          });      }// Execute the request with retry logic
+          });
+      } // Execute the request with retry logic
       const { result } = await retryHandler.executeWithRetry(
         () => service.sendPrompt(requestParams),
         { maxRetries: 3, baseDelay: 1000 }
@@ -85,10 +89,13 @@ class TestController {
       // Calculate token usage and costs
       const tokenUsage = result.tokenUsage || {
         promptTokens: tokenCounter.countTokens(prompt),
-        completionTokens: tokenCounter.countTokens(result.completion || result.response || ""),
+        completionTokens: tokenCounter.countTokens(
+          result.completion || result.response || ""
+        ),
         totalTokens: 0,
       };
-      tokenUsage.totalTokens = tokenUsage.promptTokens + tokenUsage.completionTokens;
+      tokenUsage.totalTokens =
+        tokenUsage.promptTokens + tokenUsage.completionTokens;
 
       const cost = costEstimator.calculateCost(provider, model, tokenUsage);
 
@@ -158,7 +165,8 @@ class TestController {
       res.status(500).json({
         success: false,
         error: error.message || "Failed to test prompt",
-        details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        details:
+          process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
     }
   }
@@ -168,7 +176,11 @@ class TestController {
    */
   async compareModels(req, res) {
     try {
-      const { prompt, models, systemMessage = "You are a helpful assistant." } = req.body;
+      const {
+        prompt,
+        models,
+        systemMessage = "You are a helpful assistant.",
+      } = req.body;
 
       if (!prompt || !models || !Array.isArray(models) || models.length === 0) {
         return res.status(400).json({
@@ -182,11 +194,19 @@ class TestController {
 
       // Test each model configuration
       for (const modelConfig of models) {
-        const { provider, model, temperature = 0.7, maxTokens = 1000 } = modelConfig;
+        const {
+          provider,
+          model,
+          temperature = 0.7,
+          maxTokens = 1000,
+        } = modelConfig;
 
         try {
           const modelStartTime = Date.now();
-          const requestId = `compare-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;          let service;
+          const requestId = `compare-${Date.now()}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
+          let service;
           switch (provider.toLowerCase()) {
             case "openai":
               service = this.services.openai;
@@ -201,25 +221,31 @@ class TestController {
               service = this.services.openrouter;
               break;
             default:
-              throw new Error(`Unsupported provider: ${provider}`);          }const { result } = await retryHandler.executeWithRetry(
-            () => service.sendPrompt({
-              prompt,
-              model,
-              systemMessage,
-              temperature,
-              maxTokens,
-            }),
+              throw new Error(`Unsupported provider: ${provider}`);
+          }
+          const { result } = await retryHandler.executeWithRetry(
+            () =>
+              service.sendPrompt({
+                prompt,
+                model,
+                systemMessage,
+                temperature,
+                maxTokens,
+              }),
             { maxRetries: 3, baseDelay: 1000 }
           );
 
           const modelEndTime = Date.now();
-          const duration = modelEndTime - modelStartTime;          // Calculate token usage and costs
+          const duration = modelEndTime - modelStartTime; // Calculate token usage and costs
           const tokenUsage = result.tokenUsage || {
             promptTokens: tokenCounter.countTokens(prompt),
-            completionTokens: tokenCounter.countTokens(result.completion || result.response || ""),
+            completionTokens: tokenCounter.countTokens(
+              result.completion || result.response || ""
+            ),
             totalTokens: 0,
           };
-          tokenUsage.totalTokens = tokenUsage.promptTokens + tokenUsage.completionTokens;
+          tokenUsage.totalTokens =
+            tokenUsage.promptTokens + tokenUsage.completionTokens;
 
           const cost = costEstimator.calculateCost(provider, model, tokenUsage);
 
@@ -279,8 +305,8 @@ class TestController {
           timestamp: new Date().toISOString(),
           summary: {
             total: models.length,
-            successful: results.filter(r => r.status === "success").length,
-            failed: results.filter(r => r.status === "error").length,
+            successful: results.filter((r) => r.status === "success").length,
+            failed: results.filter((r) => r.status === "error").length,
           },
         },
       });
@@ -330,12 +356,12 @@ class TestController {
           "meta-llama/llama-2-70b-chat",
           "mistralai/mistral-7b-instruct",
         ],
-      };      // Try to get real-time model lists from providers
+      }; // Try to get real-time model lists from providers
       try {
         // For Ollama, try to get actual running models
         const ollamaModels = await this.services.ollama.listModels?.();
         if (ollamaModels && ollamaModels.length > 0) {
-          models.ollama = ollamaModels.map(model => model.name || model);
+          models.ollama = ollamaModels.map((model) => model.name || model);
         }
       } catch (error) {
         console.warn("Could not fetch Ollama models:", error.message);
@@ -367,7 +393,8 @@ class TestController {
           success: false,
           error: "Missing required fields: prompt, provider, model",
         });
-      }      const promptTokens = tokenCounter.countTokens(prompt);
+      }
+      const promptTokens = tokenCounter.countTokens(prompt);
       const estimatedCompletionTokens = Math.min(maxTokens, promptTokens * 0.5); // Rough estimate
 
       const tokenUsage = {
@@ -386,7 +413,11 @@ class TestController {
           model,
           tokenUsage,
           estimatedCost: cost,
-          breakdown: costEstimator.getCostBreakdown?.(provider, model, tokenUsage),
+          breakdown: costEstimator.getCostBreakdown?.(
+            provider,
+            model,
+            tokenUsage
+          ),
         },
       });
     } catch (error) {
@@ -431,16 +462,26 @@ class TestController {
 
       // Validate temperature
       if (temperature !== undefined) {
-        if (typeof temperature !== "number" || temperature < 0 || temperature > 2) {
+        if (
+          typeof temperature !== "number" ||
+          temperature < 0 ||
+          temperature > 2
+        ) {
           errors.push("Temperature must be a number between 0 and 2");
         } else if (temperature > 1.5) {
-          warnings.push("High temperature may produce very creative but less coherent responses");
+          warnings.push(
+            "High temperature may produce very creative but less coherent responses"
+          );
         }
       }
 
       // Validate maxTokens
       if (maxTokens !== undefined) {
-        if (typeof maxTokens !== "number" || maxTokens < 1 || maxTokens > 4096) {
+        if (
+          typeof maxTokens !== "number" ||
+          maxTokens < 1 ||
+          maxTokens > 4096
+        ) {
           errors.push("Max tokens must be a number between 1 and 4096");
         } else if (maxTokens > 2000) {
           warnings.push("High token limit may increase cost and response time");
@@ -448,7 +489,8 @@ class TestController {
       }
 
       // Estimate cost and warn if high
-      try {        const promptTokens = tokenCounter.countTokens(prompt || "");
+      try {
+        const promptTokens = tokenCounter.countTokens(prompt || "");
         const estimatedCost = costEstimator.calculateCost(provider, model, {
           promptTokens,
           completionTokens: maxTokens || 1000,
@@ -469,9 +511,15 @@ class TestController {
           errors,
           warnings,
           recommendations: [
-            ...(prompt && prompt.length < 50 ? ["Consider adding more context to your prompt"] : []),
-            ...(temperature === undefined ? ["Setting temperature can improve response quality"] : []),
-            ...(maxTokens === undefined ? ["Setting max tokens helps control response length"] : []),
+            ...(prompt && prompt.length < 50
+              ? ["Consider adding more context to your prompt"]
+              : []),
+            ...(temperature === undefined
+              ? ["Setting temperature can improve response quality"]
+              : []),
+            ...(maxTokens === undefined
+              ? ["Setting max tokens helps control response length"]
+              : []),
           ],
         },
       });

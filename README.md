@@ -46,7 +46,6 @@ _Detailed logging of all LLM API calls with filtering and search_
 ![Prompt Replay](docs/images/OpenLLM-Replay.png)
 _Test and compare prompts across different providers and models_
 
-
 </div>
 
 ---

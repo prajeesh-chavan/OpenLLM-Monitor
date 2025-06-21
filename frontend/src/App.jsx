@@ -84,7 +84,8 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        {/* Dashboard Routes */}        <Route path="/" element={<DashboardLayout />}>
+        {/* Dashboard Routes */}{" "}
+        <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="analytics" element={<Analytics />} />
@@ -94,7 +95,6 @@ function App() {
           <Route path="test" element={<TestModelsPage />} />
           <Route path="providers" element={<ProvidersPage />} />
         </Route>
-
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

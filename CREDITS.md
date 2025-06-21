@@ -29,6 +29,7 @@
 ## 🚀 Recent Feature Additions
 
 ### ✨ Test Models Page (December 2024)
+
 - **Direct Model Testing**: Added dedicated interface for testing prompts without existing logs
 - **Multi-Provider Comparison**: Compare responses across different LLM providers
 - **Example Prompt Library**: Pre-built prompts for various use cases

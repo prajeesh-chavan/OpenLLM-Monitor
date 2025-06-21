@@ -62,7 +62,10 @@ const TestModelsPage = () => {
     };
     const updated = [...savedPrompts, newPrompt];
     setSavedPrompts(updated);
-    localStorage.setItem("openllm-monitor-test-prompts", JSON.stringify(updated));
+    localStorage.setItem(
+      "openllm-monitor-test-prompts",
+      JSON.stringify(updated)
+    );
     toast.success("Prompt saved successfully!");
   };
 
@@ -84,26 +87,27 @@ const TestModelsPage = () => {
 
   const removeTestConfig = (id) => {
     if (testConfigs.length > 1) {
-      setTestConfigs(testConfigs.filter(config => config.id !== id));
+      setTestConfigs(testConfigs.filter((config) => config.id !== id));
     }
   };
 
   const updateTestConfig = (id, updates) => {
-    setTestConfigs(configs =>
-      configs.map(config =>
+    setTestConfigs((configs) =>
+      configs.map((config) =>
         config.id === id ? { ...config, ...updates } : config
       )
     );
   };
 
   const runTest = async (configId) => {
-    const config = testConfigs.find(c => c.id === configId);
+    const config = testConfigs.find((c) => c.id === configId);
     if (!config.prompt.trim()) {
       toast.error("Please enter a prompt to test");
       return;
     }
 
-    updateTestConfig(configId, { isRunning: true, error: null });    try {
+    updateTestConfig(configId, { isRunning: true, error: null });
+    try {
       const startTime = Date.now();
       const response = await ApiService.testPrompt({
         provider: config.provider,
@@ -146,7 +150,7 @@ const TestModelsPage = () => {
   };
 
   const runAllTests = async () => {
-    const validConfigs = testConfigs.filter(config => config.prompt.trim());
+    const validConfigs = testConfigs.filter((config) => config.prompt.trim());
     if (validConfigs.length === 0) {
       toast.error("Please enter prompts to test");
       return;
@@ -156,7 +160,7 @@ const TestModelsPage = () => {
     for (const config of validConfigs) {
       await runTest(config.id);
       // Small delay between tests to avoid overwhelming the API
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
   };
 
@@ -171,9 +175,9 @@ const TestModelsPage = () => {
   };
 
   const loadExamplePrompt = (configId, example) => {
-    updateTestConfig(configId, { 
+    updateTestConfig(configId, {
       prompt: example.prompt,
-      systemMessage: example.systemMessage || "You are a helpful assistant."
+      systemMessage: example.systemMessage || "You are a helpful assistant.",
     });
     toast.success("Example loaded!");
   };
@@ -182,29 +186,38 @@ const TestModelsPage = () => {
   const examplePrompts = [
     {
       name: "Creative Writing",
-      prompt: "Write a short story about a robot discovering emotions for the first time.",
-      systemMessage: "You are a creative writing assistant."
+      prompt:
+        "Write a short story about a robot discovering emotions for the first time.",
+      systemMessage: "You are a creative writing assistant.",
     },
     {
       name: "Code Review",
-      prompt: "Review this Python function and suggest improvements:\n\ndef calculate_factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * calculate_factorial(n-1)",
-      systemMessage: "You are a senior software engineer providing code reviews."
+      prompt:
+        "Review this Python function and suggest improvements:\n\ndef calculate_factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * calculate_factorial(n-1)",
+      systemMessage:
+        "You are a senior software engineer providing code reviews.",
     },
     {
       name: "Data Analysis",
-      prompt: "Explain the key insights from this sales data trend: Sales increased 15% in Q1, decreased 5% in Q2, increased 25% in Q3, and remained flat in Q4.",
-      systemMessage: "You are a data analyst helping interpret business metrics."
+      prompt:
+        "Explain the key insights from this sales data trend: Sales increased 15% in Q1, decreased 5% in Q2, increased 25% in Q3, and remained flat in Q4.",
+      systemMessage:
+        "You are a data analyst helping interpret business metrics.",
     },
     {
       name: "Technical Documentation",
-      prompt: "Write API documentation for a REST endpoint that creates a new user account.",
-      systemMessage: "You are a technical writer creating clear, comprehensive documentation."
+      prompt:
+        "Write API documentation for a REST endpoint that creates a new user account.",
+      systemMessage:
+        "You are a technical writer creating clear, comprehensive documentation.",
     },
     {
       name: "Problem Solving",
-      prompt: "A farmer has 100 animals consisting of cows, pigs, and chickens. If there are 70 heads and 200 legs total, how many of each animal are there?",
-      systemMessage: "You are a mathematics tutor helping solve word problems step by step."
-    }
+      prompt:
+        "A farmer has 100 animals consisting of cows, pigs, and chickens. If there are 70 heads and 200 legs total, how many of each animal are there?",
+      systemMessage:
+        "You are a mathematics tutor helping solve word problems step by step.",
+    },
   ];
 
   // Load available models
@@ -283,12 +296,22 @@ const TestModelsPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="px-6 py-6">        <div className={`grid gap-6 ${compareMode && testConfigs.length > 1 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+      <div className="px-6 py-6">
+        {" "}
+        <div
+          className={`grid gap-6 ${
+            compareMode && testConfigs.length > 1
+              ? "grid-cols-1 lg:grid-cols-2"
+              : "grid-cols-1"
+          }`}
+        >
           {testConfigs.map((config, index) => (
             <div
               key={config.id}
               className="bg-white rounded-lg border border-gray-200 shadow-sm relative"
-            >              {/* Loading Overlay */}
+            >
+              {" "}
+              {/* Loading Overlay */}
               {config.isRunning && (
                 <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-blue-50/90 to-purple-50/90 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center">
                   <div className="text-center p-8">
@@ -303,9 +326,18 @@ const TestModelsPage = () => {
                       </div>
                       {/* Orbiting dots */}
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-20 h-20 relative animate-spin" style={{ animationDuration: '3s', animationDirection: 'reverse' }}>
+                        <div
+                          className="w-20 h-20 relative animate-spin"
+                          style={{
+                            animationDuration: "3s",
+                            animationDirection: "reverse",
+                          }}
+                        >
                           <div className="absolute top-0 left-1/2 w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 animate-pulse shadow-md"></div>
-                          <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-purple-400 rounded-full transform -translate-x-1/2 animate-pulse shadow-md" style={{ animationDelay: '0.5s' }}></div>
+                          <div
+                            className="absolute bottom-0 left-1/2 w-2 h-2 bg-purple-400 rounded-full transform -translate-x-1/2 animate-pulse shadow-md"
+                            style={{ animationDelay: "0.5s" }}
+                          ></div>
                         </div>
                       </div>
                     </div>
@@ -317,27 +349,39 @@ const TestModelsPage = () => {
                         </span>
                       </h4>
                       <p className="text-sm text-gray-700 max-w-xs mx-auto font-medium">
-                        Processing your prompt with <span className="font-bold text-blue-600">{config.model}</span>
+                        Processing your prompt with{" "}
+                        <span className="font-bold text-blue-600">
+                          {config.model}
+                        </span>
                       </p>
                       <div className="flex items-center justify-center space-x-1 text-xs text-gray-600 mt-4">
                         <div className="flex space-x-1">
                           <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm"></div>
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '0.2s' }}></div>
+                          <div
+                            className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm"
+                            style={{ animationDelay: "0.1s" }}
+                          ></div>
+                          <div
+                            className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
                         </div>
-                        <span className="ml-2 font-semibold">Generating response</span>
+                        <span className="ml-2 font-semibold">
+                          Generating response
+                        </span>
                       </div>
                       <div className="mt-6 pt-4 border-t border-gray-300/50">
                         <p className="text-xs text-gray-600 flex items-center justify-center space-x-1 font-medium">
                           <ClockIcon className="h-3 w-3" />
-                          <span>This may take up to 2 minutes for complex prompts</span>
+                          <span>
+                            This may take up to 2 minutes for complex prompts
+                          </span>
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
-
               {/* Test Config Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
@@ -378,7 +422,6 @@ const TestModelsPage = () => {
                   )}
                 </div>
               </div>
-
               {/* Configuration */}
               <div className="p-4 space-y-4">
                 {/* Provider and Model Selection */}
@@ -390,7 +433,9 @@ const TestModelsPage = () => {
                     <select
                       value={config.provider}
                       onChange={(e) =>
-                        updateTestConfig(config.id, { provider: e.target.value })
+                        updateTestConfig(config.id, {
+                          provider: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
@@ -416,7 +461,7 @@ const TestModelsPage = () => {
                       {loadingModels ? (
                         <option value="">Loading models...</option>
                       ) : (
-                        availableModels[config.provider]?.map(model => (
+                        availableModels[config.provider]?.map((model) => (
                           <option key={model} value={model}>
                             {model}
                           </option>
@@ -434,7 +479,9 @@ const TestModelsPage = () => {
                   <textarea
                     value={config.systemMessage}
                     onChange={(e) =>
-                      updateTestConfig(config.id, { systemMessage: e.target.value })
+                      updateTestConfig(config.id, {
+                        systemMessage: e.target.value,
+                      })
                     }
                     placeholder="You are a helpful assistant..."
                     rows={2}
@@ -444,52 +491,56 @@ const TestModelsPage = () => {
 
                 {/* Prompt */}
                 <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Prompt
-                      </label>
-                      <div className="flex items-center space-x-2">
-                        {/* Example Prompts Dropdown */}
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Prompt
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      {/* Example Prompts Dropdown */}
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            const example = examplePrompts.find(
+                              (ex) => ex.name === e.target.value
+                            );
+                            if (example) loadExamplePrompt(config.id, example);
+                            e.target.value = "";
+                          }
+                        }}
+                        className="text-sm border border-gray-300 rounded px-2 py-1"
+                      >
+                        <option value="">Load example...</option>
+                        {examplePrompts.map((example) => (
+                          <option key={example.name} value={example.name}>
+                            {example.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Saved Prompts Dropdown */}
+                      {savedPrompts.length > 0 && (
                         <select
                           onChange={(e) => {
                             if (e.target.value) {
-                              const example = examplePrompts.find(ex => ex.name === e.target.value);
-                              if (example) loadExamplePrompt(config.id, example);
+                              const saved = savedPrompts.find(
+                                (p) => p.id.toString() === e.target.value
+                              );
+                              if (saved) loadSavedPrompt(config.id, saved);
                               e.target.value = "";
                             }
                           }}
                           className="text-sm border border-gray-300 rounded px-2 py-1"
                         >
-                          <option value="">Load example...</option>
-                          {examplePrompts.map(example => (
-                            <option key={example.name} value={example.name}>
-                              {example.name}
+                          <option value="">Load saved...</option>
+                          {savedPrompts.map((saved) => (
+                            <option key={saved.id} value={saved.id}>
+                              {saved.name}
                             </option>
                           ))}
                         </select>
-                        
-                        {/* Saved Prompts Dropdown */}
-                        {savedPrompts.length > 0 && (
-                          <select
-                            onChange={(e) => {
-                              if (e.target.value) {
-                                const saved = savedPrompts.find(p => p.id.toString() === e.target.value);
-                                if (saved) loadSavedPrompt(config.id, saved);
-                                e.target.value = "";
-                              }
-                            }}
-                            className="text-sm border border-gray-300 rounded px-2 py-1"
-                          >
-                            <option value="">Load saved...</option>
-                            {savedPrompts.map(saved => (
-                              <option key={saved.id} value={saved.id}>
-                                {saved.name}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
+                      )}
                     </div>
+                  </div>
                   <textarea
                     value={config.prompt}
                     onChange={(e) =>
@@ -530,7 +581,9 @@ const TestModelsPage = () => {
                       step="0.1"
                       value={config.temperature}
                       onChange={(e) =>
-                        updateTestConfig(config.id, { temperature: parseFloat(e.target.value) })
+                        updateTestConfig(config.id, {
+                          temperature: parseFloat(e.target.value),
+                        })
                       }
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     />
@@ -548,7 +601,9 @@ const TestModelsPage = () => {
                       type="number"
                       value={config.maxTokens}
                       onChange={(e) =>
-                        updateTestConfig(config.id, { maxTokens: parseInt(e.target.value) })
+                        updateTestConfig(config.id, {
+                          maxTokens: parseInt(e.target.value),
+                        })
                       }
                       min="1"
                       max="4000"
@@ -557,7 +612,6 @@ const TestModelsPage = () => {
                   </div>
                 </div>
               </div>
-
               {/* Results */}
               {(config.result || config.error) && (
                 <div className="border-t border-gray-200 p-4">
@@ -565,7 +619,9 @@ const TestModelsPage = () => {
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                       <div className="flex items-center space-x-2 mb-2">
                         <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
-                        <h4 className="font-medium text-red-800">Test Failed</h4>
+                        <h4 className="font-medium text-red-800">
+                          Test Failed
+                        </h4>
                       </div>
                       <p className="text-red-700 text-sm">{config.error}</p>
                     </div>
@@ -574,9 +630,13 @@ const TestModelsPage = () => {
                       {/* Success Header */}
                       <div className="flex items-center space-x-2">
                         <CheckCircleIcon className="h-5 w-5 text-green-500" />
-                        <h4 className="font-medium text-green-800">Test Completed</h4>
+                        <h4 className="font-medium text-green-800">
+                          Test Completed
+                        </h4>
                         <span className="text-xs text-gray-500">
-                          {new Date(config.result.timestamp).toLocaleTimeString()}
+                          {new Date(
+                            config.result.timestamp
+                          ).toLocaleTimeString()}
                         </span>
                       </div>
 
@@ -589,9 +649,10 @@ const TestModelsPage = () => {
                               {config.result.duration}ms
                             </span>
                           </div>
-                          <p className="text-xs text-blue-600 mt-1">Response Time</p>
+                          <p className="text-xs text-blue-600 mt-1">
+                            Response Time
+                          </p>
                         </div>
-
                         <div className="bg-green-50 rounded-lg p-3">
                           <div className="flex items-center justify-between">
                             <CpuChipIcon className="h-4 w-4 text-green-600" />
@@ -599,24 +660,36 @@ const TestModelsPage = () => {
                               {config.result.tokenUsage?.totalTokens || 0}
                             </span>
                           </div>
-                          <p className="text-xs text-green-600 mt-1">Total Tokens</p>
-                        </div>                        <div className="bg-yellow-50 rounded-lg p-3">
+                          <p className="text-xs text-green-600 mt-1">
+                            Total Tokens
+                          </p>
+                        </div>{" "}
+                        <div className="bg-yellow-50 rounded-lg p-3">
                           <div className="flex items-center justify-between">
                             <CurrencyDollarIcon className="h-4 w-4 text-yellow-600" />
                             <span className="text-lg font-semibold text-yellow-900">
                               ${(config.result.cost?.totalCost || 0).toFixed(4)}
                             </span>
                           </div>
-                          <p className="text-xs text-yellow-600 mt-1">Estimated Cost</p>
+                          <p className="text-xs text-yellow-600 mt-1">
+                            Estimated Cost
+                          </p>
                         </div>
                       </div>
 
                       {/* Response */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-medium text-gray-900">Response</h5>
+                          <h5 className="font-medium text-gray-900">
+                            Response
+                          </h5>
                           <button
-                            onClick={() => copyToClipboard(config.result.response || config.result.completion)}
+                            onClick={() =>
+                              copyToClipboard(
+                                config.result.response ||
+                                  config.result.completion
+                              )
+                            }
                             className="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
                           >
                             <DocumentDuplicateIcon className="h-4 w-4" />
@@ -625,7 +698,9 @@ const TestModelsPage = () => {
                         </div>
                         <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
                           <pre className="text-sm text-gray-800 whitespace-pre-wrap">
-                            {config.result.response || config.result.completion || "No response content"}
+                            {config.result.response ||
+                              config.result.completion ||
+                              "No response content"}
                           </pre>
                         </div>
                       </div>
@@ -636,21 +711,32 @@ const TestModelsPage = () => {
             </div>
           ))}
         </div>
-
         {/* Saved Prompts */}
         {savedPrompts.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Saved Prompts</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Saved Prompts
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {savedPrompts.map(saved => (
-                <div key={saved.id} className="bg-white rounded-lg border border-gray-200 p-4">
+              {savedPrompts.map((saved) => (
+                <div
+                  key={saved.id}
+                  className="bg-white rounded-lg border border-gray-200 p-4"
+                >
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900 truncate">{saved.name}</h3>
+                    <h3 className="font-medium text-gray-900 truncate">
+                      {saved.name}
+                    </h3>
                     <button
                       onClick={() => {
-                        const updated = savedPrompts.filter(p => p.id !== saved.id);
+                        const updated = savedPrompts.filter(
+                          (p) => p.id !== saved.id
+                        );
                         setSavedPrompts(updated);
-                        localStorage.setItem("openllm-monitor-test-prompts", JSON.stringify(updated));
+                        localStorage.setItem(
+                          "openllm-monitor-test-prompts",
+                          JSON.stringify(updated)
+                        );
                         toast.success("Prompt deleted");
                       }}
                       className="text-red-400 hover:text-red-600"
@@ -658,7 +744,9 @@ const TestModelsPage = () => {
                       <TrashIcon className="h-4 w-4" />
                     </button>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-3">{saved.prompt}</p>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                    {saved.prompt}
+                  </p>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">
                       {new Date(saved.createdAt).toLocaleDateString()}

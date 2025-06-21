@@ -21,14 +21,18 @@ router.post("/compare", (req, res) => testController.compareModels(req, res));
  * @desc    Get available models for all configured providers
  * @access  Public
  */
-router.get("/models", (req, res) => testController.getAvailableModels(req, res));
+router.get("/models", (req, res) =>
+  testController.getAvailableModels(req, res)
+);
 
 /**
  * @route   POST /api/test/estimate
  * @desc    Get cost estimate for a test prompt
  * @access  Public
  */
-router.post("/estimate", (req, res) => testController.getCostEstimate(req, res));
+router.post("/estimate", (req, res) =>
+  testController.getCostEstimate(req, res)
+);
 
 /**
  * @route   POST /api/test/validate
