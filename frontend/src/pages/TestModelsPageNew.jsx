@@ -26,14 +26,6 @@ import {
   ArrowLeftIcon,
   BookmarkIcon,
   RocketLaunchIcon,
-  TrophyIcon,
-  ScaleIcon,
-  EyeIcon,
-  DocumentArrowDownIcon,
-  HeartIcon,
-  BoltIcon,
-  ShieldCheckIcon,
-  AcademicCapIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { useAppStore } from "../store";
@@ -51,8 +43,6 @@ const TestModelsPage = () => {
   const [loadingModels, setLoadingModels] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(true);
-  const [showComparison, setShowComparison] = useState(false);
-  const [comparisonMetrics, setComparisonMetrics] = useState(null);
 
   // Enhanced template system with categorization
   const templateCategories = [
@@ -395,6 +385,7 @@ What could be causing this and how do I fix it?`,
     updateTestConfig(configId, { prompt: savedPrompt.prompt });
     toast.success("Prompt loaded!");
   };
+
   const getColorClasses = (color) => {
     const colors = {
       emerald: {
@@ -433,210 +424,6 @@ What could be causing this and how do I fix it?`,
     return colors[color] || colors.blue;
   };
 
-  // Enhanced comparison analysis functions
-  const analyzeComparison = (completedConfigs) => {
-    if (completedConfigs.length < 2) return null;
-
-    const results = completedConfigs.map((config) => ({
-      id: config.id,
-      model: config.model,
-      provider: config.provider,
-      result: config.result,
-      response: config.result?.response || config.result?.completion || "",
-      duration: config.result?.duration || 0,
-      tokens: config.result?.tokenUsage?.totalTokens || 0,
-      cost: config.result?.cost?.totalCost || 0,
-    }));
-
-    // Performance analysis
-    const fastest = results.reduce((prev, curr) =>
-      prev.duration < curr.duration ? prev : curr
-    );
-    const cheapest = results.reduce((prev, curr) =>
-      prev.cost < curr.cost ? prev : curr
-    );
-    const mostTokens = results.reduce((prev, curr) =>
-      prev.tokens > curr.tokens ? prev : curr
-    );
-
-    // Response quality analysis (simple heuristics)
-    const responseAnalysis = results.map((result) => ({
-      ...result,
-      wordCount: result.response.split(/\s+/).length,
-      sentenceCount: result.response.split(/[.!?]+/).length,
-      readabilityScore: calculateReadabilityScore(result.response),
-      completenessScore: calculateCompletenessScore(
-        result.response,
-        selectedTemplate
-      ),
-    }));
-
-    const mostComplete = responseAnalysis.reduce((prev, curr) =>
-      prev.completenessScore > curr.completenessScore ? prev : curr
-    );
-    const mostReadable = responseAnalysis.reduce((prev, curr) =>
-      prev.readabilityScore > curr.readabilityScore ? prev : curr
-    );
-
-    // Generate insights
-    const insights = generateInsights(results, responseAnalysis);
-
-    return {
-      performance: { fastest, cheapest, mostTokens },
-      quality: { mostComplete, mostReadable },
-      insights,
-      detailed: responseAnalysis,
-    };
-  };
-
-  const calculateReadabilityScore = (text) => {
-    // Simple readability heuristic (0-100)
-    const avgWordsPerSentence =
-      text.split(/\s+/).length / Math.max(text.split(/[.!?]+/).length, 1);
-    const avgCharsPerWord = text.length / Math.max(text.split(/\s+/).length, 1);
-
-    // Prefer shorter sentences and words for readability
-    const sentenceScore = Math.max(0, 100 - (avgWordsPerSentence - 15) * 2);
-    const wordScore = Math.max(0, 100 - (avgCharsPerWord - 5) * 5);
-
-    return Math.round((sentenceScore + wordScore) / 2);
-  };
-
-  const calculateCompletenessScore = (response, template) => {
-    // Simple completeness heuristic based on response length and key elements
-    const baseScore = Math.min(response.length / 10, 80); // Length component
-
-    let bonusScore = 0;
-    if (template?.tags?.includes("code") && response.includes("```"))
-      bonusScore += 20;
-    if (template?.tags?.includes("analysis") && response.includes("conclusion"))
-      bonusScore += 15;
-    if (response.includes("example") || response.includes("for instance"))
-      bonusScore += 10;
-
-    return Math.min(100, Math.round(baseScore + bonusScore));
-  };
-
-  const generateInsights = (results, analysis) => {
-    const insights = [];
-
-    // Performance insights
-    const speedDiff =
-      Math.max(...results.map((r) => r.duration)) -
-      Math.min(...results.map((r) => r.duration));
-    if (speedDiff > 1000) {
-      const fastest = results.find(
-        (r) => r.duration === Math.min(...results.map((res) => res.duration))
-      );
-      insights.push({
-        type: "performance",
-        icon: BoltIcon,
-        title: "Speed Winner",
-        description: `${fastest.model} is ${Math.round(
-          speedDiff / 1000
-        )}x faster than the slowest model`,
-        model: fastest.model,
-        color: "text-yellow-600",
-        bg: "bg-yellow-50",
-      });
-    }
-
-    // Cost insights
-    const costDiff =
-      Math.max(...results.map((r) => r.cost)) -
-      Math.min(...results.map((r) => r.cost));
-    if (costDiff > 0.001) {
-      const cheapest = results.find(
-        (r) => r.cost === Math.min(...results.map((res) => res.cost))
-      );
-      insights.push({
-        type: "cost",
-        icon: CurrencyDollarIcon,
-        title: "Most Cost-Effective",
-        description: `${cheapest.model} costs ${
-          Math.round(costDiff * 10000) / 10000
-        }$ less per request`,
-        model: cheapest.model,
-        color: "text-green-600",
-        bg: "bg-green-50",
-      });
-    }
-
-    // Quality insights
-    const qualityLeader = analysis.reduce((prev, curr) =>
-      prev.completenessScore + prev.readabilityScore >
-      curr.completenessScore + curr.readabilityScore
-        ? prev
-        : curr
-    );
-    insights.push({
-      type: "quality",
-      icon: TrophyIcon,
-      title: "Quality Leader",
-      description: `${qualityLeader.model} provides the most complete and readable response`,
-      model: qualityLeader.model,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
-    });
-
-    return insights;
-  };
-
-  const generateComparisonReport = () => {
-    const completedConfigs = testConfigs.filter((config) => config.result);
-    const analysis = analyzeComparison(completedConfigs);
-
-    if (!analysis) {
-      toast.error("Need at least 2 completed tests to generate report");
-      return;
-    }
-
-    // Generate downloadable report
-    const reportData = {
-      timestamp: new Date().toISOString(),
-      prompt: completedConfigs[0]?.prompt,
-      template: selectedTemplate?.name || "Custom",
-      comparison: analysis,
-      configs: completedConfigs.map((config) => ({
-        provider: config.provider,
-        model: config.model,
-        settings: {
-          temperature: config.temperature,
-          maxTokens: config.maxTokens,
-        },
-        result: config.result,
-      })),
-    };
-
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `model-comparison-${Date.now()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    toast.success("Comparison report downloaded!");
-  };
-
-  // Auto-analyze when compare mode is active and tests complete
-  useEffect(() => {
-    if (compareMode && testConfigs.length >= 2) {
-      const completedConfigs = testConfigs.filter(
-        (config) => config.result && !config.error
-      );
-      if (completedConfigs.length >= 2) {
-        const analysis = analyzeComparison(completedConfigs);
-        setComparisonMetrics(analysis);
-        setShowComparison(true);
-      }
-    }
-  }, [testConfigs, compareMode]);
-
   // Load available models
   useEffect(() => {
     const loadModels = async () => {
@@ -669,17 +456,7 @@ What could be causing this and how do I fix it?`,
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-40">
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            {" "}
             <div className="flex items-center space-x-4">
-              {/* Main Back to Dashboard Button */}
-              <Link
-                to="/dashboard"
-                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 border border-gray-200 hover:border-gray-300"
-              >
-                <ArrowLeftIcon className="h-4 w-4" />
-                <span className="text-sm font-medium">Dashboard</span>
-              </Link>
-
               {currentStep !== "template" && (
                 <button
                   onClick={() => setCurrentStep("template")}
@@ -708,6 +485,7 @@ What could be causing this and how do I fix it?`,
                 </div>
               </div>
             </div>
+
             {currentStep === "test" && (
               <div className="flex items-center space-x-3">
                 <button
@@ -725,7 +503,8 @@ What could be causing this and how do I fix it?`,
                   ) : (
                     <ChevronDownIcon className="h-4 w-4" />
                   )}
-                </button>{" "}
+                </button>
+
                 <button
                   onClick={() => setCompareMode(!compareMode)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
@@ -736,26 +515,8 @@ What could be causing this and how do I fix it?`,
                 >
                   <ArrowsRightLeftIcon className="h-4 w-4" />
                   <span>Compare</span>
-                  {compareMode && (
-                    <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
-                      {testConfigs.filter((c) => c.result).length}/
-                      {testConfigs.length}
-                    </span>
-                  )}
                 </button>
-                {compareMode && comparisonMetrics && (
-                  <button
-                    onClick={() => setShowComparison(!showComparison)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                      showComparison
-                        ? "bg-indigo-600 text-white shadow-lg"
-                        : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                    }`}
-                  >
-                    <EyeIcon className="h-4 w-4" />
-                    <span>{showComparison ? "Hide" : "Show"} Analysis</span>
-                  </button>
-                )}
+
                 <button
                   onClick={addTestConfig}
                   className="flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-lg"
@@ -763,6 +524,7 @@ What could be causing this and how do I fix it?`,
                   <PlusIcon className="h-4 w-4" />
                   <span>Add Test</span>
                 </button>
+
                 <button
                   onClick={runAllTests}
                   className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
@@ -969,371 +731,10 @@ What could be causing this and how do I fix it?`,
               </div>
             )}
           </div>
-        )}{" "}
+        )}
+
         {currentStep === "test" && testConfigs.length > 0 && (
           <div className="max-w-7xl mx-auto">
-            {/* Enhanced Comparison Dashboard */}
-            {compareMode && showComparison && comparisonMetrics && (
-              <div className="mb-8 bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 p-6 text-white">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-white/20 rounded-lg">
-                        <ScaleIcon className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold">
-                          Intelligent Comparison Analysis
-                        </h3>
-                        <p className="text-white/90">
-                          AI-powered insights across{" "}
-                          {testConfigs.filter((c) => c.result).length} model
-                          responses
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={generateComparisonReport}
-                      className="flex items-center space-x-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200"
-                    >
-                      <DocumentArrowDownIcon className="h-4 w-4" />
-                      <span>Export Report</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-6 space-y-6">
-                  {/* Key Insights */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                      <LightBulbIcon className="h-5 w-5 text-amber-600" />
-                      <span>Key Insights</span>
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {comparisonMetrics.insights.map((insight, index) => {
-                        const IconComponent = insight.icon;
-                        return (
-                          <div
-                            key={index}
-                            className={`${insight.bg} border border-gray-200 rounded-xl p-4`}
-                          >
-                            <div className="flex items-start space-x-3">
-                              <div className="p-2 bg-white rounded-lg shadow-sm">
-                                <IconComponent
-                                  className={`h-5 w-5 ${insight.color}`}
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h5 className="font-semibold text-gray-900 mb-1">
-                                  {insight.title}
-                                </h5>
-                                <p className="text-sm text-gray-700 mb-2">
-                                  {insight.description}
-                                </p>
-                                <span className="inline-flex items-center px-2 py-1 bg-white rounded-full text-xs font-medium text-gray-700">
-                                  {insight.model}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  {/* Performance Metrics */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                      <ChartBarIcon className="h-5 w-5 text-blue-600" />
-                      <span>Performance Comparison</span>
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h5 className="font-semibold text-blue-900">
-                            Fastest Response
-                          </h5>
-                          <BoltIcon className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div className="text-2xl font-bold text-blue-900 mb-1">
-                          {comparisonMetrics.performance.fastest.duration}ms
-                        </div>
-                        <p className="text-sm text-blue-700">
-                          {comparisonMetrics.performance.fastest.model}
-                        </p>
-                      </div>
-
-                      <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h5 className="font-semibold text-green-900">
-                            Most Cost-Effective
-                          </h5>
-                          <CurrencyDollarIcon className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div className="text-2xl font-bold text-green-900 mb-1">
-                          $
-                          {comparisonMetrics.performance.cheapest.cost.toFixed(
-                            4
-                          )}
-                        </div>
-                        <p className="text-sm text-green-700">
-                          {comparisonMetrics.performance.cheapest.model}
-                        </p>
-                      </div>
-
-                      <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h5 className="font-semibold text-purple-900">
-                            Highest Quality
-                          </h5>
-                          <TrophyIcon className="h-5 w-5 text-purple-600" />
-                        </div>
-                        <div className="text-2xl font-bold text-purple-900 mb-1">
-                          {Math.round(
-                            comparisonMetrics.quality.mostComplete
-                              .completenessScore
-                          )}
-                          %
-                        </div>
-                        <p className="text-sm text-purple-700">
-                          {comparisonMetrics.quality.mostComplete.model}
-                        </p>
-                      </div>
-                    </div>
-                  </div>{" "}
-                  {/* Response Analysis */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                      <AcademicCapIcon className="h-5 w-5 text-indigo-600" />
-                      <span>Response Analysis</span>
-                    </h4>
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-gray-200">
-                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                              Model
-                            </th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                              Speed
-                            </th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                              Cost
-                            </th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                              Tokens
-                            </th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                              Quality
-                            </th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                              Readability
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {comparisonMetrics.detailed.map((item, index) => (
-                            <tr
-                              key={item.id}
-                              className="border-b border-gray-100 hover:bg-gray-50"
-                            >
-                              <td className="py-3 px-4">
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-medium text-gray-900">
-                                    {item.model}
-                                  </span>
-                                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                    {item.provider}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="py-3 px-4">
-                                <div className="flex items-center space-x-2">
-                                  <div
-                                    className={`w-2 h-2 rounded-full ${
-                                      item.duration ===
-                                      comparisonMetrics.performance.fastest
-                                        .duration
-                                        ? "bg-green-500"
-                                        : "bg-gray-300"
-                                    }`}
-                                  ></div>
-                                  <span className="text-sm">
-                                    {item.duration}ms
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="py-3 px-4">
-                                <div className="flex items-center space-x-2">
-                                  <div
-                                    className={`w-2 h-2 rounded-full ${
-                                      item.cost ===
-                                      comparisonMetrics.performance.cheapest
-                                        .cost
-                                        ? "bg-green-500"
-                                        : "bg-gray-300"
-                                    }`}
-                                  ></div>
-                                  <span className="text-sm">
-                                    ${item.cost.toFixed(4)}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="py-3 px-4 text-sm">
-                                {item.tokens}
-                              </td>
-                              <td className="py-3 px-4">
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-16 bg-gray-200 rounded-full h-2">
-                                    <div
-                                      className="bg-purple-600 h-2 rounded-full"
-                                      style={{
-                                        width: `${item.completenessScore}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                  <span className="text-sm">
-                                    {item.completenessScore}%
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="py-3 px-4">
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-16 bg-gray-200 rounded-full h-2">
-                                    <div
-                                      className="bg-blue-600 h-2 rounded-full"
-                                      style={{
-                                        width: `${item.readabilityScore}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                  <span className="text-sm">
-                                    {item.readabilityScore}%
-                                  </span>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  {/* Response Comparison */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                      <DocumentTextIcon className="h-5 w-5 text-green-600" />
-                      <span>Response Comparison</span>
-                    </h4>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {comparisonMetrics.detailed
-                        .slice(0, 2)
-                        .map((item, index) => (
-                          <div
-                            key={item.id}
-                            className="bg-gray-50 rounded-lg p-4 border border-gray-200"
-                          >
-                            <div className="flex items-center justify-between mb-3">
-                              <h5 className="font-medium text-gray-900">
-                                {item.model}
-                              </h5>
-                              <div className="flex items-center space-x-2">
-                                <span className="text-xs text-gray-500">
-                                  {item.wordCount} words
-                                </span>
-                                <span className="text-xs text-gray-500">•</span>
-                                <span className="text-xs text-gray-500">
-                                  {item.sentenceCount} sentences
-                                </span>
-                              </div>
-                            </div>
-                            <div className="max-h-48 overflow-y-auto">
-                              <pre className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                                {item.response.length > 500
-                                  ? item.response.substring(0, 500) + "..."
-                                  : item.response}
-                              </pre>
-                            </div>
-                            <div className="mt-3 pt-3 border-t border-gray-300 flex items-center justify-between">
-                              <div className="flex items-center space-x-4">
-                                <div className="flex items-center space-x-1">
-                                  <span className="text-xs text-gray-500">
-                                    Quality:
-                                  </span>
-                                  <div className="w-12 bg-gray-200 rounded-full h-1">
-                                    <div
-                                      className="bg-purple-600 h-1 rounded-full"
-                                      style={{
-                                        width: `${item.completenessScore}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                  <span className="text-xs text-gray-500">
-                                    Readability:
-                                  </span>
-                                  <div className="w-12 bg-gray-200 rounded-full h-1">
-                                    <div
-                                      className="bg-blue-600 h-1 rounded-full"
-                                      style={{
-                                        width: `${item.readabilityScore}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => copyToClipboard(item.response)}
-                                className="text-xs text-blue-600 hover:text-blue-800 flex items-center space-x-1"
-                              >
-                                <DocumentDuplicateIcon className="h-3 w-3" />
-                                <span>Copy</span>
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                  {/* Recommendations */}
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center space-x-2">
-                      <ShieldCheckIcon className="h-5 w-5 text-blue-600" />
-                      <span>Smart Recommendations</span>
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h5 className="font-medium text-gray-900 mb-2">
-                          Best for Production
-                        </h5>
-                        <p className="text-sm text-gray-700">
-                          Consider{" "}
-                          <strong>
-                            {comparisonMetrics.performance.fastest.model}
-                          </strong>{" "}
-                          for speed-critical applications and{" "}
-                          <strong>
-                            {comparisonMetrics.performance.cheapest.model}
-                          </strong>{" "}
-                          for cost optimization.
-                        </p>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-gray-900 mb-2">
-                          Best for Quality
-                        </h5>
-                        <p className="text-sm text-gray-700">
-                          <strong>
-                            {comparisonMetrics.quality.mostComplete.model}
-                          </strong>{" "}
-                          provides the most comprehensive responses for complex
-                          tasks requiring detailed output.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div
               className={`grid gap-6 ${
                 compareMode && testConfigs.length > 1
@@ -1591,47 +992,19 @@ What could be causing this and how do I fix it?`,
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          {" "}
                           {/* Success Header */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <CheckCircleIcon className="h-5 w-5 text-green-500" />
-                              <h4 className="font-medium text-green-800">
-                                Test Completed
-                              </h4>
-                              <span className="text-xs text-gray-500">
-                                {new Date(
-                                  config.result.timestamp
-                                ).toLocaleTimeString()}
-                              </span>
-                            </div>
-                            {/* Comparison badges */}
-                            {compareMode && comparisonMetrics && (
-                              <div className="flex items-center space-x-1">
-                                {comparisonMetrics.performance.fastest.id ===
-                                  config.id && (
-                                  <span className="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
-                                    <BoltIcon className="h-3 w-3 mr-1" />
-                                    Fastest
-                                  </span>
-                                )}
-                                {comparisonMetrics.performance.cheapest.id ===
-                                  config.id && (
-                                  <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                    <CurrencyDollarIcon className="h-3 w-3 mr-1" />
-                                    Cheapest
-                                  </span>
-                                )}
-                                {comparisonMetrics.quality.mostComplete.id ===
-                                  config.id && (
-                                  <span className="inline-flex items-center px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
-                                    <TrophyIcon className="h-3 w-3 mr-1" />
-                                    Best Quality
-                                  </span>
-                                )}
-                              </div>
-                            )}
+                          <div className="flex items-center space-x-2">
+                            <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                            <h4 className="font-medium text-green-800">
+                              Test Completed
+                            </h4>
+                            <span className="text-xs text-gray-500">
+                              {new Date(
+                                config.result.timestamp
+                              ).toLocaleTimeString()}
+                            </span>
                           </div>
+
                           {/* Metrics */}
                           <div className="grid grid-cols-3 gap-4">
                             <div className="bg-blue-50 rounded-lg p-3">
@@ -1671,6 +1044,7 @@ What could be causing this and how do I fix it?`,
                               </p>
                             </div>
                           </div>
+
                           {/* Response */}
                           <div>
                             <div className="flex items-center justify-between mb-2">
