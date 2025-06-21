@@ -93,7 +93,7 @@ const Dashboard = () => {
   // Show loading screen during initial load
   if (initialLoading) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 flex items-center justify-center z-50 overflow-hidden">
+      <div className="fixed inset-0 bg-white flex items-center justify-center z-50 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -left-40 w-80 h-80 bg-blue-100/20 rounded-full blur-3xl animate-pulse"></div>
@@ -237,7 +237,8 @@ const Dashboard = () => {
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Quick Actions
-          </h2>          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          </h2>{" "}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link
               to="/test"
               className="flex flex-col items-center p-4 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors group"
