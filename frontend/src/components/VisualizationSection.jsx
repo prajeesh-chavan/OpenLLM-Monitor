@@ -195,6 +195,7 @@ const VisualizationSection = () => {
   return (
     <div className="px-3 sm:px-6 py-3 sm:py-4 bg-white">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+        {" "}
         {/* Token Usage Over Time */}
         <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
@@ -212,40 +213,61 @@ const VisualizationSection = () => {
               </div>
             </div>
           </div>
-          <ResponsiveContainer
-            width="100%"
-            height={200}
-            className="sm:!h-[250px]"
-          >
-            <AreaChart data={analyticsStats.tokenUsage || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="timestamp"
-                tick={{ fontSize: 12 }}
-                hide={window.innerWidth < 640}
-              />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="inputTokens"
-                stackId="1"
-                stroke="#3B82F6"
-                fill="#3B82F6"
-                fillOpacity={0.6}
-              />
-              <Area
-                type="monotone"
-                dataKey="outputTokens"
-                stackId="1"
-                stroke="#10B981"
-                fill="#10B981"
-                fillOpacity={0.6}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
+          <div className="relative">
+            <ResponsiveContainer
+              width="100%"
+              height={200}
+              className="sm:!h-[250px]"
+            >
+              <AreaChart data={analyticsStats.tokenUsage || []}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="timestamp"
+                  tick={{ fontSize: 12 }}
+                  hide={window.innerWidth < 640}
+                />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Area
+                  type="monotone"
+                  dataKey="inputTokens"
+                  stackId="1"
+                  stroke="#3B82F6"
+                  fill="#3B82F6"
+                  fillOpacity={0.6}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="outputTokens"
+                  stackId="1"
+                  stroke="#10B981"
+                  fill="#10B981"
+                  fillOpacity={0.6}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+            {/* Empty State Overlay */}
+            {(!analyticsStats.tokenUsage ||
+              analyticsStats.tokenUsage.length === 0 ||
+              analyticsStats.tokenUsage.every(
+                (item) =>
+                  (item.inputTokens || 0) === 0 &&
+                  (item.outputTokens || 0) === 0
+              )) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                <div className="text-center p-6">
+                  <div className="text-4xl mb-3">📊</div>
+                  <div className="text-lg font-semibold text-blue-700 mb-2">
+                    No Token Usage Data
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Start making API requests to see token usage trends
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>{" "}
         {/* Latency Trends */}
         <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
@@ -254,39 +276,56 @@ const VisualizationSection = () => {
             </h3>
             <div className="text-xs sm:text-sm text-gray-600">Target: 2s</div>
           </div>
-          <ResponsiveContainer
-            width="100%"
-            height={200}
-            className="sm:!h-[250px]"
-          >
-            <LineChart data={latencyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="time"
-                tick={{ fontSize: 12 }}
-                hide={window.innerWidth < 640}
-              />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="latency"
-                stroke="#F59E0B"
-                strokeWidth={2}
-                dot={{ fill: "#F59E0B", strokeWidth: 2, r: 3 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="threshold"
-                stroke="#EF4444"
-                strokeDasharray="5 5"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="relative">
+            <ResponsiveContainer
+              width="100%"
+              height={200}
+              className="sm:!h-[250px]"
+            >
+              <LineChart data={latencyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="time"
+                  tick={{ fontSize: 12 }}
+                  hide={window.innerWidth < 640}
+                />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type="monotone"
+                  dataKey="latency"
+                  stroke="#F59E0B"
+                  strokeWidth={2}
+                  dot={{ fill: "#F59E0B", strokeWidth: 2, r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="threshold"
+                  stroke="#EF4444"
+                  strokeDasharray="5 5"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            {/* Empty State Overlay */}
+            {latencyData &&
+              latencyData.every((item) => (item.latency || 0) === 0) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                  <div className="text-center p-6">
+                    <div className="text-4xl mb-3">⚡</div>
+                    <div className="text-lg font-semibold text-amber-700 mb-2">
+                      No Latency Data Available
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Performance metrics will appear here once you make API
+                      requests
+                    </div>
+                  </div>
+                </div>
+              )}
+          </div>
         </div>
-
         {/* Retry Spike Alerts */}
         <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
@@ -297,29 +336,46 @@ const VisualizationSection = () => {
               Alert threshold: 5
             </div>
           </div>
-          <ResponsiveContainer
-            width="100%"
-            height={200}
-            className="sm:!h-[250px]"
-          >
-            <BarChart data={retryData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="time"
-                tick={{ fontSize: 12 }}
-                hide={window.innerWidth < 640}
-              />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar
-                dataKey="retries"
-                fill={(entry) => (entry >= 5 ? "#EF4444" : "#6366F1")}
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="relative">
+            <ResponsiveContainer
+              width="100%"
+              height={200}
+              className="sm:!h-[250px]"
+            >
+              <BarChart data={retryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="time"
+                  tick={{ fontSize: 12 }}
+                  hide={window.innerWidth < 640}
+                />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar
+                  dataKey="retries"
+                  fill={(entry) => (entry >= 5 ? "#EF4444" : "#6366F1")}
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+            {/* Empty State Overlay */}
+            {retryData &&
+              retryData.every((item) => (item.retries || 0) === 0) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                  <div className="text-center p-6">
+                    <div className="text-4xl mb-3">✨</div>
+                    <div className="text-lg font-semibold text-green-700 mb-2">
+                      0 Retry Spikes Detected
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Your system is running smoothly with no retry errors in
+                      the last 24 hours
+                    </div>
+                  </div>
+                </div>
+              )}
+          </div>
         </div>
-
         {/* Cost Breakdown */}
         <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
@@ -329,8 +385,8 @@ const VisualizationSection = () => {
             <div className="text-xs sm:text-sm text-gray-600">
               Total: $24.55
             </div>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center">
+          </div>{" "}
+          <div className="flex flex-col sm:flex-row items-center relative">
             <ResponsiveContainer
               width="100%"
               height={180}
@@ -354,6 +410,20 @@ const VisualizationSection = () => {
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+            {/* Empty State Overlay for Cost Chart */}
+            {(!costBreakdownData || costBreakdownData.length === 0) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                <div className="text-center p-6">
+                  <div className="text-4xl mb-3">💰</div>
+                  <div className="text-lg font-semibold text-green-700 mb-2">
+                    No Cost Data Yet
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Cost breakdown will appear as you use different models
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex-1 w-full sm:w-auto space-y-2 mt-4 sm:mt-0">
               {costBreakdownData.map((item, index) => (
                 <div key={index} className="flex items-center justify-between">

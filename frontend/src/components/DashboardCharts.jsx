@@ -67,27 +67,47 @@ const DashboardCharts = () => {
             </button>
           ))}
         </div>
-      </div>
+      </div>{" "}
       {/* Request Volume Chart */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Request Volume Over Time
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={stats.requestVolume || []}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="timestamp" />
-            <YAxis />
-            <Tooltip formatter={formatTooltipValue} />
-            <Area
-              type="monotone"
-              dataKey="requests"
-              stroke="#3B82F6"
-              fill="#3B82F6"
-              fillOpacity={0.3}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <div className="relative">
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={stats.requestVolume || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="timestamp" />
+              <YAxis />
+              <Tooltip formatter={formatTooltipValue} />
+              <Area
+                type="monotone"
+                dataKey="requests"
+                stroke="#3B82F6"
+                fill="#3B82F6"
+                fillOpacity={0.3}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+          {/* Empty State Overlay */}
+          {(!stats.requestVolume ||
+            stats.requestVolume.length === 0 ||
+            stats.requestVolume.every(
+              (item) => (item.requests || 0) === 0
+            )) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+              <div className="text-center p-6">
+                <div className="text-4xl mb-3">📈</div>
+                <div className="text-lg font-semibold text-blue-700 mb-2">
+                  No Request Activity
+                </div>
+                <div className="text-sm text-gray-600">
+                  Request volume will be displayed once API calls are made
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       {/* Response Time Chart */}
       <div className="bg-white p-6 rounded-lg shadow">
@@ -112,37 +132,54 @@ const DashboardCharts = () => {
         </ResponsiveContainer>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {" "}
         {/* Provider Distribution */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Provider Distribution
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={stats.providerDistribution || []}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(0)}%`
-                }
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {(stats.providerDistribution || []).map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="relative">
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={stats.providerDistribution || []}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {(stats.providerDistribution || []).map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            {/* Empty State Overlay */}
+            {(!stats.providerDistribution ||
+              stats.providerDistribution.length === 0) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                <div className="text-center p-6">
+                  <div className="text-4xl mb-3">🔌</div>
+                  <div className="text-lg font-semibold text-indigo-700 mb-2">
+                    No Provider Data
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Provider usage distribution will appear here
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-
         {/* Status Distribution */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">

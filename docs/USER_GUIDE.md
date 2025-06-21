@@ -23,16 +23,19 @@ Welcome to OpenLLM Monitor! This comprehensive guide will help you understand an
 ### First Time Experience
 
 1. **Enhanced Loading Screen**
+
    - Beautiful animated loading experience with gradient backgrounds
    - Smooth transitions and loading indicators
    - Minimum 2.5-second showcase of loading animations
 
 2. **Access the Dashboard**
+
    - Navigate to `http://localhost:5173`
    - Experience the modernized dashboard with improved layout
    - Enjoy the responsive design that adapts to your screen size
 
 3. **Connection Status**
+
    - Check the enhanced connection indicator in the top header
    - Green dot with animation = System connected and healthy
    - Red dot = Connection issues (with detailed error information)
@@ -60,18 +63,21 @@ The dashboard provides a comprehensive overview with significant UI/UX improveme
 ### Enhanced Key Metrics Cards
 
 1. **Total Requests**
+
    - Shows total number of API calls with enhanced visual design
    - Includes success and failure counts with color-coded indicators
    - Real-time updates with smooth animations
    - Hover effects and improved interaction feedback
 
 2. **Total Cost**
+
    - Cumulative cost tracking with improved cost visualization
    - Enhanced provider and model breakdown
    - Cost trends with interactive charts
    - Visual cost alerts and warnings
 
 3. **Average Latency**
+
    - Response time metrics with performance indicators
    - Enhanced provider comparison visualization
    - Performance trends with detailed analysis
@@ -86,12 +92,14 @@ The dashboard provides a comprehensive overview with significant UI/UX improveme
 ### Advanced Real-time Features
 
 1. **Enhanced Charts & Visualizations**
+
    - Responsive charts that adapt to screen size
    - Interactive hover states and tooltips
    - Smooth animations and transitions
    - Export capabilities for reporting
 
 2. **Live Feed Integration**
+
    - Toggle live feed mode for real-time monitoring
    - Activity counter with animated indicators
    - Recent activity panel with detailed log previews
@@ -110,18 +118,21 @@ The dashboard provides a comprehensive overview with significant UI/UX improveme
 The new alert system provides intelligent monitoring with beautiful UI:
 
 1. **Bell Icon Notifications**
+
    - Located in the top header with badge count
    - Animated notification indicators
    - Color-coded alert priorities
    - Quick preview of active alerts
 
 2. **Alert Types & Intelligence**
+
    - **High Retry Rate**: Detects connectivity issues (>20%)
    - **Error Rate Spikes**: Monitors error patterns (>15%)
    - **Cost Thresholds**: Budget monitoring ($50+ daily)
    - **Performance Issues**: Latency warnings (>2 seconds)
 
 3. **Enhanced Alert Details**
+
    - Full-screen modal with comprehensive information
    - Current metrics vs. threshold comparisons
    - Impact analysis and recommendations
@@ -140,18 +151,21 @@ The new alert system provides intelligent monitoring with beautiful UI:
 The log management system has been completely enhanced:
 
 1. **Advanced Table Features**
+
    - Expandable rows for detailed information
    - Multi-column sorting with visual indicators
    - Bulk selection and operations
    - Enhanced pagination controls
 
 2. **Real-time Log Streaming**
+
    - WebSocket-powered real-time updates
    - Live log feed with activity counters
    - Automatic refresh with user controls
    - Visual indicators for new logs
 
 3. **Enhanced Filtering & Search**
+
    - Multi-dimensional filtering system
    - Real-time search with instant results
    - Saved filter combinations
@@ -170,18 +184,21 @@ The log management system has been completely enhanced:
 The model testing feature has been completely redesigned:
 
 1. **Template Categories**
+
    - **Quick Start**: Simple interactions and basic testing
    - **Development**: Code review, debugging, documentation
    - **Creative**: Story writing, brainstorming, content creation
    - **Analysis**: Data insights, research, competitive analysis
 
 2. **Advanced Testing Features**
+
    - Step-by-step wizard interface
    - Real-time cost estimation
    - Parameter validation and guidance
    - Progress tracking for batch tests
 
 3. **Enhanced Comparison Mode**
+
    - Side-by-side model comparison
    - Performance metrics analysis
    - Cost-benefit analysis
@@ -198,12 +215,14 @@ The model testing feature has been completely redesigned:
 ### Live Activity Monitoring
 
 1. **Live Feed Toggle**
+
    - Located in bottom-left corner
    - Real-time activity counter
    - Visual activity indicators
    - Pause/resume functionality
 
 2. **Activity Panel**
+
    - Recent log previews
    - Status indicators and timestamps
    - Quick action buttons
@@ -220,11 +239,13 @@ The model testing feature has been completely redesigned:
 ### Built-in Shortcuts
 
 1. **Global Shortcuts**
+
    - `Cmd/Ctrl + K`: Global search
    - `R`: Quick replay (when not in input fields)
    - `Escape`: Close modals and overlays
 
 2. **Navigation Shortcuts**
+
    - Quick access to key features
    - Modal dismissal
    - Search activation
@@ -746,6 +767,7 @@ Navigate to **Settings** → **Providers**:
 Access comprehensive settings through the gear icon in the top header:
 
 1. **Tabbed Interface**
+
    - **General**: Basic system preferences
    - **Providers**: API key management and testing
    - **Notifications**: Alert and notification preferences
@@ -753,6 +775,7 @@ Access comprehensive settings through the gear icon in the top header:
    - **Security**: Access control and audit settings
 
 2. **Notification Settings**
+
    - **Activity Notifications**: New requests and system activity
    - **Error Notifications**: Error alerts and warnings
    - **Cost Notifications**: Budget and spending alerts
@@ -760,6 +783,7 @@ Access comprehensive settings through the gear icon in the top header:
    - **Test Notifications**: Built-in notification testing
 
 3. **Provider Management**
+
    - Add and configure API keys
    - Test provider connections
    - Set provider priorities
@@ -778,12 +802,14 @@ Access comprehensive settings through the gear icon in the top header:
 Access detailed performance metrics through the dedicated performance modal:
 
 1. **Comprehensive Metrics**
+
    - Latency analysis with percentiles
    - Token usage statistics
    - Cost breakdown by provider
    - Success/failure rate tracking
 
 2. **Visual Performance Indicators**
+
    - Color-coded performance metrics
    - Interactive charts and graphs
    - Historical trend analysis
@@ -802,12 +828,14 @@ Access detailed performance metrics through the dedicated performance modal:
 The entire interface has been optimized for mobile devices:
 
 1. **Responsive Design**
+
    - Adaptive layouts for all screen sizes
    - Touch-friendly interface elements
    - Optimized typography and spacing
    - Mobile-specific navigation patterns
 
 2. **Mobile-Specific Features**
+
    - Safe area support for devices with notches
    - Touch-optimized controls
    - Gesture-friendly interactions
@@ -843,7 +871,7 @@ The entire interface has been optimized for mobile devices:
 ### Support Resources
 
 - 📖 [README.md](../README.md) - Setup and installation
-- 🔧 [API Documentation](./API_DOCUMENTATION.md) - API reference  
+- 🔧 [API Documentation](./API_DOCUMENTATION.md) - API reference
 - 🚀 [Deployment Guide](./DEPLOYMENT.md) - Production deployment
 - 📊 [Development Guide](./DEVELOPMENT.md) - Development status and testing
 - ⚡ [Features Guide](./FEATURES.md) - Complete feature overview

@@ -129,9 +129,10 @@ _Test and compare prompts across different providers and models_
 
 ## 🎨 Latest UI/UX Enhancements
 
-OpenLLM Monitor has received major UI/UX improvements and feature enhancements! 
+OpenLLM Monitor has received major UI/UX improvements and feature enhancements!
 
 **🚀 What's New:**
+
 - ✨ **Beautiful Loading Experience** with animated backgrounds
 - 🔔 **Smart Alerts System** with interactive bell notifications
 - 📱 **Enhanced Mobile Experience** with responsive design
