@@ -102,151 +102,170 @@ const Analytics = () => {
   };
 
   const advancedStats = getAdvancedStats();
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="relative mb-6">
+            {/* Main spinning ring */}
+            <div className="w-16 h-16 border-4 border-transparent border-t-blue-600 border-r-blue-500 rounded-full animate-spin mx-auto shadow-lg"></div>
+            {/* Secondary spinning ring */}
+            <div
+              className="absolute inset-0 w-16 h-16 border-4 border-transparent border-b-purple-600 border-l-purple-500 rounded-full animate-spin mx-auto"
+              style={{ animationDirection: "reverse", animationDuration: "2s" }}
+            ></div>
+            {/* Inner pulsing core */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-4 h-4 bg-gradient-to-r from-blue-600 via-purple-500 to-blue-600 rounded-full animate-pulse shadow-lg"></div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-gray-900">Loading Analytics</h3>
+            <p className="text-gray-600">Gathering insights and metrics...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header with Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Advanced Analytics
-          </h1>
-          <p className="mt-2 text-gray-400">
-            Deep insights into your LLM usage patterns and performance metrics
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="space-y-6 px-3 sm:px-6 py-6">
+        {/* Header with Controls */}
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Advanced Analytics
+              </h1>
+              <p className="mt-2 text-gray-600">
+                Deep insights into your LLM usage patterns and performance metrics
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Timeframe Selector */}
+              <div className="flex items-center gap-2">
+                <ClockIcon className="h-4 w-4 text-gray-500" />
+                <select
+                  value={timeframe}
+                  onChange={(e) => setTimeframe(e.target.value)}
+                  className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                >
+                  {timeframeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Metric Selector */}
+              <div className="flex items-center gap-2">
+                <BeakerIcon className="h-4 w-4 text-gray-500" />
+                <select
+                  value={selectedMetric}
+                  onChange={(e) => setSelectedMetric(e.target.value)}
+                  className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                >
+                  {metricOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>        {/* Quick Stats Overview */}
+        <SummaryStatsPanel />
+
+        {/* Advanced Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-50 rounded-lg border border-blue-100">
+                <CpuChipIcon className="h-5 w-5 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Token Efficiency
+              </h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Avg Tokens/Request</span>
+                <span className="text-gray-900 font-mono font-semibold">
+                  {advancedStats.avgTokensPerRequest.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Avg Cost/Token</span>
+                <span className="text-gray-900 font-mono font-semibold">
+                  ${(advancedStats.avgCostPerToken * 1000).toFixed(4)}/1K
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100">
+                <ArrowTrendingUpIcon className="h-5 w-5 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Performance</h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Success Rate</span>
+                <span className="text-emerald-600 font-mono font-semibold">
+                  {advancedStats.successRate}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Avg Latency</span>
+                <span className="text-gray-900 font-mono font-semibold">
+                  {advancedStats.avgLatency}ms
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-purple-50 rounded-lg border border-purple-100">
+                <BeakerIcon className="h-5 w-5 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Popular Choices
+              </h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Top Model</span>
+                <span className="text-gray-900 font-mono text-xs bg-gray-100 border border-gray-200 px-2 py-1 rounded">
+                  {advancedStats.popularModel}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Top Provider</span>
+                <span className="text-gray-900 font-mono text-xs bg-gray-100 border border-gray-200 px-2 py-1 rounded">
+                  {advancedStats.topProvider}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Timeframe Selector */}
-          <div className="flex items-center gap-2">
-            <ClockIcon className="h-4 w-4 text-gray-400" />
-            <select
-              value={timeframe}
-              onChange={(e) => setTimeframe(e.target.value)}
-              className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {timeframeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+        {/* Charts Section */}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-blue-50 rounded-lg border border-blue-100">
+              <ChartBarIcon className="h-5 w-5 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900">Visual Analytics</h3>
           </div>
-
-          {/* Metric Selector */}
-          <div className="flex items-center gap-2">
-            <BeakerIcon className="h-4 w-4 text-gray-400" />
-            <select
-              value={selectedMetric}
-              onChange={(e) => setSelectedMetric(e.target.value)}
-              className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {metricOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <DashboardCharts />
         </div>
-      </div>
-
-      {/* Quick Stats Overview */}
-      <SummaryStatsPanel />
-
-      {/* Advanced Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-500/20 rounded-lg">
-              <CpuChipIcon className="h-5 w-5 text-blue-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-white">
-              Token Efficiency
-            </h3>
-          </div>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Avg Tokens/Request</span>
-              <span className="text-white font-mono">
-                {advancedStats.avgTokensPerRequest.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Avg Cost/Token</span>
-              <span className="text-white font-mono">
-                ${(advancedStats.avgCostPerToken * 1000).toFixed(4)}/1K
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-green-500/20 rounded-lg">
-              <ArrowTrendingUpIcon className="h-5 w-5 text-green-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-white">Performance</h3>
-          </div>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Success Rate</span>
-              <span className="text-green-400 font-mono">
-                {advancedStats.successRate}%
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Avg Latency</span>
-              <span className="text-white font-mono">
-                {advancedStats.avgLatency}ms
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-purple-500/20 rounded-lg">
-              <BeakerIcon className="h-5 w-5 text-purple-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-white">
-              Popular Choices
-            </h3>
-          </div>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Top Model</span>
-              <span className="text-white font-mono text-xs bg-gray-700 px-2 py-1 rounded">
-                {advancedStats.popularModel}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Top Provider</span>
-              <span className="text-white font-mono text-xs bg-gray-700 px-2 py-1 rounded">
-                {advancedStats.topProvider}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Charts Section */}
-      <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/30 rounded-xl p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-500/20 rounded-lg">
-            <ChartBarIcon className="h-5 w-5 text-blue-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-white">Visual Analytics</h3>
-        </div>
-        <DashboardCharts />
       </div>
     </div>
   );
