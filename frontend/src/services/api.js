@@ -1,4 +1,5 @@
 import axios from "axios";
+import errorHandler from "./errorHandler";
 
 // Create axios instance with default config
 const api = axios.create({
@@ -9,42 +10,22 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
-    // Add timestamp to prevent caching
-    config.params = {
-      ...config.params,
-      _t: Date.now(),
-    };
+// Apply error handler interceptors
+errorHandler.createAxiosInterceptor(api);
 
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor
+// Additional response interceptor for data extraction
 api.interceptors.response.use(
   (response) => {
     return response.data;
   },
   (error) => {
-    // Handle common errors
-    if (error.response?.status === 429) {
-      throw new Error("Too many requests. Please try again later.");
+    // The error handler has already processed this error
+    // Just propagate it with clean error message
+    if (error.response?.data?.error) {
+      throw new Error(error.response.data.error);
     }
-
-    if (error.response?.status >= 500) {
-      throw new Error("Server error. Please try again later.");
-    }
-
-    if (error.code === "ECONNABORTED") {
-      throw new Error("Request timeout. Please try again.");
-    }
-
-    throw error.response?.data?.error || error.message || "An error occurred";
+    
+    throw error.message || "An error occurred";
   }
 );
 

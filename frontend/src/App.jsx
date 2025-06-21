@@ -14,6 +14,17 @@ import ReplayPage from "./pages/ReplayPage";
 import TestModelsPage from "./pages/TestModelsPage";
 import ProvidersPage from "./pages/ProvidersPage";
 
+// Error Pages
+import {
+  NotFoundErrorPage,
+  RateLimitErrorPage,
+  ServerErrorPage,
+  NetworkErrorPage,
+} from "./pages/ErrorPages";
+
+// Components
+import ErrorBoundary from "./components/ErrorBoundary";
+
 // Services
 import wsService from "./services/websocket";
 import { useAppStore } from "./store";
@@ -80,28 +91,32 @@ function App() {
     return () => {
       wsService.disconnect();
     };
-  }, [setWsConnected, setWsReconnecting]);
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Routes>
-        {/* Standalone Analytics Page */}
-        <Route path="/analytics" element={<Analytics />} />
+  }, [setWsConnected, setWsReconnecting]);  return (
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50">
+        <Routes>
+          {/* Error Pages */}
+          <Route path="/error/429" element={<RateLimitErrorPage />} />
+          <Route path="/error/500" element={<ServerErrorPage />} />
+          <Route path="/error/network" element={<NetworkErrorPage />} />          {/* Standalone Pages */}
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/providers" element={<ProvidersPage />} />
 
-        {/* Dashboard Routes */}
-        <Route path="/" element={<DashboardLayout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="logs" element={<LogsPage />} />
-          <Route path="logs/:id" element={<LogDetailPage />} />
-          <Route path="replay" element={<ReplayPage />} />
-          <Route path="test" element={<TestModelsPage />} />
-          <Route path="providers" element={<ProvidersPage />} />
-        </Route>
+          {/* Dashboard Routes */}
+          <Route path="/" element={<DashboardLayout />}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="logs" element={<LogsPage />} />
+            <Route path="logs/:id" element={<LogDetailPage />} />
+            <Route path="replay" element={<ReplayPage />} />
+            <Route path="test" element={<TestModelsPage />} />
+          </Route>
 
-        {/* Catch all route */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </div>
+          {/* 404 Catch all route */}
+          <Route path="*" element={<NotFoundErrorPage />} />
+        </Routes>
+      </div>
+    </ErrorBoundary>
   );
 }
 

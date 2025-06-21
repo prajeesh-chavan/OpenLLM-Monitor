@@ -237,8 +237,7 @@ const Dashboard = () => {
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Quick Actions
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          </h2>          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link
               to="/test"
               className="flex flex-col items-center p-4 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors group"
