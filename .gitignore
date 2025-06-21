@@ -40,3 +40,6 @@ coverage/
 
 # Ignore by default, but keep .env.example
 !*.env.example
+
+# Private documentation (keep local only)
+PRIVATE_PROJECT_DOCUMENTATION.md
