@@ -84,17 +84,20 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        {/* Dashboard Routes */}{" "}
+        {/* Standalone Analytics Page */}
+        <Route path="/analytics" element={<Analytics />} />
+
+        {/* Dashboard Routes */}
         <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="analytics" element={<Analytics />} />
           <Route path="logs" element={<LogsPage />} />
           <Route path="logs/:id" element={<LogDetailPage />} />
           <Route path="replay" element={<ReplayPage />} />
           <Route path="test" element={<TestModelsPage />} />
           <Route path="providers" element={<ProvidersPage />} />
         </Route>
+
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
