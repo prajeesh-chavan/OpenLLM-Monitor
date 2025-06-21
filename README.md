@@ -86,19 +86,33 @@ _Test and compare prompts across different providers and models_
 
 ## 🚀 Features
 
-### 🔔 Smart Alerts & Monitoring
+### 🔔 Enhanced Smart Alerts & Monitoring
 
-- 🚨 **Intelligent Alert System** - Proactive monitoring with real-time notifications
-- 📊 **Performance Alerts** - Latency, error rate, and retry monitoring with detailed analysis
-- 💰 **Cost Alerts** - Budget threshold notifications with comprehensive insights
-- � **Detailed Diagnostics** - In-depth alert analysis with actionable recommendations
-- 📈 **Trend Monitoring** - Continuous tracking of key performance metrics
+- 🚨 **Intelligent Alert System** - Proactive monitoring with enhanced real-time notifications and interactive bell icon
+- 📊 **Advanced Performance Alerts** - Latency, error rate, and retry monitoring with detailed analysis and visual indicators
+- 💰 **Smart Cost Alerts** - Budget threshold notifications with comprehensive spending insights and trends
+- 🔍 **Detailed Alert Analysis** - In-depth alert analysis with actionable recommendations and impact assessment
+- 📈 **Enhanced Trend Monitoring** - Continuous tracking of key performance metrics with advanced visualizations
+- 🎛️ **Notification Management** - Granular notification controls with test notification capabilities
 
-### 🧪 Model Testing & Experimentation
+### 🧪 Enhanced Model Testing & Experimentation
 
-- 🔬 **Direct Model Testing** - Test prompts directly without existing logs
-- 🔄 **Multi-Model Comparison** - Compare responses across different providers and models
-- 📝 **Prompt Library** - Save and manage frequently used test prompts
+- 🔬 **Redesigned Testing Interface** - Completely redesigned model testing with template categories and step-by-step wizard
+- 🎯 **Template Categories** - Organized templates for Quick Start, Development, Creative, and Analysis use cases
+- 🔄 **Advanced Multi-Model Comparison** - Enhanced side-by-side comparison with detailed performance metrics
+- 💡 **Smart Template Library** - Pre-built prompts with categorization, icons, and estimated completion times
+- 📊 **Real-time Cost Estimation** - Accurate cost preview with token counting before running tests
+- � **Enhanced Batch Testing** - Test multiple configurations with progress tracking and results analysis
+
+### 📱 Modern UI/UX & Enhanced User Experience
+
+- ✨ **Beautiful Loading Experience** - Animated loading screen with gradient backgrounds and smooth transitions
+- 🎨 **Enhanced Responsive Design** - Fully optimized layouts for desktop, tablet, and mobile devices
+- ⌨️ **Keyboard Shortcuts** - Built-in shortcuts for power users (Cmd/Ctrl+K, R, Escape)
+- 🔄 **Live Feed Mode** - Real-time activity monitoring with toggleable live feed and activity counters
+- 🎭 **Smooth Animations** - CSS animations and transitions for enhanced user experience
+- 📊 **Interactive Components** - Enhanced tables, modals, and interactive elements with improved UX
+- 📝 **Pre-built prompts** for different use cases
 - ⚡ **Quick Examples** - Pre-built prompts for different use cases
 - 💰 **Cost Estimation** - Preview costs before running expensive tests
 - 📊 **Performance Benchmarking** - Compare latency, quality, and costs
@@ -110,6 +124,23 @@ _Test and compare prompts across different providers and models_
 - 💰 **Cost Tracking & Analysis** - Track spending across providers with detailed breakdowns
 - ⚡ **Performance Monitoring** - Latency tracking, retry analysis, and error monitoring
 - 🚨 **Error Tracking** - Comprehensive error analysis and alerting
+
+---
+
+## 🎨 Latest UI/UX Enhancements
+
+OpenLLM Monitor has received major UI/UX improvements and feature enhancements! 
+
+**🚀 What's New:**
+- ✨ **Beautiful Loading Experience** with animated backgrounds
+- 🔔 **Smart Alerts System** with interactive bell notifications
+- 📱 **Enhanced Mobile Experience** with responsive design
+- ⌨️ **Keyboard Shortcuts** for power users
+- 🔄 **Live Feed Mode** with real-time activity monitoring
+- 🧪 **Redesigned Model Testing** with template categories
+- 📊 **Interactive Components** with smooth animations
+
+**📖 See Complete Enhancement Guide:** [Enhanced Features Documentation](./docs/ENHANCED_FEATURES.md)
 
 ### 🌐 Provider Support
 
@@ -1025,11 +1056,17 @@ tail -f ~/.ollama/logs/server.log
 
 ### 📚 Resources
 
-- 📖 **[User Guide](./USER_GUIDE.md)** - Complete usage guide
+- 📖 **[User Guide](./docs/USER_GUIDE.md)** - Complete usage guide with enhanced UI features
+- 🎨 **[Enhanced Features Guide](./docs/ENHANCED_FEATURES.md)** - Latest UI/UX improvements and new features
 - 🚀 **[Quick Start](./docs/QUICK_START.md)** - Get running in 5 minutes
+- 📊 **[Features Overview](./docs/FEATURES.md)** - Comprehensive feature documentation
 - 🔧 **[API Docs](./docs/API_DOCUMENTATION.md)** - Full API reference
-- 🐳 **[Docker Guide](./docs/DOCKER_GUIDE.md)** - Docker setup and deployment
-- 🛠️ **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- � **[Development Guide](./docs/DEVELOPMENT.md)** - Development status and technical details
+- �🐳 **[Docker Guide](./docs/DOCKER_GUIDE.md)** - Docker setup and deployment
+- 🧪 **[Test Models Guide](./docs/TEST_MODELS_GUIDE.md)** - Enhanced model testing interface
+- � **[Smart Alerts](./docs/SMART_ALERTS.md)** - Intelligent monitoring and notifications
+- �🛠️ **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- 📝 **[Changelog](./CHANGELOG.md)** - All recent improvements and changes
 
 ---
 

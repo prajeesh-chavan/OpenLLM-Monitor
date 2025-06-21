@@ -2,102 +2,237 @@
 
 _User guide and project by Prajeesh Chavan_
 
-Welcome to OpenLLM Monitor! This comprehensive guide will help you understand and effectively use all the features of the system.
+Welcome to OpenLLM Monitor! This comprehensive guide will help you understand and effectively use all the enhanced features of the system, including the latest UI/UX improvements and new capabilities.
 
 ## 📋 Table of Contents
 
 1. [Getting Started](#getting-started)
-2. [Dashboard Overview](#dashboard-overview)
-3. [Monitoring LLM Requests](#monitoring-llm-requests)
-4. [Analyzing Performance](#analyzing-performance)
-5. [Replaying Prompts](#replaying-prompts)
-6. [Provider Management](#provider-management)
-7. [Advanced Analytics](#advanced-analytics)
-8. [Making API Calls Through Frontend](#-making-api-calls-through-frontend)
-9. [Troubleshooting](#troubleshooting)
-10. [Making API Calls Through Frontend](#making-api-calls-through-frontend)
+2. [Enhanced Dashboard Overview](#enhanced-dashboard-overview)
+3. [Smart Alerts & Notifications](#smart-alerts--notifications)
+4. [Advanced Log Management](#advanced-log-management)
+5. [Enhanced Model Testing](#enhanced-model-testing)
+6. [Live Feed & Real-time Updates](#live-feed--real-time-updates)
+7. [Keyboard Shortcuts & Power User Features](#keyboard-shortcuts--power-user-features)
+8. [Settings & Configuration](#settings--configuration)
+9. [Performance Monitoring](#performance-monitoring)
+10. [Mobile & Responsive Experience](#mobile--responsive-experience)
+11. [Troubleshooting](#troubleshooting)
 
 ## 🚀 Getting Started
 
-### First Time Setup
+### First Time Experience
 
-1. **Access the Dashboard**
+1. **Enhanced Loading Screen**
+   - Beautiful animated loading experience with gradient backgrounds
+   - Smooth transitions and loading indicators
+   - Minimum 2.5-second showcase of loading animations
 
-   - Open your browser and navigate to `http://localhost:5173`
-   - You'll see the main dashboard with real-time metrics
+2. **Access the Dashboard**
+   - Navigate to `http://localhost:5173`
+   - Experience the modernized dashboard with improved layout
+   - Enjoy the responsive design that adapts to your screen size
 
-2. **Verify Connection**
+3. **Connection Status**
+   - Check the enhanced connection indicator in the top header
+   - Green dot with animation = System connected and healthy
+   - Red dot = Connection issues (with detailed error information)
+   - Yellow/Orange = Reconnecting with progress indication
 
-   - Check the connection status indicator in the top header
-   - Green dot = System is running and connected
-   - Red dot = Connection issues (check backend server)
+4. **Smart Alerts Setup**
+   - Notice the bell icon in the top header for notifications
+   - Configure alert preferences in the enhanced settings modal
+   - Test notifications with the built-in testing system
 
-3. **Configure Providers** (Optional)
-   - Navigate to **Settings** → **Providers**
-   - Add your API keys for the LLM providers you want to monitor
-   - Test connections to ensure everything is working
+### Enhanced Navigation
 
-### Navigation
+The application features a completely modernized interface:
 
-The application has a clean, intuitive interface:
+- **Top Header**: Enhanced header with auto-refresh controls, smart alerts, and settings access
+- **Live Feed**: Toggle live feed mode for real-time activity monitoring
+- **Keyboard Shortcuts**: Built-in shortcuts for power users
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **Smooth Animations**: CSS animations for better user experience
 
-- **Header**: Shows connection status, refresh controls, and user actions
-- **Sidebar**: Main navigation menu with all features
-- **Main Content**: The active page content
-- **Real-time Updates**: Live data updates via WebSocket
+## 📊 Enhanced Dashboard Overview
 
-## 📊 Dashboard Overview
+The dashboard provides a comprehensive overview with significant UI/UX improvements:
 
-The dashboard provides a comprehensive overview of your LLM usage:
-
-### Key Metrics Cards
+### Enhanced Key Metrics Cards
 
 1. **Total Requests**
-
-   - Shows total number of API calls made
-   - Includes success and failure counts
-   - Updates in real-time
+   - Shows total number of API calls with enhanced visual design
+   - Includes success and failure counts with color-coded indicators
+   - Real-time updates with smooth animations
+   - Hover effects and improved interaction feedback
 
 2. **Total Cost**
-
-   - Cumulative cost across all providers
-   - Breaks down by provider and model
-   - Includes cost trends
+   - Cumulative cost tracking with improved cost visualization
+   - Enhanced provider and model breakdown
+   - Cost trends with interactive charts
+   - Visual cost alerts and warnings
 
 3. **Average Latency**
-
-   - Response time metrics
-   - Provider comparison
-   - Performance trends
+   - Response time metrics with performance indicators
+   - Enhanced provider comparison visualization
+   - Performance trends with detailed analysis
+   - Visual performance alerts
 
 4. **Success Rate**
-   - Percentage of successful requests
-   - Error rate tracking
-   - Reliability metrics
+   - Percentage of successful requests with visual progress indicators
+   - Enhanced error rate tracking with pattern analysis
+   - Reliability metrics with historical comparison
+   - Visual reliability indicators
 
-### Real-time Charts
+### Advanced Real-time Features
 
-1. **Request Volume Over Time**
+1. **Enhanced Charts & Visualizations**
+   - Responsive charts that adapt to screen size
+   - Interactive hover states and tooltips
+   - Smooth animations and transitions
+   - Export capabilities for reporting
 
-   - Hourly/daily request patterns
-   - Provider breakdown
-   - Trend analysis
+2. **Live Feed Integration**
+   - Toggle live feed mode for real-time monitoring
+   - Activity counter with animated indicators
+   - Recent activity panel with detailed log previews
+   - Real-time notifications for new requests
 
-2. **Cost Analysis**
+3. **Smart Dashboard Interactions**
+   - Keyboard shortcuts for quick navigation
+   - Auto-refresh controls with user preferences
+   - Enhanced filtering and search capabilities
+   - Contextual quick actions
 
-   - Cost distribution by provider
-   - Daily/weekly spending patterns
-   - Budget tracking
+## 🔔 Smart Alerts & Notifications
 
-3. **Performance Metrics**
+### Enhanced Alert System
 
-   - Latency distribution
-   - Provider performance comparison
-   - Response time trends
+The new alert system provides intelligent monitoring with beautiful UI:
 
-4. **Error Analysis**
-   - Error types and frequencies
-   - Provider-specific issues
+1. **Bell Icon Notifications**
+   - Located in the top header with badge count
+   - Animated notification indicators
+   - Color-coded alert priorities
+   - Quick preview of active alerts
+
+2. **Alert Types & Intelligence**
+   - **High Retry Rate**: Detects connectivity issues (>20%)
+   - **Error Rate Spikes**: Monitors error patterns (>15%)
+   - **Cost Thresholds**: Budget monitoring ($50+ daily)
+   - **Performance Issues**: Latency warnings (>2 seconds)
+
+3. **Enhanced Alert Details**
+   - Full-screen modal with comprehensive information
+   - Current metrics vs. threshold comparisons
+   - Impact analysis and recommendations
+   - Historical context and trends
+
+4. **Alert Management**
+   - Individual alert dismissal
+   - Bulk alert clearing
+   - Auto-dismissal for resolved issues
+   - Alert history tracking
+
+## 📋 Advanced Log Management
+
+### Interactive Log Table
+
+The log management system has been completely enhanced:
+
+1. **Advanced Table Features**
+   - Expandable rows for detailed information
+   - Multi-column sorting with visual indicators
+   - Bulk selection and operations
+   - Enhanced pagination controls
+
+2. **Real-time Log Streaming**
+   - WebSocket-powered real-time updates
+   - Live log feed with activity counters
+   - Automatic refresh with user controls
+   - Visual indicators for new logs
+
+3. **Enhanced Filtering & Search**
+   - Multi-dimensional filtering system
+   - Real-time search with instant results
+   - Saved filter combinations
+   - Advanced date range selection
+
+4. **Log Details Modal**
+   - Full-screen detailed view with enhanced design
+   - Syntax highlighting for code and JSON
+   - Copy-to-clipboard functionality
+   - Enhanced metadata display
+
+## 🧪 Enhanced Model Testing
+
+### Redesigned Testing Interface
+
+The model testing feature has been completely redesigned:
+
+1. **Template Categories**
+   - **Quick Start**: Simple interactions and basic testing
+   - **Development**: Code review, debugging, documentation
+   - **Creative**: Story writing, brainstorming, content creation
+   - **Analysis**: Data insights, research, competitive analysis
+
+2. **Advanced Testing Features**
+   - Step-by-step wizard interface
+   - Real-time cost estimation
+   - Parameter validation and guidance
+   - Progress tracking for batch tests
+
+3. **Enhanced Comparison Mode**
+   - Side-by-side model comparison
+   - Performance metrics analysis
+   - Cost-benefit analysis
+   - Quality assessment tools
+
+4. **Prompt Management**
+   - Save and organize custom prompts
+   - Template library with categorization
+   - Prompt history and versioning
+   - Export and sharing capabilities
+
+## 📡 Live Feed & Real-time Updates
+
+### Live Activity Monitoring
+
+1. **Live Feed Toggle**
+   - Located in bottom-left corner
+   - Real-time activity counter
+   - Visual activity indicators
+   - Pause/resume functionality
+
+2. **Activity Panel**
+   - Recent log previews
+   - Status indicators and timestamps
+   - Quick action buttons
+   - Expandable details
+
+3. **WebSocket Integration**
+   - Real-time data streaming
+   - Connection status monitoring
+   - Automatic reconnection
+   - Error handling and recovery
+
+## ⌨️ Keyboard Shortcuts & Power User Features
+
+### Built-in Shortcuts
+
+1. **Global Shortcuts**
+   - `Cmd/Ctrl + K`: Global search
+   - `R`: Quick replay (when not in input fields)
+   - `Escape`: Close modals and overlays
+
+2. **Navigation Shortcuts**
+   - Quick access to key features
+   - Modal dismissal
+   - Search activation
+
+3. **Power User Features**
+   - Keyboard-first navigation
+   - Quick actions and commands
+   - Efficient workflow patterns
    - Resolution tracking
 
 ## 🔍 Monitoring LLM Requests
@@ -604,31 +739,114 @@ Navigate to **Settings** → **Providers**:
 
 ---
 
+## ⚙️ Settings & Configuration
+
+### Enhanced Settings Modal
+
+Access comprehensive settings through the gear icon in the top header:
+
+1. **Tabbed Interface**
+   - **General**: Basic system preferences
+   - **Providers**: API key management and testing
+   - **Notifications**: Alert and notification preferences
+   - **Appearance**: Theme and display options
+   - **Security**: Access control and audit settings
+
+2. **Notification Settings**
+   - **Activity Notifications**: New requests and system activity
+   - **Error Notifications**: Error alerts and warnings
+   - **Cost Notifications**: Budget and spending alerts
+   - **Performance Notifications**: Latency and performance warnings
+   - **Test Notifications**: Built-in notification testing
+
+3. **Provider Management**
+   - Add and configure API keys
+   - Test provider connections
+   - Set provider priorities
+   - Monitor provider health
+
+4. **Appearance Options**
+   - Light/Dark mode toggle (dark mode coming soon)
+   - Layout preferences
+   - Chart and visualization options
+   - Mobile optimization settings
+
+## 📊 Performance Monitoring
+
+### Enhanced Performance Modal
+
+Access detailed performance metrics through the dedicated performance modal:
+
+1. **Comprehensive Metrics**
+   - Latency analysis with percentiles
+   - Token usage statistics
+   - Cost breakdown by provider
+   - Success/failure rate tracking
+
+2. **Visual Performance Indicators**
+   - Color-coded performance metrics
+   - Interactive charts and graphs
+   - Historical trend analysis
+   - Comparative performance data
+
+3. **Performance Alerts**
+   - Automated performance monitoring
+   - Threshold-based alerting
+   - Performance degradation detection
+   - Optimization recommendations
+
+## 📱 Mobile & Responsive Experience
+
+### Mobile Optimization
+
+The entire interface has been optimized for mobile devices:
+
+1. **Responsive Design**
+   - Adaptive layouts for all screen sizes
+   - Touch-friendly interface elements
+   - Optimized typography and spacing
+   - Mobile-specific navigation patterns
+
+2. **Mobile-Specific Features**
+   - Safe area support for devices with notches
+   - Touch-optimized controls
+   - Gesture-friendly interactions
+   - Mobile-optimized modals and overlays
+
+3. **Performance on Mobile**
+   - Optimized animations and transitions
+   - Efficient data loading
+   - Smooth scrolling and interactions
+   - Battery-conscious design
+
 ## 🎯 Quick Reference
 
-### Navigation Shortcuts
+### Enhanced Navigation Shortcuts
 
-- **Dashboard**: Overview and real-time metrics
-- **Logs**: Detailed request history and filtering
-- **Analytics**: Comprehensive performance insights
-- **Replay**: Prompt testing and comparison
-- **Settings**: Configuration and provider management
+- **Dashboard**: Overview with enhanced real-time metrics
+- **Logs**: Advanced log management with interactive table
+- **Analytics**: Comprehensive performance insights with enhanced charts
+- **Test Models**: Redesigned testing interface with templates
+- **Settings**: Comprehensive configuration modal
 
-### Key Features
+### Enhanced Key Features
 
-- ✅ Real-time monitoring
-- ✅ Multi-provider support
-- ✅ Cost tracking and analysis
-- ✅ Performance monitoring
-- ✅ Prompt replay and comparison
-- ✅ Advanced analytics and reporting
+- ✅ **Real-time monitoring** with live feed toggle
+- ✅ **Smart alerts** with bell icon notifications
+- ✅ **Enhanced UI/UX** with animations and responsive design
+- ✅ **Keyboard shortcuts** for power users
+- ✅ **Mobile optimization** with touch-friendly interface
+- ✅ **Advanced testing** with template categories
+- ✅ **Performance monitoring** with detailed analytics
+- ✅ **Live activity feed** with real-time updates
 
 ### Support Resources
 
-- 📖 [README.md](./README.md) - Setup and installation
-- 🔧 [API Documentation](./API_DOCUMENTATION.md) - API reference
+- 📖 [README.md](../README.md) - Setup and installation
+- 🔧 [API Documentation](./API_DOCUMENTATION.md) - API reference  
 - 🚀 [Deployment Guide](./DEPLOYMENT.md) - Production deployment
 - 📊 [Development Guide](./DEVELOPMENT.md) - Development status and testing
+- ⚡ [Features Guide](./FEATURES.md) - Complete feature overview
 
 ---
 
