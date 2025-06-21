@@ -31,7 +31,8 @@ class ErrorBoundary extends React.Component {
         <GenericErrorPage
           error={this.state.error}
           resetError={this.resetError}
-        />      );
+        />
+      );
     }
 
     return this.props.children;

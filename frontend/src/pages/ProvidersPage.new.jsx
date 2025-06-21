@@ -23,7 +23,7 @@ const ProvidersPage = () => {
     updateProvider,
     testConnection,
   } = useProvidersStore();
-  
+
   const [testingProvider, setTestingProvider] = useState(null);
   const [showAddProvider, setShowAddProvider] = useState(false);
   const [testResults, setTestResults] = useState({});
@@ -54,7 +54,7 @@ const ProvidersPage = () => {
   const getProviderColor = (providerId) => {
     const colors = {
       openai: "from-green-500 to-teal-600",
-      anthropic: "from-orange-500 to-red-600", 
+      anthropic: "from-orange-500 to-red-600",
       mistral: "from-purple-500 to-indigo-600",
       ollama: "from-yellow-500 to-orange-600",
       openrouter: "from-blue-500 to-cyan-600",
@@ -73,7 +73,9 @@ const ProvidersPage = () => {
       case "failed":
         return <XCircleIcon className="h-5 w-5 text-red-500" />;
       case "testing":
-        return <ArrowPathIcon className="h-5 w-5 text-yellow-500 animate-spin" />;
+        return (
+          <ArrowPathIcon className="h-5 w-5 text-yellow-500 animate-spin" />
+        );
       default:
         return <ExclamationTriangleIcon className="h-5 w-5 text-gray-400" />;
     }
@@ -83,24 +85,24 @@ const ProvidersPage = () => {
     setTestingProvider(providerId);
     try {
       const result = await testConnection(providerId);
-      setTestResults(prev => ({
+      setTestResults((prev) => ({
         ...prev,
         [providerId]: {
           success: result.connected,
-          message: result.connected 
+          message: result.connected
             ? `Connected successfully (${result.latency}ms)`
             : `Connection failed: ${result.status}`,
           timestamp: new Date().toISOString(),
-        }
+        },
       }));
     } catch (error) {
-      setTestResults(prev => ({
+      setTestResults((prev) => ({
         ...prev,
         [providerId]: {
           success: false,
           message: error.message || "Connection failed",
           timestamp: new Date().toISOString(),
-        }
+        },
       }));
     } finally {
       setTestingProvider(null);
@@ -198,7 +200,7 @@ const ProvidersPage = () => {
                 <ArrowPathIcon className="h-4 w-4" />
                 Refresh
               </button>
-              
+
               <button
                 onClick={() => setShowAddProvider(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
@@ -219,7 +221,7 @@ const ProvidersPage = () => {
             const testResult = testResults[providerId];
             const isActive = provider.enabled !== false;
             const isTesting = testingProvider === providerId;
-            
+
             return (
               <div
                 key={providerId}
@@ -230,19 +232,25 @@ const ProvidersPage = () => {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className={`p-3 bg-gradient-to-br ${getProviderColor(providerId)} rounded-lg text-white text-xl shadow-lg`}>
+                    <div
+                      className={`p-3 bg-gradient-to-br ${getProviderColor(
+                        providerId
+                      )} rounded-lg text-white text-xl shadow-lg`}
+                    >
                       {getProviderLogo(providerId)}
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">
-                        {provider.name || providerId.charAt(0).toUpperCase() + providerId.slice(1)}
+                        {provider.name ||
+                          providerId.charAt(0).toUpperCase() +
+                            providerId.slice(1)}
                       </h3>
                       <p className="text-sm text-gray-500 truncate max-w-[200px]">
                         {provider.baseUrl || "Default endpoint"}
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Status Badge */}
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(provider.status)}
@@ -251,11 +259,13 @@ const ProvidersPage = () => {
 
                 {/* Test Result */}
                 {testResult && (
-                  <div className={`mb-4 p-3 rounded-lg border ${
-                    testResult.success 
-                      ? "bg-green-50 border-green-200 text-green-700" 
-                      : "bg-red-50 border-red-200 text-red-700"
-                  }`}>
+                  <div
+                    className={`mb-4 p-3 rounded-lg border ${
+                      testResult.success
+                        ? "bg-green-50 border-green-200 text-green-700"
+                        : "bg-red-50 border-red-200 text-red-700"
+                    }`}
+                  >
                     <div className="flex items-center">
                       {testResult.success ? (
                         <CheckCircleIcon className="h-4 w-4 mr-2" />
@@ -301,7 +311,9 @@ const ProvidersPage = () => {
                     <input
                       type="checkbox"
                       checked={isActive}
-                      onChange={(e) => handleToggleProvider(providerId, e.target.checked)}
+                      onChange={(e) =>
+                        handleToggleProvider(providerId, e.target.checked)
+                      }
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-purple-600"></div>
@@ -316,8 +328,12 @@ const ProvidersPage = () => {
         {(!providers || Object.keys(providers).length === 0) && (
           <div className="text-center py-12">
             <CpuChipIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No providers configured</h3>
-            <p className="text-gray-500 mb-6">Get started by adding your first AI provider</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No providers configured
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Get started by adding your first AI provider
+            </p>
             <button
               onClick={() => setShowAddProvider(true)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
@@ -335,7 +351,8 @@ const ProvidersPage = () => {
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">
-                Configure {providers[selectedProvider]?.name || selectedProvider}
+                Configure{" "}
+                {providers[selectedProvider]?.name || selectedProvider}
               </h3>
               <button
                 onClick={() => {
@@ -357,7 +374,12 @@ const ProvidersPage = () => {
                 <input
                   type="password"
                   value={configForm.apiKey}
-                  onChange={(e) => setConfigForm(prev => ({ ...prev, apiKey: e.target.value }))}
+                  onChange={(e) =>
+                    setConfigForm((prev) => ({
+                      ...prev,
+                      apiKey: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your API key"
                 />
@@ -370,7 +392,12 @@ const ProvidersPage = () => {
                 <input
                   type="url"
                   value={configForm.baseUrl}
-                  onChange={(e) => setConfigForm(prev => ({ ...prev, baseUrl: e.target.value }))}
+                  onChange={(e) =>
+                    setConfigForm((prev) => ({
+                      ...prev,
+                      baseUrl: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="https://api.example.com"
                 />

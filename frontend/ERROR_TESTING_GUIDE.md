@@ -7,6 +7,7 @@ This guide shows you how to test the error pages and error handling functionalit
 ### Method 1: Visual Testing Interface (Recommended)
 
 1. Start your development server:
+
    ```bash
    cd frontend
    npm run dev
@@ -42,27 +43,29 @@ For more realistic testing, you can use our mock API service that simulates real
 1. Open your browser's developer console (F12)
 
 2. Activate the error testing service:
+
    ```javascript
-   window.testErrors.activate()
+   window.testErrors.activate();
    ```
 
 3. Now all API calls will randomly return errors. Try using the app normally (view logs, analytics, etc.)
 
 4. To test specific errors:
+
    ```javascript
    // Test rate limiting
-   window.testErrors.simulateRateLimit()
-   
+   window.testErrors.simulateRateLimit();
+
    // Test server errors
-   window.testErrors.simulateServerError()
-   
+   window.testErrors.simulateServerError();
+
    // Test network errors
-   window.testErrors.simulateNetworkError()
+   window.testErrors.simulateNetworkError();
    ```
 
 5. Deactivate when done:
    ```javascript
-   window.testErrors.deactivate()
+   window.testErrors.deactivate();
    ```
 
 ### Testing with Query Parameters
@@ -70,25 +73,28 @@ For more realistic testing, you can use our mock API service that simulates real
 You can also force specific errors by adding query parameters to API calls:
 
 - `?test-error=429` - Rate limit error
-- `?test-error=500` - Server error  
+- `?test-error=500` - Server error
 - `?test-error=network` - Network error
 - `?test-error=404` - Not found error
 
 ## 🎯 What to Test
 
 ### Error Pages
+
 - [ ] **Rate Limit (429)**: Shows countdown timer and retry suggestions
 - [ ] **Server Error (500)**: Shows maintenance message with support options
 - [ ] **Network Error**: Shows connection troubleshooting steps
 - [ ] **404 Not Found**: Shows helpful navigation options
 
 ### Error Handling Features
+
 - [ ] **Automatic Retries**: Failed requests are retried automatically
 - [ ] **Toast Notifications**: Users see informative error messages
 - [ ] **Graceful Degradation**: App continues working when possible
 - [ ] **Error Recovery**: Users can recover from errors easily
 
 ### User Experience
+
 - [ ] **Consistent Design**: Error pages match the app's design language
 - [ ] **Helpful Actions**: Each error page provides relevant next steps
 - [ ] **Animations**: Smooth transitions and engaging micro-animations
@@ -97,21 +103,25 @@ You can also force specific errors by adding query parameters to API calls:
 ## 🔧 Testing Different Scenarios
 
 ### 1. Network Disconnection
+
 - Disconnect your internet connection
 - Try using various features in the app
 - Reconnect and see how the app recovers
 
 ### 2. Backend Server Down
+
 - Stop your backend server (if running)
 - Try features that require API calls
 - Restart the server and test recovery
 
 ### 3. Slow Network
+
 - Use browser dev tools to throttle network speed
 - Test how the app handles slow responses
 - Look for timeout handling and loading states
 
 ### 4. API Rate Limiting
+
 - Use the mock service to simulate rate limits
 - Test how the app handles retry-after headers
 - Verify the countdown timer works correctly
@@ -119,16 +129,19 @@ You can also force specific errors by adding query parameters to API calls:
 ## 📱 Testing on Different Devices
 
 ### Desktop
+
 - Test all error pages in different browser sizes
 - Verify animations and hover effects work
 - Test keyboard navigation
 
 ### Mobile
+
 - Use browser dev tools device emulation
 - Test touch interactions
 - Verify responsive layouts
 
 ### Tablet
+
 - Test medium screen sizes
 - Verify layout adapts properly
 - Test both portrait and landscape
@@ -136,18 +149,21 @@ You can also force specific errors by adding query parameters to API calls:
 ## 🐛 Common Issues to Look For
 
 ### Visual Issues
+
 - [ ] Text overflow or truncation
 - [ ] Broken layouts on small screens
 - [ ] Missing or broken animations
 - [ ] Inconsistent spacing or colors
 
 ### Functional Issues
+
 - [ ] Buttons that don't work
 - [ ] Broken navigation links
 - [ ] Missing error messages
 - [ ] Infinite loading states
 
 ### Performance Issues
+
 - [ ] Slow page loads
 - [ ] Janky animations
 - [ ] Memory leaks
@@ -173,16 +189,19 @@ Use this checklist to ensure comprehensive testing:
 Test how errors interact with other app features:
 
 ### WebSocket Connection
+
 - Disconnect WebSocket
 - Verify reconnection logic
 - Test real-time features during connection issues
 
 ### State Management
+
 - Trigger errors while app state is loading
 - Verify state consistency after errors
 - Test error recovery with cached data
 
 ### Navigation
+
 - Trigger errors during route changes
 - Test browser back/forward with errors
 - Verify deep linking to error pages
@@ -198,20 +217,23 @@ Test how errors interact with other app features:
 ## 🆘 Troubleshooting
 
 ### Error Testing Service Not Working
+
 ```javascript
 // Check if service is loaded
 console.log(window.errorTestingService);
 
 // Manually reload the service
-import('/src/utils/errorTestingService.js');
+import("/src/utils/errorTestingService.js");
 ```
 
 ### Errors Not Showing
+
 - Check browser console for JavaScript errors
 - Verify API service is properly imported
 - Check network tab in dev tools
 
 ### Styling Issues
+
 - Clear browser cache
 - Check for CSS conflicts
 - Verify Tailwind classes are working

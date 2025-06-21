@@ -40,8 +40,14 @@ const BaseErrorPage = ({
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-4 -right-4 w-72 h-72 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute -bottom-8 -left-4 w-72 h-72 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div
+          className="absolute -bottom-8 -left-4 w-72 h-72 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
       </div>
 
       {/* Main content */}
@@ -49,17 +55,23 @@ const BaseErrorPage = ({
         <div
           className={`
             transform transition-all duration-1000 ease-out
-            ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}
+            ${
+              isVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
+            }
           `}
         >
           {/* Error Code Badge */}
           {errorCode && (
             <div className="text-center mb-6">
-              <span className={`
+              <span
+                className={`
                 inline-flex items-center px-4 py-2 rounded-full text-sm font-medium
                 bg-gradient-to-r ${bgGradient} text-${accentColor}-700 border border-${accentColor}-200
                 transform transition-all duration-300 hover:scale-105
-              `}>
+              `}
+              >
                 Error {errorCode}
               </span>
             </div>
@@ -70,20 +82,26 @@ const BaseErrorPage = ({
             className={`
               bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50
               transform transition-all duration-500 ease-out
-              ${hoveredCard ? 'scale-105 shadow-2xl' : 'scale-100'}
-              ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}
+              ${hoveredCard ? "scale-105 shadow-2xl" : "scale-100"}
+              ${
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-8 opacity-0"
+              }
             `}
             onMouseEnter={() => setHoveredCard(true)}
             onMouseLeave={() => setHoveredCard(false)}
-            style={{ transitionDelay: '200ms' }}
+            style={{ transitionDelay: "200ms" }}
           >
             <div className="px-8 py-12 text-center">
               {/* Icon */}
               <div className="flex justify-center mb-6">
-                <div className={`
+                <div
+                  className={`
                   p-4 rounded-full bg-gradient-to-br ${bgGradient}
                   transform transition-all duration-500 hover:rotate-12 hover:scale-110
-                `}>
+                `}
+                >
                   <Icon className={`h-12 w-12 ${iconColor}`} />
                 </div>
               </div>
@@ -142,7 +160,8 @@ const BaseErrorPage = ({
           {/* Footer */}
           <div className="text-center mt-8 opacity-60">
             <p className="text-sm text-gray-500 flex items-center justify-center">
-              Made with <HeartIcon className="h-4 w-4 text-red-500 mx-1" /> by OpenLLM Monitor
+              Made with <HeartIcon className="h-4 w-4 text-red-500 mx-1" /> by
+              OpenLLM Monitor
             </p>
           </div>
         </div>
@@ -215,11 +234,22 @@ export const RateLimitErrorPage = () => {
         <ul className="text-amber-700 space-y-2 text-left">
           <li className="flex items-start">
             <span className="text-amber-500 mr-2">•</span>
-            <span>Check out the <Link to="/analytics" className="text-amber-600 hover:text-amber-800 underline">Analytics Dashboard</Link> for insights</span>
+            <span>
+              Check out the{" "}
+              <Link
+                to="/analytics"
+                className="text-amber-600 hover:text-amber-800 underline"
+              >
+                Analytics Dashboard
+              </Link>{" "}
+              for insights
+            </span>
           </li>
           <li className="flex items-start">
             <span className="text-amber-500 mr-2">•</span>
-            <span>Consider implementing request batching for better performance</span>
+            <span>
+              Consider implementing request batching for better performance
+            </span>
           </li>
           <li className="flex items-start">
             <span className="text-amber-500 mr-2">•</span>
@@ -294,9 +324,10 @@ export const ServerErrorPage = () => {
             inline-flex items-center px-6 py-3 border border-transparent rounded-xl
             text-base font-medium transform transition-all duration-200 hover:scale-105
             focus:outline-none focus:ring-2 focus:ring-offset-2
-            ${reportSent
-              ? 'text-green-700 bg-green-100 border-green-200 cursor-not-allowed'
-              : 'text-red-700 bg-red-100 hover:bg-red-200 border-red-200 focus:ring-red-500'
+            ${
+              reportSent
+                ? "text-green-700 bg-green-100 border-green-200 cursor-not-allowed"
+                : "text-red-700 bg-red-100 hover:bg-red-200 border-red-200 focus:ring-red-500"
             }
           `}
         >
@@ -315,10 +346,13 @@ export const ServerErrorPage = () => {
       }
     >
       <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
-        <h3 className="text-lg font-semibold text-red-800 mb-3">What happened?</h3>
+        <h3 className="text-lg font-semibold text-red-800 mb-3">
+          What happened?
+        </h3>
         <p className="text-red-700 text-left">
-          Our monitoring systems have been notified and our engineering team is investigating.
-          You can help by reporting what you were doing when this error occurred.
+          Our monitoring systems have been notified and our engineering team is
+          investigating. You can help by reporting what you were doing when this
+          error occurred.
         </p>
       </div>
     </BaseErrorPage>
@@ -334,19 +368,19 @@ export const NetworkErrorPage = () => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
   const retryConnection = async () => {
     setRetrying(true);
     // Simulate retry delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     if (navigator.onLine) {
       window.location.reload();
     }
@@ -363,7 +397,9 @@ export const NetworkErrorPage = () => {
       }
       icon={WifiIcon}
       iconColor={isOnline ? "text-orange-500" : "text-gray-500"}
-      bgGradient={isOnline ? "from-orange-50 to-yellow-100" : "from-gray-50 to-gray-100"}
+      bgGradient={
+        isOnline ? "from-orange-50 to-yellow-100" : "from-gray-50 to-gray-100"
+      }
       accentColor={isOnline ? "orange" : "gray"}
       customActions={
         <button
@@ -373,9 +409,10 @@ export const NetworkErrorPage = () => {
             inline-flex items-center px-6 py-3 border border-transparent rounded-xl
             text-base font-medium transform transition-all duration-200 hover:scale-105
             focus:outline-none focus:ring-2 focus:ring-offset-2
-            ${isOnline
-              ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 focus:ring-orange-500'
-              : 'text-gray-500 bg-gray-200 cursor-not-allowed'
+            ${
+              isOnline
+                ? "text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 focus:ring-orange-500"
+                : "text-gray-500 bg-gray-200 cursor-not-allowed"
             }
           `}
         >
@@ -393,16 +430,28 @@ export const NetworkErrorPage = () => {
         </button>
       }
     >
-      <div className={`
+      <div
+        className={`
         border rounded-xl p-4 mb-6
-        ${isOnline ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-200'}
-      `}>
+        ${
+          isOnline
+            ? "bg-orange-50 border-orange-200"
+            : "bg-gray-50 border-gray-200"
+        }
+      `}
+      >
         <div className="flex items-center justify-center space-x-2">
-          <div className={`
+          <div
+            className={`
             w-3 h-3 rounded-full
-            ${isOnline ? 'bg-orange-500 animate-pulse' : 'bg-gray-400'}
-          `}></div>
-          <span className={`font-medium ${isOnline ? 'text-orange-700' : 'text-gray-600'}`}>
+            ${isOnline ? "bg-orange-500 animate-pulse" : "bg-gray-400"}
+          `}
+          ></div>
+          <span
+            className={`font-medium ${
+              isOnline ? "text-orange-700" : "text-gray-600"
+            }`}
+          >
             {isOnline ? "Online" : "Offline"}
           </span>
         </div>
@@ -433,7 +482,7 @@ export const GenericErrorPage = ({ error, resetError }) => {
         )
       }
     >
-      {error && process.env.NODE_ENV === 'development' && (
+      {error && process.env.NODE_ENV === "development" && (
         <details className="mt-4 text-left bg-gray-50 border border-gray-200 rounded-xl p-4">
           <summary className="cursor-pointer text-sm text-gray-700 font-medium mb-2">
             Error Details (Development Only)

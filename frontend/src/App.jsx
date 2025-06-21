@@ -91,17 +91,18 @@ function App() {
     return () => {
       wsService.disconnect();
     };
-  }, [setWsConnected, setWsReconnecting]);  return (
+  }, [setWsConnected, setWsReconnecting]);
+  return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50">
         <Routes>
           {/* Error Pages */}
           <Route path="/error/429" element={<RateLimitErrorPage />} />
           <Route path="/error/500" element={<ServerErrorPage />} />
-          <Route path="/error/network" element={<NetworkErrorPage />} />          {/* Standalone Pages */}
+          <Route path="/error/network" element={<NetworkErrorPage />} />{" "}
+          {/* Standalone Pages */}
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/providers" element={<ProvidersPage />} />
-
           {/* Dashboard Routes */}
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
@@ -111,7 +112,6 @@ function App() {
             <Route path="replay" element={<ReplayPage />} />
             <Route path="test" element={<TestModelsPage />} />
           </Route>
-
           {/* 404 Catch all route */}
           <Route path="*" element={<NotFoundErrorPage />} />
         </Routes>

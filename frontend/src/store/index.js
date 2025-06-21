@@ -29,7 +29,7 @@ export const useAppStore = create(
         errorThreshold: 5, // Show notification after X consecutive errors
         latencyThreshold: 5000, // Show notification if latency > X ms
         costThreshold: 1.0, // Show notification if cost > $X
-      },      // Stats State
+      }, // Stats State
       stats: {
         totalRequests: 0,
         requestsChange: 0,
@@ -53,7 +53,7 @@ export const useAppStore = create(
           prompt: 0,
           completion: 0,
         },
-      },// Actions
+      }, // Actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       setSettingsModalOpen: (open) => set({ settingsModalOpen: open }),
       setLogDetailsModalOpen: (open) => set({ logDetailsModalOpen: open }),
@@ -76,7 +76,7 @@ export const useAppStore = create(
           notificationSettings: { ...state.notificationSettings, ...settings },
         })),
 
-      setStats: (stats) => set({ stats }),      // Fetch stats
+      setStats: (stats) => set({ stats }), // Fetch stats
       fetchStats: async () => {
         try {
           set({ loading: true });
@@ -98,20 +98,24 @@ export const useAppStore = create(
           // Try to get most active user from logs
           let mostActiveUser = "N/A";
           let mostActiveUserPercentage = 0;
-          
+
           try {
             const logsResponse = await ApiService.get("/logs?limit=1000"); // Get recent logs
-            if (logsResponse.success && logsResponse.data && logsResponse.data.logs) {
+            if (
+              logsResponse.success &&
+              logsResponse.data &&
+              logsResponse.data.logs
+            ) {
               const logs = logsResponse.data.logs;
               const userCounts = {};
               let totalRequests = logs.length;
-              
+
               // Count requests per user
-              logs.forEach(log => {
+              logs.forEach((log) => {
                 const userId = log.userId || log.user || "Anonymous";
                 userCounts[userId] = (userCounts[userId] || 0) + 1;
               });
-              
+
               // Find most active user
               let maxCount = 0;
               Object.entries(userCounts).forEach(([userId, count]) => {
@@ -120,9 +124,11 @@ export const useAppStore = create(
                   mostActiveUser = userId;
                 }
               });
-              
+
               if (totalRequests > 0 && maxCount > 0) {
-                mostActiveUserPercentage = Math.round((maxCount / totalRequests) * 100);
+                mostActiveUserPercentage = Math.round(
+                  (maxCount / totalRequests) * 100
+                );
               }
             }
           } catch (userError) {

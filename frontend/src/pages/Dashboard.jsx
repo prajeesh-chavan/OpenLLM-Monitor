@@ -71,14 +71,6 @@ const Dashboard = () => {
     openLogDetailsModal(log);
   };
 
-  const handleGlobalSearch = () => {
-    // Focus on the global search input in the control bar
-    const searchInput = document.querySelector('input[placeholder*="Search"]');
-    if (searchInput) {
-      searchInput.focus();
-    }
-  };
-
   const handleKeyboardReplay = () => {
     // Open replay zone with the most recent log
     if (logs.length > 0) {
@@ -222,16 +214,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {" "}
       {/* Keyboard Shortcuts Handler */}
-      <KeyboardShortcuts
-        onGlobalSearch={handleGlobalSearch}
-        onReplay={handleKeyboardReplay}
-      />
+      <KeyboardShortcuts onReplay={handleKeyboardReplay} />
       {/* Live Feed Mode */}
       <LiveFeedMode onNewLog={handleLiveFeedLog} />
       {/* Summary Stats Panel */}
       <SummaryStatsPanel />
-
       {/* Quick Actions */}
       <div className="px-3 sm:px-6 py-4">
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
@@ -299,7 +288,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
       {/* Visualization Section and Replay Zone */}
       <div className="flex flex-col lg:flex-row">
         {/* Left side - Charts */}
@@ -316,14 +304,10 @@ const Dashboard = () => {
         isOpen={showReplayZone}
         onClose={() => setShowReplayZone(false)}
         log={selectedLog}
-      />
+      />{" "}
       {/* Keyboard shortcuts help - Hidden on mobile */}
       <div className="hidden sm:block fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg p-3 shadow-lg opacity-75 hover:opacity-100 transition-opacity">
         <div className="text-xs text-gray-600 space-y-1">
-          <div>
-            <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">⌘K</kbd>{" "}
-            Global Search
-          </div>
           <div>
             <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">R</kbd>{" "}
             Replay

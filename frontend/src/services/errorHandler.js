@@ -14,27 +14,27 @@ class ErrorHandlerService {
 
   // Handle different types of errors
   handleError(error, context = {}) {
-    console.error('Error occurred:', error, context);
+    console.error("Error occurred:", error, context);
 
     // Determine error type and redirect accordingly
     if (this.isRateLimitError(error)) {
-      this.navigateToError('/error/429');
+      this.navigateToError("/error/429");
     } else if (this.isServerError(error)) {
-      this.navigateToError('/error/500');
+      this.navigateToError("/error/500");
     } else if (this.isNetworkError(error)) {
-      this.navigateToError('/error/network');
+      this.navigateToError("/error/network");
     } else {
       // For unhandled errors, let ErrorBoundary catch them
       throw error;
     }
 
     // Execute registered callbacks
-    const callbacks = this.errorCallbacks.get('any') || [];
-    callbacks.forEach(callback => {
+    const callbacks = this.errorCallbacks.get("any") || [];
+    callbacks.forEach((callback) => {
       try {
         callback(error, context);
       } catch (callbackError) {
-        console.error('Error in error callback:', callbackError);
+        console.error("Error in error callback:", callbackError);
       }
     });
   }
@@ -46,23 +46,23 @@ class ErrorHandlerService {
 
     switch (status) {
       case 429:
-        this.navigateToError('/error/429');
+        this.navigateToError("/error/429");
         break;
       case 500:
       case 502:
       case 503:
       case 504:
-        this.navigateToError('/error/500');
+        this.navigateToError("/error/500");
         break;
       case 404:
         // Don't redirect for API 404s, just log them
-        console.warn('API endpoint not found:', response);
+        console.warn("API endpoint not found:", response);
         break;
       default:
         if (status >= 500) {
-          this.navigateToError('/error/500');
+          this.navigateToError("/error/500");
         } else if (!navigator.onLine) {
-          this.navigateToError('/error/network');
+          this.navigateToError("/error/network");
         }
     }
 
@@ -70,21 +70,21 @@ class ErrorHandlerService {
   }
 
   // Handle fetch/network errors
-  handleFetchError(error, url = '') {
-    console.error('Fetch error:', error, 'URL:', url);
+  handleFetchError(error, url = "") {
+    console.error("Fetch error:", error, "URL:", url);
 
     if (!navigator.onLine) {
-      this.navigateToError('/error/network');
+      this.navigateToError("/error/network");
       return true;
     }
 
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      this.navigateToError('/error/network');
+    if (error.name === "TypeError" && error.message.includes("fetch")) {
+      this.navigateToError("/error/network");
       return true;
     }
 
-    if (error.name === 'TimeoutError') {
-      this.navigateToError('/error/network');
+    if (error.name === "TimeoutError") {
+      this.navigateToError("/error/network");
       return true;
     }
 
@@ -96,8 +96,8 @@ class ErrorHandlerService {
     return (
       error?.response?.status === 429 ||
       error?.status === 429 ||
-      error?.message?.toLowerCase().includes('rate limit') ||
-      error?.message?.toLowerCase().includes('too many requests')
+      error?.message?.toLowerCase().includes("rate limit") ||
+      error?.message?.toLowerCase().includes("too many requests")
     );
   }
 
@@ -109,10 +109,10 @@ class ErrorHandlerService {
   isNetworkError(error) {
     return (
       !navigator.onLine ||
-      error?.code === 'NETWORK_ERROR' ||
-      error?.message?.toLowerCase().includes('network') ||
-      error?.message?.toLowerCase().includes('fetch') ||
-      error?.name === 'TypeError'
+      error?.code === "NETWORK_ERROR" ||
+      error?.message?.toLowerCase().includes("network") ||
+      error?.message?.toLowerCase().includes("fetch") ||
+      error?.name === "TypeError"
     );
   }
 
@@ -133,7 +133,10 @@ class ErrorHandlerService {
   enhancedFetch = async (url, options = {}) => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), options.timeout || 30000);
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        options.timeout || 30000
+      );
 
       const response = await fetch(url, {
         ...options,
@@ -144,7 +147,9 @@ class ErrorHandlerService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const error = new Error(
+          `HTTP ${response.status}: ${response.statusText}`
+        );
         error.response = response;
         error.status = response.status;
         error.data = errorData;
@@ -155,9 +160,9 @@ class ErrorHandlerService {
 
       return response;
     } catch (error) {
-      if (error.name === 'AbortError') {
-        const timeoutError = new Error('Request timeout');
-        timeoutError.name = 'TimeoutError';
+      if (error.name === "AbortError") {
+        const timeoutError = new Error("Request timeout");
+        timeoutError.name = "TimeoutError";
         this.handleFetchError(timeoutError, url);
         throw timeoutError;
       }
@@ -177,7 +182,7 @@ class ErrorHandlerService {
         return config;
       },
       (error) => {
-        this.handleError(error, { type: 'request' });
+        this.handleError(error, { type: "request" });
         return Promise.reject(error);
       }
     );
@@ -189,7 +194,7 @@ class ErrorHandlerService {
       },
       (error) => {
         const handled = this.handleApiError(error.response, {
-          type: 'response',
+          type: "response",
           config: error.config,
         });
 
@@ -226,36 +231,39 @@ class ErrorHandlerService {
 
         // Exponential backoff
         const delay = baseDelay * Math.pow(2, attempt - 1);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
-    this.handleError(lastError, { type: 'retry-exhausted', attempts: maxRetries });
+    this.handleError(lastError, {
+      type: "retry-exhausted",
+      attempts: maxRetries,
+    });
     throw lastError;
   };
 
   // Monitor network status
   startNetworkMonitoring() {
-    window.addEventListener('online', () => {
-      console.log('Network connection restored');
+    window.addEventListener("online", () => {
+      console.log("Network connection restored");
       // Optionally redirect back from network error page
-      if (window.location.pathname === '/error/network') {
+      if (window.location.pathname === "/error/network") {
         window.history.back();
       }
     });
 
-    window.addEventListener('offline', () => {
-      console.log('Network connection lost');
-      this.navigateToError('/error/network');
+    window.addEventListener("offline", () => {
+      console.log("Network connection lost");
+      this.navigateToError("/error/network");
     });
   }
 
   // Global error handlers
   setupGlobalErrorHandlers() {
     // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
-      console.error('Unhandled promise rejection:', event.reason);
-      
+    window.addEventListener("unhandledrejection", (event) => {
+      console.error("Unhandled promise rejection:", event.reason);
+
       // Try to handle the error gracefully
       if (this.handleFetchError(event.reason)) {
         event.preventDefault(); // Prevent console error
@@ -263,12 +271,12 @@ class ErrorHandlerService {
     });
 
     // Handle global errors
-    window.addEventListener('error', (event) => {
-      console.error('Global error:', event.error);
+    window.addEventListener("error", (event) => {
+      console.error("Global error:", event.error);
       // Let ErrorBoundary handle most errors
       // Only handle specific network/fetch errors here
       if (this.isNetworkError(event.error)) {
-        this.handleError(event.error, { type: 'global' });
+        this.handleError(event.error, { type: "global" });
         event.preventDefault();
       }
     });
@@ -281,7 +289,7 @@ class ErrorHandlerService {
 const errorHandler = new ErrorHandlerService();
 
 // Auto-setup global handlers
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   errorHandler.setupGlobalErrorHandlers();
 }
 

@@ -24,7 +24,7 @@ api.interceptors.response.use(
     if (error.response?.data?.error) {
       throw new Error(error.response.data.error);
     }
-    
+
     throw error.message || "An error occurred";
   }
 );

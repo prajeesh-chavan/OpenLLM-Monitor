@@ -143,7 +143,8 @@ const Providers = () => {
     const [isHovered, setIsHovered] = useState(false);
     const providerInfo = getProviderInfo(providerId);
     const statusInfo = getStatusInfo(provider.status);
-    const testResult = testResults[providerId];    const colorClasses = {
+    const testResult = testResults[providerId];
+    const colorClasses = {
       blue: {
         iconBg: "bg-blue-50 border-blue-200",
         iconColor: "text-blue-600",
@@ -152,7 +153,7 @@ const Providers = () => {
       },
       purple: {
         iconBg: "bg-purple-50 border-purple-200",
-        iconColor: "text-purple-600", 
+        iconColor: "text-purple-600",
         hoverColor: "#f3e8ff", // purple-50
         iconHoverBg: "#faf5ff", // purple-50
       },
@@ -163,7 +164,7 @@ const Providers = () => {
         iconHoverBg: "#f0fdf4", // emerald-50
       },
       orange: {
-        iconBg: "bg-orange-50 border-orange-200", 
+        iconBg: "bg-orange-50 border-orange-200",
         iconColor: "text-orange-600",
         hoverColor: "#fff7ed", // orange-50
         iconHoverBg: "#fffbeb", // orange-50
@@ -174,16 +175,21 @@ const Providers = () => {
         hoverColor: "#f9fafb", // gray-50
         iconHoverBg: "#f9fafb", // gray-50
       },
-    };return (
+    };
+    return (
       <div
         className={`bg-white border border-gray-200 rounded-lg shadow-sm p-6 cursor-pointer transition-all duration-500 transform ${
-          showAnimations ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          showAnimations
+            ? "translate-y-0 opacity-100"
+            : "translate-y-4 opacity-0"
         } hover:shadow-md hover:-translate-y-1 hover:scale-[1.02]`}
         style={{
           transitionDelay: `${index * 100}ms`,
           background: showAnimations
             ? isHovered
-              ? `linear-gradient(145deg, #ffffff 0%, ${colorClasses[providerInfo.color].hoverColor} 100%)`
+              ? `linear-gradient(145deg, #ffffff 0%, ${
+                  colorClasses[providerInfo.color].hoverColor
+                } 100%)`
               : "linear-gradient(145deg, #ffffff 0%, #fafafa 100%)"
             : "#ffffff",
         }}
@@ -191,17 +197,25 @@ const Providers = () => {
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">            <div
-              className={`p-3 ${colorClasses[providerInfo.color].iconBg} border rounded-xl transition-all duration-300 relative overflow-hidden ${
+          <div className="flex items-center gap-4">
+            {" "}
+            <div
+              className={`p-3 ${
+                colorClasses[providerInfo.color].iconBg
+              } border rounded-xl transition-all duration-300 relative overflow-hidden ${
                 isHovered ? "scale-110 rotate-3" : ""
               }`}
               style={{
-                background: isHovered 
-                  ? `linear-gradient(135deg, ${colorClasses[providerInfo.color].iconHoverBg} 0%, ${colorClasses[providerInfo.color].hoverColor} 100%)`
-                  : undefined
+                background: isHovered
+                  ? `linear-gradient(135deg, ${
+                      colorClasses[providerInfo.color].iconHoverBg
+                    } 0%, ${colorClasses[providerInfo.color].hoverColor} 100%)`
+                  : undefined,
               }}
             >
-              <span className="text-2xl relative z-10">{providerInfo.emoji}</span>
+              <span className="text-2xl relative z-10">
+                {providerInfo.emoji}
+              </span>
               {isHovered && (
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
               )}
@@ -210,7 +224,9 @@ const Providers = () => {
               <h3 className="text-lg font-semibold text-gray-900">
                 {providerInfo.name}
               </h3>
-              <p className="text-sm text-gray-600">{providerInfo.description}</p>
+              <p className="text-sm text-gray-600">
+                {providerInfo.description}
+              </p>
               {provider.baseUrl && (
                 <p className="text-xs text-gray-500 mt-1">{provider.baseUrl}</p>
               )}
@@ -219,7 +235,9 @@ const Providers = () => {
 
           <div className="flex items-center gap-3">
             {/* Status Badge */}
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${statusInfo.bg} ${statusInfo.border}`}>
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-full border ${statusInfo.bg} ${statusInfo.border}`}
+            >
               <statusInfo.icon className={`h-4 w-4 ${statusInfo.color}`} />
               <span className={`text-sm font-medium ${statusInfo.color}`}>
                 {statusInfo.label}
@@ -231,7 +249,9 @@ const Providers = () => {
               <input
                 type="checkbox"
                 checked={provider.enabled ?? true}
-                onChange={(e) => handleToggleProvider(providerId, e.target.checked)}
+                onChange={(e) =>
+                  handleToggleProvider(providerId, e.target.checked)
+                }
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -276,7 +296,9 @@ const Providers = () => {
               }`}
             />
             <span className="text-sm font-medium">
-              {testingProvider === providerId ? "Testing..." : "Test Connection"}
+              {testingProvider === providerId
+                ? "Testing..."
+                : "Test Connection"}
             </span>
           </button>
 
@@ -307,7 +329,9 @@ const Providers = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-gray-900">Loading Providers</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Loading Providers
+            </h3>
             <p className="text-gray-600">Checking provider configurations...</p>
           </div>
         </div>
@@ -365,28 +389,36 @@ const Providers = () => {
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center gap-2">
               <XCircleIcon className="h-5 w-5 text-red-600" />
-              <span className="text-red-800 font-medium">Error loading providers</span>
+              <span className="text-red-800 font-medium">
+                Error loading providers
+              </span>
             </div>
             <p className="text-red-700 mt-1">{error}</p>
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {Object.entries(providers || {}).map(([providerId, provider], index) => (
-            <ProviderCard
-              key={providerId}
-              providerId={providerId}
-              provider={provider}
-              index={index}
-            />
-          ))}
+          {Object.entries(providers || {}).map(
+            ([providerId, provider], index) => (
+              <ProviderCard
+                key={providerId}
+                providerId={providerId}
+                provider={provider}
+                index={index}
+              />
+            )
+          )}
         </div>
 
         {(!providers || Object.keys(providers).length === 0) && !loading && (
           <div className="text-center py-12">
             <CloudIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No providers configured</h3>
-            <p className="text-gray-600">Add your first LLM provider to get started.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No providers configured
+            </h3>
+            <p className="text-gray-600">
+              Add your first LLM provider to get started.
+            </p>
           </div>
         )}
       </div>
