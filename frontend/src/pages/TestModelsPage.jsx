@@ -283,13 +283,61 @@ const TestModelsPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="px-6 py-6">
-        <div className={`grid gap-6 ${compareMode && testConfigs.length > 1 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+      <div className="px-6 py-6">        <div className={`grid gap-6 ${compareMode && testConfigs.length > 1 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
           {testConfigs.map((config, index) => (
             <div
               key={config.id}
-              className="bg-white rounded-lg border border-gray-200 shadow-sm"
-            >
+              className="bg-white rounded-lg border border-gray-200 shadow-sm relative"
+            >              {/* Loading Overlay */}
+              {config.isRunning && (
+                <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-blue-50/90 to-purple-50/90 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <div className="relative mb-6">
+                      {/* Outer rotating ring */}
+                      <div className="w-20 h-20 border-4 border-gray-200 rounded-full mx-auto"></div>
+                      {/* Main spinning ring */}
+                      <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-blue-600 border-r-blue-600 rounded-full animate-spin mx-auto"></div>
+                      {/* Inner pulsing core */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-4 h-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full animate-pulse shadow-lg"></div>
+                      </div>
+                      {/* Orbiting dots */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-20 h-20 relative animate-spin" style={{ animationDuration: '3s', animationDirection: 'reverse' }}>
+                          <div className="absolute top-0 left-1/2 w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 animate-pulse shadow-md"></div>
+                          <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-purple-400 rounded-full transform -translate-x-1/2 animate-pulse shadow-md" style={{ animationDelay: '0.5s' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-xl font-bold text-gray-900 flex items-center justify-center space-x-2">
+                        <SparklesIcon className="h-6 w-6 text-blue-600 animate-pulse" />
+                        <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animate-pulse">
+                          AI Thinking...
+                        </span>
+                      </h4>
+                      <p className="text-sm text-gray-700 max-w-xs mx-auto font-medium">
+                        Processing your prompt with <span className="font-bold text-blue-600">{config.model}</span>
+                      </p>
+                      <div className="flex items-center justify-center space-x-1 text-xs text-gray-600 mt-4">
+                        <div className="flex space-x-1">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm"></div>
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                        <span className="ml-2 font-semibold">Generating response</span>
+                      </div>
+                      <div className="mt-6 pt-4 border-t border-gray-300/50">
+                        <p className="text-xs text-gray-600 flex items-center justify-center space-x-1 font-medium">
+                          <ClockIcon className="h-3 w-3" />
+                          <span>This may take up to 2 minutes for complex prompts</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Test Config Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
