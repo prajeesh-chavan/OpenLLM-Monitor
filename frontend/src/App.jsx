@@ -103,6 +103,7 @@ function App() {
           {/* Standalone Pages */}
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/providers" element={<ProvidersPage />} />
+          <Route path="test" element={<TestModelsPage />} />
           {/* Dashboard Routes */}
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
@@ -110,7 +111,6 @@ function App() {
             <Route path="logs" element={<LogsPage />} />
             <Route path="logs/:id" element={<LogDetailPage />} />
             <Route path="replay" element={<ReplayPage />} />
-            <Route path="test" element={<TestModelsPage />} />
           </Route>
           {/* 404 Catch all route */}
           <Route path="*" element={<NotFoundErrorPage />} />
