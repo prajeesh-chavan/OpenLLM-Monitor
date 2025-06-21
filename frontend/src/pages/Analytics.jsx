@@ -183,7 +183,8 @@ const AnimatedMetricCard = ({
             isVisible={hasAnimated}
             isExpanded={isExpanded}
           />
-        ))}        {/* Expanded content */}
+        ))}{" "}
+        {/* Expanded content */}
         {isExpanded && (
           <div
             className={`mt-4 pt-4 border-t border-gray-100 space-y-3 transition-all duration-500 ${
@@ -210,7 +211,8 @@ const AnimatedMetricCard = ({
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3">
               <div className="text-xs text-gray-500 mb-1">AI Insights</div>
               <div className="text-sm text-gray-700">
-                {insights?.suggestion || "Performance is trending upward with consistent usage patterns"}
+                {insights?.suggestion ||
+                  "Performance is trending upward with consistent usage patterns"}
               </div>
             </div>
           </div>
@@ -339,7 +341,15 @@ const Analytics = () => {
         await Promise.all([
           fetchLogs(),
           fetchStats(),
-          fetchStatsData(timeframe === "24h" ? 24 : timeframe === "7d" ? 168 : timeframe === "30d" ? 720 : 1)
+          fetchStatsData(
+            timeframe === "24h"
+              ? 24
+              : timeframe === "7d"
+              ? 168
+              : timeframe === "30d"
+              ? 720
+              : 1
+          ),
         ]);
       } catch (error) {
         console.error("Failed to load analytics data:", error);
@@ -386,16 +396,27 @@ const Analytics = () => {
     }
 
     const totalTokens = logs.reduce(
-      (sum, log) => sum + (log.tokenUsage?.totalTokens || log.promptTokens + log.completionTokens || 0),
+      (sum, log) =>
+        sum +
+        (log.tokenUsage?.totalTokens ||
+          log.promptTokens + log.completionTokens ||
+          0),
       0
     );
     const totalCost = logs.reduce(
       (sum, log) => sum + (log.cost?.totalCost || log.cost || 0),
       0
     );
-    const totalLatency = logs.reduce((sum, log) => sum + (log.latency || log.duration || 0), 0);
-    const successLogs = logs.filter((log) => log.status === "success" || log.status === "completed");
-    const errorLogs = logs.filter((log) => log.status === "error" || log.status === "failed");
+    const totalLatency = logs.reduce(
+      (sum, log) => sum + (log.latency || log.duration || 0),
+      0
+    );
+    const successLogs = logs.filter(
+      (log) => log.status === "success" || log.status === "completed"
+    );
+    const errorLogs = logs.filter(
+      (log) => log.status === "error" || log.status === "failed"
+    );
 
     // Find most popular model and provider
     const modelCounts = logs.reduce((acc, log) => {
@@ -403,20 +424,26 @@ const Analytics = () => {
       acc[model] = (acc[model] || 0) + 1;
       return acc;
     }, {});
-    
+
     const providerCounts = logs.reduce((acc, log) => {
       const provider = log.provider || "Unknown";
       acc[provider] = (acc[provider] || 0) + 1;
       return acc;
     }, {});
 
-    const popularModel = Object.keys(modelCounts).length > 0 
-      ? Object.keys(modelCounts).reduce((a, b) => (modelCounts[a] > modelCounts[b] ? a : b))
-      : "N/A";
-      
-    const topProvider = Object.keys(providerCounts).length > 0
-      ? Object.keys(providerCounts).reduce((a, b) => (providerCounts[a] > providerCounts[b] ? a : b))
-      : "N/A";
+    const popularModel =
+      Object.keys(modelCounts).length > 0
+        ? Object.keys(modelCounts).reduce((a, b) =>
+            modelCounts[a] > modelCounts[b] ? a : b
+          )
+        : "N/A";
+
+    const topProvider =
+      Object.keys(providerCounts).length > 0
+        ? Object.keys(providerCounts).reduce((a, b) =>
+            providerCounts[a] > providerCounts[b] ? a : b
+          )
+        : "N/A";
 
     // Calculate peak hour from timestamps
     const hourCounts = logs.reduce((acc, log) => {
@@ -424,31 +451,48 @@ const Analytics = () => {
       acc[hour] = (acc[hour] || 0) + 1;
       return acc;
     }, {});
-    
-    const peakHour = Object.keys(hourCounts).length > 0
-      ? Object.keys(hourCounts).reduce((a, b) => (hourCounts[a] > hourCounts[b] ? a : b))
-      : "N/A";
+
+    const peakHour =
+      Object.keys(hourCounts).length > 0
+        ? Object.keys(hourCounts).reduce((a, b) =>
+            hourCounts[a] > hourCounts[b] ? a : b
+          )
+        : "N/A";
 
     // Calculate trend (simple comparison with first vs last half of data)
     const midPoint = Math.floor(logs.length / 2);
     const firstHalf = logs.slice(0, midPoint);
     const secondHalf = logs.slice(midPoint);
-    
-    const firstHalfAvgLatency = firstHalf.length > 0 
-      ? firstHalf.reduce((sum, log) => sum + (log.latency || log.duration || 0), 0) / firstHalf.length
-      : 0;
-    const secondHalfAvgLatency = secondHalf.length > 0
-      ? secondHalf.reduce((sum, log) => sum + (log.latency || log.duration || 0), 0) / secondHalf.length
-      : 0;
-    
-    const trendPercentage = firstHalfAvgLatency > 0 
-      ? ((secondHalfAvgLatency - firstHalfAvgLatency) / firstHalfAvgLatency) * 100
-      : 0;
+
+    const firstHalfAvgLatency =
+      firstHalf.length > 0
+        ? firstHalf.reduce(
+            (sum, log) => sum + (log.latency || log.duration || 0),
+            0
+          ) / firstHalf.length
+        : 0;
+    const secondHalfAvgLatency =
+      secondHalf.length > 0
+        ? secondHalf.reduce(
+            (sum, log) => sum + (log.latency || log.duration || 0),
+            0
+          ) / secondHalf.length
+        : 0;
+
+    const trendPercentage =
+      firstHalfAvgLatency > 0
+        ? ((secondHalfAvgLatency - firstHalfAvgLatency) / firstHalfAvgLatency) *
+          100
+        : 0;
 
     return {
-      avgTokensPerRequest: logs.length > 0 ? Math.round(totalTokens / logs.length) : 0,
+      avgTokensPerRequest:
+        logs.length > 0 ? Math.round(totalTokens / logs.length) : 0,
       avgCostPerToken: totalTokens > 0 ? totalCost / totalTokens : 0,
-      successRate: logs.length > 0 ? Math.round((successLogs.length / logs.length) * 100) : 0,
+      successRate:
+        logs.length > 0
+          ? Math.round((successLogs.length / logs.length) * 100)
+          : 0,
       avgLatency: logs.length > 0 ? Math.round(totalLatency / logs.length) : 0,
       popularModel,
       topProvider,
@@ -480,10 +524,16 @@ const Analytics = () => {
         },
       ],
       insights: {
-        trend: advancedStats.avgTokensPerRequest > 100 ? "High token usage" : "Efficient token usage",
+        trend:
+          advancedStats.avgTokensPerRequest > 100
+            ? "High token usage"
+            : "Efficient token usage",
         peakTime: advancedStats.peakHour,
-        suggestion: advancedStats.avgCostPerToken > 0.01 ? "Consider optimizing prompts" : "Cost efficient"
-      }
+        suggestion:
+          advancedStats.avgCostPerToken > 0.01
+            ? "Consider optimizing prompts"
+            : "Cost efficient",
+      },
     },
     {
       icon: ArrowTrendingUpIcon,
@@ -504,10 +554,16 @@ const Analytics = () => {
         },
       ],
       insights: {
-        trend: advancedStats.trendPercentage > 0 ? `+${advancedStats.trendPercentage}%` : `${advancedStats.trendPercentage}%`,
+        trend:
+          advancedStats.trendPercentage > 0
+            ? `+${advancedStats.trendPercentage}%`
+            : `${advancedStats.trendPercentage}%`,
         peakTime: advancedStats.peakHour,
-        suggestion: advancedStats.successRate > 95 ? "Excellent reliability" : "Monitor error patterns"
-      }
+        suggestion:
+          advancedStats.successRate > 95
+            ? "Excellent reliability"
+            : "Monitor error patterns",
+      },
     },
     {
       icon: BeakerIcon,
@@ -529,8 +585,11 @@ const Analytics = () => {
       insights: {
         trend: `${advancedStats.totalRequests} total requests`,
         peakTime: advancedStats.peakHour,
-        suggestion: advancedStats.errorCount > 0 ? `${advancedStats.errorCount} errors to review` : "No errors detected"
-      }
+        suggestion:
+          advancedStats.errorCount > 0
+            ? `${advancedStats.errorCount} errors to review`
+            : "No errors detected",
+      },
     },
   ];
 
@@ -601,19 +660,28 @@ const Analytics = () => {
                   Promise.all([
                     fetchLogs(),
                     fetchStats(),
-                    fetchStatsData(timeframe === "24h" ? 24 : timeframe === "7d" ? 168 : timeframe === "30d" ? 720 : 1)
+                    fetchStatsData(
+                      timeframe === "24h"
+                        ? 24
+                        : timeframe === "7d"
+                        ? 168
+                        : timeframe === "30d"
+                        ? 720
+                        : 1
+                    ),
                   ]).finally(() => {
                     setLoading(false);
-                    showToastMessage('Data refreshed successfully!');
+                    showToastMessage("Data refreshed successfully!");
                   });
                 }}
                 className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200"
                 disabled={loading}
               >
-                <ArrowsUpDownIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                {loading ? 'Refreshing...' : 'Refresh'}
+                <ArrowsUpDownIcon
+                  className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                />
+                {loading ? "Refreshing..." : "Refresh"}
               </button>
-              
               {/* Timeframe Selector */}
               <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
                 <ClockIcon className="h-5 w-5 text-gray-500" />
@@ -621,7 +689,13 @@ const Analytics = () => {
                   value={timeframe}
                   onChange={(e) => {
                     setTimeframe(e.target.value);
-                    showToastMessage(`Switched to ${timeframeOptions.find(opt => opt.value === e.target.value)?.label} view`);
+                    showToastMessage(
+                      `Switched to ${
+                        timeframeOptions.find(
+                          (opt) => opt.value === e.target.value
+                        )?.label
+                      } view`
+                    );
                   }}
                   className="bg-transparent border-none text-sm text-gray-900 focus:ring-0 focus:outline-none font-medium"
                 >
@@ -632,7 +706,6 @@ const Analytics = () => {
                   ))}
                 </select>
               </div>
-
               {/* Metric Selector */}
               <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
                 <BeakerIcon className="h-5 w-5 text-gray-500" />
@@ -647,8 +720,9 @@ const Analytics = () => {
                     </option>
                   ))}
                 </select>
-              </div>              {/* Export Button */}
-              <button 
+              </div>{" "}
+              {/* Export Button */}
+              <button
                 onClick={() => {
                   const exportData = {
                     timeframe,
@@ -661,23 +735,25 @@ const Analytics = () => {
                       avgLatency: advancedStats.avgLatency,
                       totalCost: advancedStats.totalCost,
                       popularModel: advancedStats.popularModel,
-                      topProvider: advancedStats.topProvider
-                    }
+                      topProvider: advancedStats.topProvider,
+                    },
                   };
-                  
+
                   const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-                    type: 'application/json'
+                    type: "application/json",
                   });
                   const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
+                  const a = document.createElement("a");
                   a.href = url;
-                  a.download = `analytics-export-${timeframe}-${new Date().toISOString().split('T')[0]}.json`;
+                  a.download = `analytics-export-${timeframe}-${
+                    new Date().toISOString().split("T")[0]
+                  }.json`;
                   document.body.appendChild(a);
                   a.click();
                   document.body.removeChild(a);
                   URL.revokeObjectURL(url);
-                  
-                  showToastMessage('Analytics data exported successfully!');
+
+                  showToastMessage("Analytics data exported successfully!");
                 }}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
               >
@@ -704,7 +780,9 @@ const Analytics = () => {
           </div>{" "}
           {/* Advanced Metrics Grid */}
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500">              {metricCards.map((card, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500">
+              {" "}
+              {metricCards.map((card, index) => (
                 <AnimatedMetricCard
                   key={`${card.title}-${index}`}
                   icon={card.icon}
@@ -774,79 +852,133 @@ const Analytics = () => {
       </div>
       {/* Floating Action Buttons */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
-        {" "}        {/* Quick Insights Button */}
+        {" "}
+        {/* Quick Insights Button */}
         <button
-          onClick={() => {            // Generate quick insights based on current data
+          onClick={() => {
+            // Generate quick insights based on current data
             const insights = [];
-            
+
             // Success rate insights
             if (advancedStats.successRate < 85) {
-              insights.push(`🚨 Low success rate: ${advancedStats.successRate}%\nRecommendation: Review error logs and implement retry logic`);
+              insights.push(
+                `🚨 Low success rate: ${advancedStats.successRate}%\nRecommendation: Review error logs and implement retry logic`
+              );
             } else if (advancedStats.successRate < 95) {
-              insights.push(`⚠️ Success rate: ${advancedStats.successRate}%\nRecommendation: Investigate error patterns to reach 95%+ target`);
+              insights.push(
+                `⚠️ Success rate: ${advancedStats.successRate}%\nRecommendation: Investigate error patterns to reach 95%+ target`
+              );
             } else {
-              insights.push(`✅ Excellent success rate: ${advancedStats.successRate}%\nYour system is performing reliably`);
+              insights.push(
+                `✅ Excellent success rate: ${advancedStats.successRate}%\nYour system is performing reliably`
+              );
             }
-            
+
             // Latency insights
             if (advancedStats.avgLatency > 3000) {
-              insights.push(`🐌 High latency: ${advancedStats.avgLatency}ms\nRecommendation: Consider caching or faster model alternatives`);
+              insights.push(
+                `🐌 High latency: ${advancedStats.avgLatency}ms\nRecommendation: Consider caching or faster model alternatives`
+              );
             } else if (advancedStats.avgLatency > 1500) {
-              insights.push(`⏰ Moderate latency: ${advancedStats.avgLatency}ms\nRecommendation: Monitor for user experience impact`);
+              insights.push(
+                `⏰ Moderate latency: ${advancedStats.avgLatency}ms\nRecommendation: Monitor for user experience impact`
+              );
             } else if (advancedStats.avgLatency > 0) {
-              insights.push(`⚡ Fast responses: ${advancedStats.avgLatency}ms\nGreat user experience with quick turnaround`);
+              insights.push(
+                `⚡ Fast responses: ${advancedStats.avgLatency}ms\nGreat user experience with quick turnaround`
+              );
             }
-            
+
             // Cost efficiency insights
             if (advancedStats.avgCostPerToken > 0.02) {
-              insights.push(`💰 High token cost: $${advancedStats.avgCostPerToken.toFixed(4)}/token\nRecommendation: Optimize prompts or switch to cost-effective models`);
+              insights.push(
+                `💰 High token cost: $${advancedStats.avgCostPerToken.toFixed(
+                  4
+                )}/token\nRecommendation: Optimize prompts or switch to cost-effective models`
+              );
             } else if (advancedStats.avgCostPerToken > 0.01) {
-              insights.push(`💸 Moderate cost: $${advancedStats.avgCostPerToken.toFixed(4)}/token\nRecommendation: Monitor costs as usage scales`);
+              insights.push(
+                `💸 Moderate cost: $${advancedStats.avgCostPerToken.toFixed(
+                  4
+                )}/token\nRecommendation: Monitor costs as usage scales`
+              );
             } else if (advancedStats.avgCostPerToken > 0) {
-              insights.push(`💚 Cost-efficient: $${advancedStats.avgCostPerToken.toFixed(4)}/token\nWell-optimized token usage`);
+              insights.push(
+                `💚 Cost-efficient: $${advancedStats.avgCostPerToken.toFixed(
+                  4
+                )}/token\nWell-optimized token usage`
+              );
             }
-            
+
             // Usage pattern insights
             if (advancedStats.totalRequests > 1000) {
-              insights.push(`📈 High usage: ${advancedStats.totalRequests} requests\nRecommendation: Consider implementing rate limiting and monitoring scaling needs`);
+              insights.push(
+                `📈 High usage: ${advancedStats.totalRequests} requests\nRecommendation: Consider implementing rate limiting and monitoring scaling needs`
+              );
             } else if (advancedStats.totalRequests > 100) {
-              insights.push(`📊 Growing usage: ${advancedStats.totalRequests} requests\nYour system is gaining traction`);
+              insights.push(
+                `📊 Growing usage: ${advancedStats.totalRequests} requests\nYour system is gaining traction`
+              );
             } else if (advancedStats.totalRequests > 0) {
-              insights.push(`🌱 Early usage: ${advancedStats.totalRequests} requests\nGreat start! Monitor growth patterns`);
+              insights.push(
+                `🌱 Early usage: ${advancedStats.totalRequests} requests\nGreat start! Monitor growth patterns`
+              );
             }
-            
+
             // Error analysis
             if (advancedStats.errorCount > 10) {
-              insights.push(`🔍 ${advancedStats.errorCount} errors detected\nRecommendation: Prioritize error investigation and implement better error handling`);
+              insights.push(
+                `🔍 ${advancedStats.errorCount} errors detected\nRecommendation: Prioritize error investigation and implement better error handling`
+              );
             } else if (advancedStats.errorCount > 0) {
-              insights.push(`⚠️ ${advancedStats.errorCount} errors found\nRecommendation: Review error patterns for improvement opportunities`);
+              insights.push(
+                `⚠️ ${advancedStats.errorCount} errors found\nRecommendation: Review error patterns for improvement opportunities`
+              );
             }
-              // Peak usage insight
+            // Peak usage insight
             if (advancedStats.peakHour !== "N/A") {
-              insights.push(`🕐 Peak usage at ${advancedStats.peakHour}\nRecommendation: Ensure adequate resources during peak hours`);
+              insights.push(
+                `🕐 Peak usage at ${advancedStats.peakHour}\nRecommendation: Ensure adequate resources during peak hours`
+              );
             }
-            
+
             // Model and provider insights
-            if (advancedStats.popularModel !== "N/A" && advancedStats.topProvider !== "N/A") {
-              insights.push(`🤖 Top performing: ${advancedStats.popularModel} (${advancedStats.topProvider})\nRecommendation: Monitor for vendor lock-in and consider multi-provider strategy`);
+            if (
+              advancedStats.popularModel !== "N/A" &&
+              advancedStats.topProvider !== "N/A"
+            ) {
+              insights.push(
+                `🤖 Top performing: ${advancedStats.popularModel} (${advancedStats.topProvider})\nRecommendation: Monitor for vendor lock-in and consider multi-provider strategy`
+              );
             }
-            
+
             // Performance trend insight
-            if (advancedStats.totalRequests > 50 && advancedStats.avgLatency > 1000) {
-              insights.push(`📊 Performance optimization opportunity\nRecommendation: High request volume with slow responses - implement caching or request batching`);
+            if (
+              advancedStats.totalRequests > 50 &&
+              advancedStats.avgLatency > 1000
+            ) {
+              insights.push(
+                `📊 Performance optimization opportunity\nRecommendation: High request volume with slow responses - implement caching or request batching`
+              );
             }
-            
+
             // Cost vs performance insight
-            if (advancedStats.avgCostPerToken > 0.015 && advancedStats.avgLatency > 2000) {
-              insights.push(`⚖️ High cost + slow performance detected\nRecommendation: Switch to faster, more cost-effective model alternatives`);
+            if (
+              advancedStats.avgCostPerToken > 0.015 &&
+              advancedStats.avgLatency > 2000
+            ) {
+              insights.push(
+                `⚖️ High cost + slow performance detected\nRecommendation: Switch to faster, more cost-effective model alternatives`
+              );
             }
-              // Show insights in a more detailed toast
-            const insightMessage = insights.length > 0 
-              ? insights.slice(0, 3).join("\n\n") 
-              : "🎉 All systems running smoothly!\n\nYour LLM monitoring is performing optimally.";
-            
+            // Show insights in a more detailed toast
+            const insightMessage =
+              insights.length > 0
+                ? insights.slice(0, 3).join("\n\n")
+                : "🎉 All systems running smoothly!\n\nYour LLM monitoring is performing optimally.";
+
             showToastMessage(insightMessage);
-              // Add enhanced animation feedback
+            // Add enhanced animation feedback
             const button = document.querySelector('[title="Quick Insights"]');
             if (button) {
               button.style.transform = "scale(1.1) rotate(5deg)";
@@ -856,7 +988,8 @@ const Analytics = () => {
                 button.style.filter = "";
               }, 300);
             }
-          }}          className={`p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-110 ${
+          }}
+          className={`p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-110 ${
             showAnimations
               ? "translate-y-0 opacity-100"
               : "translate-y-8 opacity-0"
@@ -866,7 +999,8 @@ const Analytics = () => {
         >
           <ChartPieIcon className="h-5 w-5 text-white group-hover:rotate-180 transition-transform duration-500" />
         </button>{" "}
-      </div>      {/* Toast Notification */}
+      </div>{" "}
+      {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50 max-w-md">
           <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 transform transition-all duration-300 animate-in slide-in-from-top">

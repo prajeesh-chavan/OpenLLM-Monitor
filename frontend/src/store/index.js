@@ -29,9 +29,7 @@ export const useAppStore = create(
         errorThreshold: 5, // Show notification after X consecutive errors
         latencyThreshold: 5000, // Show notification if latency > X ms
         costThreshold: 1.0, // Show notification if cost > $X
-      },
-
-      // Stats State
+      },      // Stats State
       stats: {
         totalRequests: 0,
         requestsChange: 0,
@@ -44,7 +42,18 @@ export const useAppStore = create(
         successRateChange: 0,
         errorRate: 0,
         errorRateChange: 0,
-      }, // Actions
+        retryRate: 0,
+        retryRateChange: 0,
+        errorCount24h: 0,
+        errorCountChange: 0,
+        mostActiveUser: null,
+        mostActiveUserPercentage: 0,
+        tokenUsage: {
+          total: 0,
+          prompt: 0,
+          completion: 0,
+        },
+      },// Actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       setSettingsModalOpen: (open) => set({ settingsModalOpen: open }),
       setLogDetailsModalOpen: (open) => set({ logDetailsModalOpen: open }),
@@ -67,7 +76,7 @@ export const useAppStore = create(
           notificationSettings: { ...state.notificationSettings, ...settings },
         })),
 
-      setStats: (stats) => set({ stats }), // Fetch stats
+      setStats: (stats) => set({ stats }),      // Fetch stats
       fetchStats: async () => {
         try {
           set({ loading: true });
@@ -85,6 +94,41 @@ export const useAppStore = create(
             console.warn("Unexpected API response structure:", response);
             overview = response; // fallback to treating the whole response as overview
           }
+
+          // Try to get most active user from logs
+          let mostActiveUser = "N/A";
+          let mostActiveUserPercentage = 0;
+          
+          try {
+            const logsResponse = await ApiService.get("/logs?limit=1000"); // Get recent logs
+            if (logsResponse.success && logsResponse.data && logsResponse.data.logs) {
+              const logs = logsResponse.data.logs;
+              const userCounts = {};
+              let totalRequests = logs.length;
+              
+              // Count requests per user
+              logs.forEach(log => {
+                const userId = log.userId || log.user || "Anonymous";
+                userCounts[userId] = (userCounts[userId] || 0) + 1;
+              });
+              
+              // Find most active user
+              let maxCount = 0;
+              Object.entries(userCounts).forEach(([userId, count]) => {
+                if (count > maxCount) {
+                  maxCount = count;
+                  mostActiveUser = userId;
+                }
+              });
+              
+              if (totalRequests > 0 && maxCount > 0) {
+                mostActiveUserPercentage = Math.round((maxCount / totalRequests) * 100);
+              }
+            }
+          } catch (userError) {
+            console.warn("Could not fetch user statistics:", userError);
+          }
+
           const transformedStats = {
             totalRequests: overview.totalRequests || 0,
             requestsChange: 0,
@@ -96,7 +140,15 @@ export const useAppStore = create(
             successRate: overview.successRate || 0,
             successRateChange: 0,
             errorRate: overview.errorRate || 0,
-            errorRateChange: 0, // Add token usage data
+            errorRateChange: 0,
+            // Add missing fields for SummaryStatsPanel
+            retryRate: overview.retryRate || 0,
+            retryRateChange: 0,
+            errorCount24h: overview.errorRequests || 0,
+            errorCountChange: 0,
+            mostActiveUser,
+            mostActiveUserPercentage,
+            // Add token usage data
             tokenUsage: {
               total: overview.totalTokens || 0,
               prompt: overview.promptTokens || 0,
