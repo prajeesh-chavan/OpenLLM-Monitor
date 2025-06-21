@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import {
   CpuChipIcon,
   WifiIcon,
@@ -12,9 +11,6 @@ import {
   TrashIcon,
   XCircleIcon,
   ArrowPathIcon,
-  ArrowLeftIcon,
-  SparklesIcon,
-  RocketLaunchIcon,
 } from "@heroicons/react/24/outline";
 import { useProvidersStore } from "../store";
 
@@ -27,12 +23,12 @@ const ProvidersPage = () => {
     updateProvider,
     testConnection,
   } = useProvidersStore();
-    const [testingProvider, setTestingProvider] = useState(null);
+  
+  const [testingProvider, setTestingProvider] = useState(null);
   const [showAddProvider, setShowAddProvider] = useState(false);
   const [testResults, setTestResults] = useState({});
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState(null);
-  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
   const [configForm, setConfigForm] = useState({
     apiKey: "",
     baseUrl: "",
@@ -175,20 +171,10 @@ const ProvidersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Header */}
       <div className="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Back Button */}
-          <div className="mb-4">
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-blue-600 bg-white/50 hover:bg-white/70 rounded-lg border border-white/30 hover:border-blue-200 transition-all duration-200 group backdrop-blur-sm shadow-sm"
-            >
-              <ArrowLeftIcon className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-              <span className="text-sm font-medium">Back to Dashboard</span>
-            </Link>
-          </div>
-          
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
@@ -212,8 +198,9 @@ const ProvidersPage = () => {
                 <ArrowPathIcon className="h-4 w-4" />
                 Refresh
               </button>
-                <button
-                onClick={() => setShowComingSoonModal(true)}
+              
+              <button
+                onClick={() => setShowAddProvider(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
               >
                 <PlusIcon className="h-4 w-4" />
@@ -330,8 +317,9 @@ const ProvidersPage = () => {
           <div className="text-center py-12">
             <CpuChipIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No providers configured</h3>
-            <p className="text-gray-500 mb-6">Get started by adding your first AI provider</p>            <button
-              onClick={() => setShowComingSoonModal(true)}
+            <p className="text-gray-500 mb-6">Get started by adding your first AI provider</p>
+            <button
+              onClick={() => setShowAddProvider(true)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
             >
               <PlusIcon className="h-4 w-4" />
@@ -406,84 +394,6 @@ const ProvidersPage = () => {
               >
                 Save Configuration
               </button>
-            </div>          </div>
-        </div>
-      )}
-
-      {/* Coming Soon Modal */}
-      {showComingSoonModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-200 transform transition-all duration-300 scale-100">
-            {/* Animated Background */}
-            <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50 p-8 text-center">
-              {/* Floating Elements */}
-              <div className="absolute top-4 left-4 w-8 h-8 bg-blue-200/50 rounded-full animate-pulse"></div>
-              <div className="absolute top-8 right-6 w-4 h-4 bg-purple-300/50 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
-              <div className="absolute bottom-6 left-8 w-6 h-6 bg-indigo-200/50 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-              
-              {/* Main Content */}
-              <div className="relative z-10">
-                {/* Rocket Icon with Animation */}
-                <div className="relative mx-auto w-20 h-20 mb-6">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg transform rotate-3 animate-pulse"></div>
-                  <div className="relative bg-white rounded-2xl p-4 shadow-lg">
-                    <RocketLaunchIcon className="h-12 w-12 text-blue-600 mx-auto animate-bounce" />
-                  </div>
-                </div>
-
-                {/* Title */}
-                <h3 className="text-2xl font-bold mb-3">
-                  <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                    Coming Soon!
-                  </span>
-                </h3>
-
-                {/* Description */}
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  We're working on an amazing provider addition feature! 
-                  Soon you'll be able to easily add and configure new AI providers with just a few clicks.
-                </p>
-
-                {/* Features Preview */}
-                <div className="bg-white/70 rounded-lg p-4 mb-6 text-left">
-                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <SparklesIcon className="h-4 w-4 text-purple-500" />
-                    What's Coming:
-                  </h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      One-click provider setup
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                      Automatic configuration detection
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                      Custom provider support
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                      Advanced health monitoring
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Call to Action */}
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setShowComingSoonModal(false)}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg transform hover:scale-[1.02]"
-                  >
-                    Got it, thanks!
-                  </button>
-                  
-                  <p className="text-xs text-gray-500">
-                    For now, you can configure existing providers using the settings icon
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
