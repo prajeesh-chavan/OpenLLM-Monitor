@@ -8,7 +8,6 @@ import {
   CurrencyDollarIcon,
   BeakerIcon,
   ArrowLeftIcon,
-  SparklesIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   ArrowsUpDownIcon,
@@ -155,13 +154,6 @@ const AnimatedMetricCard = ({
           </div>
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             {title}
-            {hasAnimated && (
-              <SparklesIcon
-                className={`h-4 w-4 text-yellow-500 transition-all duration-300 ${
-                  isHovered ? "animate-spin" : "animate-pulse"
-                }`}
-              />
-            )}
           </h3>
         </div>
         <div className="flex items-center gap-2">
