@@ -1,0 +1,35 @@
+# .gitignore - Private Documentation
+
+# 🔒 IMPORTANT: This entire folder should NOT be committed to GitHub
+
+# Add this line to your main .gitignore file:
+private-docs/
+
+# This folder contains sensitive technical documentation
+# that should remain internal to the development team.
+
+# The documentation includes:
+# - Detailed internal architecture explanations
+# - Business logic implementation details
+# - Database schema and query patterns
+# - Error handling strategies
+# - Performance optimization details
+# - Security implementation notes
+
+# This information is valuable for:
+# - Internal development reference
+# - Onboarding new team members
+# - System maintenance and debugging
+# - Architecture decision tracking
+
+# But should not be publicly available because:
+# - It reveals internal implementation details
+# - Could expose potential security considerations
+# - Contains proprietary technical knowledge
+# - May include sensitive configuration patterns
+
+# To use this documentation:
+# 1. Keep this folder locally for development reference
+# 2. Share with team members through secure internal channels
+# 3. Update as the system evolves
+# 4. Never commit to public repositories

@@ -672,13 +672,15 @@ What could be causing this and how do I fix it?`,
             {" "}
             <div className="flex items-center space-x-4">
               {/* Main Back to Dashboard Button */}
-              <Link
-                to="/dashboard"
-                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 border border-gray-200 hover:border-gray-300"
-              >
-                <ArrowLeftIcon className="h-4 w-4" />
-                <span className="text-sm font-medium">Dashboard</span>
-              </Link>
+              {currentStep == "template" && (
+                <Link
+                  to="/dashboard"
+                  className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 border border-gray-200 hover:border-gray-300"
+                >
+                  <ArrowLeftIcon className="h-4 w-4" />
+                  <span className="text-sm font-medium">Dashboard</span>
+                </Link>
+              )}
 
               {currentStep !== "template" && (
                 <button

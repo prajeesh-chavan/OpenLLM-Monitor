@@ -4,7 +4,7 @@
 class RetryHandler {
   constructor() {
     this.defaultConfig = {
-      maxRetries: 3,
+      maxRetries: 20, // Maximum number of retry attempts
       baseDelay: 1000, // 1 second
       maxDelay: 30000, // 30 seconds
       backoffMultiplier: 2,

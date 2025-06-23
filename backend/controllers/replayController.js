@@ -21,8 +21,7 @@ class ReplayController {
    * Replay a prompt with the same or different provider/model
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
-   */
-  async replayPrompt(req, res) {
+   */  async replayPrompt(req, res) {
     try {
       const {
         prompt,
@@ -33,8 +32,11 @@ class ReplayController {
         originalLogId = null,
       } = req.body;
 
+      console.log(`Replay request: ${provider}:${model}`);
+
       // Validate required fields
       if (!prompt || !provider || !model) {
+        console.error("Missing required fields:", { prompt: !!prompt, provider, model });
         return res.status(400).json({
           success: false,
           error: "Missing required fields: prompt, provider, model",
@@ -44,6 +46,7 @@ class ReplayController {
       // Get the appropriate service
       const service = this.services[provider];
       if (!service) {
+        console.error(`Unsupported provider: ${provider}`);
         return res.status(400).json({
           success: false,
           error: `Unsupported provider: ${provider}`,
@@ -65,8 +68,26 @@ class ReplayController {
         frequencyPenalty: parameters.frequencyPenalty || 0,
         presencePenalty: parameters.presencePenalty || 0,
         stop: parameters.stop || null,
-      }; // Execute the prompt
+      }; 
+      
+      console.log(`Executing replay with ${provider}:${model}`);
+      
+      // Execute the prompt
       const result = await service.sendPrompt(requestParams);
+
+      console.log(`Replay result status: ${result.status}`);
+
+      // Check if the service returned an error
+      if (result.status === "error") {
+        console.error("Service returned error:", result.error);
+        return res.status(500).json({
+          success: false,
+          error: "Failed to execute prompt",
+          details: result.error?.message || "Unknown service error",
+          provider,
+          model,
+        });
+      }
 
       // Add replay metadata
       result.isReplay = true;
@@ -87,6 +108,8 @@ class ReplayController {
         duration: result.latency, // Map latency to duration for tests
       };
 
+      console.log(`Replay successful for ${provider}:${model}`);
+
       res.json({
         success: true,
         data: responseData,
@@ -104,8 +127,7 @@ class ReplayController {
    * Replay a prompt from an existing log entry
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
-   */
-  async replayFromLog(req, res) {
+   */  async replayFromLog(req, res) {
     try {
       const { logId } = req.params;
       const {
@@ -114,9 +136,12 @@ class ReplayController {
         parameters: newParameters = {},
       } = req.body;
 
+      console.log(`Replay from log: ${logId}`);
+
       // Validate ObjectId format
       const mongoose = require("mongoose");
       if (!mongoose.Types.ObjectId.isValid(logId)) {
+        console.error("Invalid log ID format:", logId);
         return res.status(400).json({
           success: false,
           error: "Invalid log ID format",
@@ -128,15 +153,20 @@ class ReplayController {
       const originalLog = await Log.findById(logId);
 
       if (!originalLog) {
+        console.error("Original log not found:", logId);
         return res.status(404).json({
           success: false,
           error: "Original log not found",
         });
       }
 
+      console.log(`Found original log: ${originalLog.provider}:${originalLog.model}`);
+
       // Use original or new provider/model
       const provider = newProvider || originalLog.provider;
       const model = newModel || originalLog.model;
+
+      console.log(`Replaying with: ${provider}:${model}`);
 
       // Merge parameters
       const parameters = {

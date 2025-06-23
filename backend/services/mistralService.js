@@ -172,7 +172,6 @@ class MistralService {
       };
     }
   }
-
   /**
    * Send a prompt to Mistral AI (unified interface)
    * @param {Object} params - Request parameters
@@ -192,6 +191,7 @@ class MistralService {
     // Get API key from environment or config
     const apiKey = process.env.MISTRAL_API_KEY;
     if (!apiKey) {
+      console.error("Mistral API key not configured");
       return {
         requestId,
         provider: "mistral",

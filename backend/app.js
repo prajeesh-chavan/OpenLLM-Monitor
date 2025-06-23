@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const { createServer } = require("http");
 const socketIo = require("socket.io");
+const path = require("path");
 
 const config = require("./config/env");
 const database = require("./config/db");
@@ -105,7 +106,6 @@ class App {
       })
     );
   }
-
   /**
    * Initialize routes
    */
@@ -131,17 +131,12 @@ class App {
       });
     });
 
-    // API routes
+    // API routes - these must come before the catch-all route
     this.app.use("/api", apiRoutes);
 
     // Serve static files in production
     if (config.isProduction) {
       this.app.use(express.static("public"));
-
-      // Handle client-side routing
-      this.app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "public", "index.html"));
-      });
     }
   }
 
@@ -235,12 +230,39 @@ class App {
       }, 2000); // Check every 2 seconds
     }
   }
-
   /**
    * Initialize error handling
    */
   initializeErrorHandling() {
-    // 404 handler
+    // 404 handler for API routes
+    this.app.use("/api/*", (req, res) => {
+      res.status(404).json({
+        success: false,
+        error: "API route not found",
+        path: req.originalUrl,
+        timestamp: new Date(),
+      });
+    });
+
+    // Handle client-side routing for production (serve index.html for non-API routes)
+    if (config.isProduction) {
+      this.app.get("*", (req, res) => {
+        // Check if the request is for an API route that wasn't found
+        if (req.path.startsWith("/api/")) {
+          return res.status(404).json({
+            success: false,
+            error: "API route not found",
+            path: req.originalUrl,
+            timestamp: new Date(),
+          });
+        }
+        
+        // Serve index.html for all other routes (client-side routing)
+        res.sendFile(path.join(__dirname, "public", "index.html"));
+      });
+    }
+
+    // Default 404 handler for development
     this.app.use("*", (req, res) => {
       res.status(404).json({
         success: false,
