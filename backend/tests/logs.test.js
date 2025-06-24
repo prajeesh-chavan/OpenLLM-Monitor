@@ -6,8 +6,7 @@ const TestUtils = require("./testUtils");
 
 // Test database
 const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://prajeeshchavan:23072004@cluster0.arjzpru.mongodb.net/openllm-monitor-test?retryWrites=true&w=majority&appName=Cluster0";
+  process.env.MONGODB_URI
 
 describe("Logs Controller", () => {
   beforeAll(async () => {
