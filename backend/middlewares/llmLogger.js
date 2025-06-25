@@ -242,7 +242,7 @@ class LLMLogger {
     const systemMessage = this.extractSystemMessage(requestBody);
 
     // Calculate token usage
-    const tokenUsage = this.calculateTokenUsage({
+    const tokenUsage = await this.calculateTokenUsage({
       prompt,
       completion,
       provider: metadata.provider,
@@ -442,8 +442,9 @@ class LLMLogger {
   /**
    * Calculate token usage
    * @param {Object} params - Token calculation parameters
-   * @returns {Object} Token usage object
-   */ calculateTokenUsage(params) {
+   * @returns {Promise<Object>} Token usage object
+   */
+  async calculateTokenUsage(params) {
     const { prompt, completion, provider, model, responseData } = params;
 
     // Use response data if available
@@ -469,8 +470,8 @@ class LLMLogger {
     );
 
     // Calculate manually
-    const promptTokens = tokenCounter.getTokenCount(prompt, provider, model);
-    const completionTokens = tokenCounter.getTokenCount(
+    const promptTokens = await tokenCounter.getTokenCount(prompt, provider, model);
+    const completionTokens = await tokenCounter.getTokenCount(
       completion,
       provider,
       model

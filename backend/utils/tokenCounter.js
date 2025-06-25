@@ -6,6 +6,8 @@ const { encoding_for_model, get_encoding } = require("tiktoken");
 class TokenCounter {
   constructor() {
     this.encodings = new Map();
+    this.llamaTokenizer = null; // Cache for llama-tokenizer-js instance
+    this.llamaTokenizerLoading = null; // Promise for loading
   }
 
   /**
@@ -93,17 +95,36 @@ class TokenCounter {
   }
 
   /**
-   * Estimate token count for Ollama models (character-based approximation)
+   * Estimate token count for Ollama models using llama-tokenizer-js (dynamic import for ESM)
    * @param {string} text - Text to estimate
-   * @returns {number} Estimated token count
+   * @returns {Promise<number>} Accurate token count
    */
-  estimateOllamaTokens(text) {
+  async estimateOllamaTokens(text) {
     if (!text || typeof text !== "string") {
       return 0;
     }
-
-    // Rough estimation: 1 token ≈ 3.5 characters for most models
-    return Math.ceil(text.length / 3.5);
+    try {
+      if (!this.llamaTokenizer) {
+        if (!this.llamaTokenizerLoading) {
+          this.llamaTokenizerLoading = import("llama-tokenizer-js").then(
+            (mod) => {
+              this.llamaTokenizer = new mod.LlamaTokenizer();
+              return this.llamaTokenizer;
+            }
+          );
+        }
+        await this.llamaTokenizerLoading;
+      }
+      const tokens = this.llamaTokenizer.encode(text);
+      return tokens.length;
+    } catch (error) {
+      console.error(
+        "Error in llama-tokenizer-js for Ollama token count:",
+        error
+      );
+      // Fallback: rough estimation (1 token ≈ 3.5 characters)
+      return Math.ceil(text.length / 3.5);
+    }
   }
 
   /**
@@ -111,9 +132,9 @@ class TokenCounter {
    * @param {string} text - Text to count
    * @param {string} provider - Provider name
    * @param {string} model - Model name
-   * @returns {number} Token count
+   * @returns {number|Promise<number>} Token count
    */
-  getTokenCount(text, provider, model) {
+  async getTokenCount(text, provider, model) {
     switch (provider) {
       case "openai":
       case "openrouter":
@@ -124,7 +145,7 @@ class TokenCounter {
         return this.countTokens(text, "gpt-3.5-turbo");
 
       case "ollama":
-        return this.estimateOllamaTokens(text);
+        return await this.estimateOllamaTokens(text); // Now uses llama-tokenizer-js
 
       default:
         return this.countTokens(text, "gpt-3.5-turbo");

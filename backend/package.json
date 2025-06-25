@@ -30,10 +30,11 @@
     "helmet": "^7.1.0",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
+    "llama-tokenizer-js": "^1.2.2",
     "mongoose": "^8.0.3",
     "morgan": "^1.10.0",
     "socket.io": "^4.7.4",
-    "tiktoken": "^1.0.10",
+    "tiktoken": "^1.0.21",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

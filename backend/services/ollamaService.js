@@ -53,7 +53,7 @@ class OllamaService {
       }
 
       // Count prompt tokens (estimated)
-      const promptTokens = tokenCounter.estimateOllamaTokens(fullPrompt);
+      const promptTokens = await tokenCounter.estimateOllamaTokens(fullPrompt);
 
       // Prepare request body
       const requestBody = {
@@ -86,7 +86,7 @@ class OllamaService {
       const completion = result.response || "";
 
       // Estimate completion tokens
-      const completionTokens = tokenCounter.estimateOllamaTokens(completion);
+      const completionTokens = await tokenCounter.estimateOllamaTokens(completion);
       const totalTokens = promptTokens + completionTokens;
 
       const tokenUsage = {
@@ -237,53 +237,52 @@ class OllamaService {
                   onChunk(chunkData);
                 }
               }
-
-              if (data.done) {
-                clearTimeout(streamTimeout); // Clear timeout on completion
-                const endTime = Date.now();
-                const latency = endTime - startTime;
-
-                // Estimate tokens
-                const promptTokens =
-                  tokenCounter.estimateOllamaTokens(fullPrompt);
-                const completionTokens =
-                  tokenCounter.estimateOllamaTokens(completion);
-
-                resolve({
-                  requestId,
-                  provider: "ollama",
-                  model,
-                  prompt,
-                  completion,
-                  systemMessage,
-                  parameters: { temperature, maxTokens, topP },
-                  tokenUsage: {
-                    promptTokens,
-                    completionTokens,
-                    totalTokens: promptTokens + completionTokens,
-                  },
-                  cost: {
-                    promptCost: 0,
-                    completionCost: 0,
-                    totalCost: 0,
-                    currency: "USD",
-                  },
-                  latency,
-                  retryHistory: [],
-                  status: "success",
-                  isStreaming: true,
-                  streamChunks,
-                  rawResponse: data,
-                });
-              }
             }
           } catch (parseError) {
             console.error("Error parsing Ollama stream chunk:", parseError);
           }
         });
 
-        response.data.on("error", (error) => {
-          reject(error);
+        response.data.on("end", async () => {
+          clearTimeout(streamTimeout);
+          const endTime = Date.now();
+          const latency = endTime - startTime;
+
+          // Estimate tokens after stream ends
+          const promptTokens = await tokenCounter.estimateOllamaTokens(fullPrompt);
+          const completionTokens = await tokenCounter.estimateOllamaTokens(completion);
+
+          resolve({
+            requestId,
+            provider: "ollama",
+            model,
+            prompt,
+            completion,
+            systemMessage,
+            parameters: { temperature, maxTokens, topP },
+            tokenUsage: {
+              promptTokens,
+              completionTokens,
+              totalTokens: promptTokens + completionTokens,
+            },
+            cost: {
+              promptCost: 0,
+              completionCost: 0,
+              totalCost: 0,
+              currency: "USD",
+            },
+            latency,
+            retryHistory: [],
+            status: "success",
+            isStreaming: true,
+            streamChunks,
+            rawResponse: {}, // You may want to aggregate raw responses if needed
+          });
+        });
+
+        response.data.on("error", (err) => {
+          clearTimeout(streamTimeout);
+          reject(err);
         });
       });
     } catch (error) {
@@ -465,10 +464,10 @@ class OllamaService {
   /**
    * Estimate tokens for Ollama models
    * @param {string} text - Text to estimate
-   * @returns {number} Estimated token count
+   * @returns {Promise<number>} Estimated token count
    */
-  estimateTokens(text) {
-    return tokenCounter.estimateOllamaTokens(text);
+  async estimateTokens(text) {
+    return await tokenCounter.estimateOllamaTokens(text);
   }
 
   /**
