@@ -1,4 +1,5 @@
 const config = require("../config/env");
+const ProviderSettings = require("../models/ProviderSettings");
 
 /**
  * Provider controller for managing LLM provider configurations
@@ -49,6 +50,25 @@ class ProviderController {
         enabled: true,
       },
     };
+    // Load Mistral API key from DB if present
+    this.loadMistralApiKey();
+  }
+
+  async loadMistralApiKey() {
+    try {
+      const settings = await ProviderSettings.findOne({ provider: "mistral" });
+      if (settings && settings.apiKey) {
+        this.providerConfigs.mistral.hasApiKey = true;
+        this.providerConfigs.mistral.baseUrl =
+          settings.baseUrl || this.providerConfigs.mistral.baseUrl;
+        this.providerConfigs.mistral.enabled =
+          settings.enabled !== undefined ? settings.enabled : true;
+        // Optionally, you can store the key in memory if needed for requests
+        this.providerConfigs.mistral._apiKey = settings.apiKey;
+      }
+    } catch (err) {
+      console.warn("Could not load Mistral API key from DB:", err.message);
+    }
   }
 
   /**
@@ -66,6 +86,41 @@ class ProviderController {
 
       if (testConnections === "true") {
         await this.updateProviderStatuses(providers);
+      }
+
+      // Always include availableModels for all providers
+      for (const provider of Object.keys(providers)) {
+        if (provider === "mistral") {
+          const mistralService = require("../services/mistralService");
+          let models = [];
+          try {
+            const apiKey = providers[provider]._apiKey;
+            const result = await mistralService.getModels(apiKey);
+            if (result.success) {
+              models = result.models.map((m) => m.id);
+            } else {
+              models = mistralService.models;
+            }
+          } catch (err) {
+            models = mistralService.models;
+          }
+          providers[provider].availableModels = models;
+        } else if (provider === "ollama") {
+          const OllamaService = require("../services/ollamaService");
+          const ollamaService = new OllamaService();
+          let models = [];
+          try {
+            const result = await ollamaService.listModels();
+            models = result.map((m) => m.id);
+          } catch (err) {
+            models = providers[provider].models || [];
+          }
+          providers[provider].availableModels = models;
+        } else {
+          // For other providers, use static or fetched models
+          providers[provider].availableModels =
+            providers[provider].models || [];
+        }
       }
 
       res.json({
@@ -113,6 +168,37 @@ class ProviderController {
         }
       }
 
+      // Always include availableModels for all providers
+      if (provider === "mistral") {
+        const mistralService = require("../services/mistralService");
+        let models = [];
+        try {
+          const apiKey = providerConfig._apiKey;
+          const result = await mistralService.getModels(apiKey);
+          if (result.success) {
+            models = result.models.map((m) => m.id);
+          } else {
+            models = mistralService.models;
+          }
+        } catch (err) {
+          models = mistralService.models;
+        }
+        providerConfig.availableModels = models;
+      } else if (provider === "ollama") {
+        const OllamaService = require("../services/ollamaService");
+        const ollamaService = new OllamaService();
+        let models = [];
+        try {
+          const result = await ollamaService.listModels();
+          models = result.map((m) => m.id);
+        } catch (err) {
+          models = providerConfig.models || [];
+        }
+        providerConfig.availableModels = models;
+      } else {
+        providerConfig.availableModels = providerConfig.models || [];
+      }
+
       res.json({
         success: true,
         data: providerConfig,
@@ -153,8 +239,14 @@ class ProviderController {
 
       if (apiKey !== undefined) {
         updatedConfig.hasApiKey = !!apiKey;
-        // Note: We don't store the actual API key for security
-        // In production, you might want to use a secure key management system
+        // Save API key to DB for Mistral only
+        if (provider === "mistral") {
+          await ProviderSettings.findOneAndUpdate(
+            { provider: "mistral" },
+            { apiKey, baseUrl, enabled, updatedAt: new Date() },
+            { upsert: true, new: true }
+          );
+        }
       }
 
       updatedConfig.enabled = enabled;
@@ -198,14 +290,40 @@ class ProviderController {
       }
 
       const config = { ...this.providerConfigs[provider] };
-
+      let testApiKey = apiKey;
+      if (provider === "mistral" && !testApiKey) {
+        // Always fetch the latest API key from DB for Mistral
+        const ProviderSettings = require("../models/ProviderSettings");
+        const settings = await ProviderSettings.findOne({
+          provider: "mistral",
+        });
+        if (settings && settings.apiKey) {
+          testApiKey = settings.apiKey;
+        }
+      }
       if (baseUrl) config.baseUrl = baseUrl;
-      if (apiKey !== undefined) config.hasApiKey = !!apiKey;
+      if (testApiKey !== undefined) config.hasApiKey = !!testApiKey;
 
       // Test connection
       const startTime = Date.now();
-      await this.testProviderConnection(provider, config, apiKey);
+      const result = await this.testProviderConnection(
+        provider,
+        config,
+        testApiKey
+      );
       const latency = Date.now() - startTime;
+
+      if (result && result.success === false) {
+        return res.status(400).json({
+          success: false,
+          error: result.error || "Connection failed",
+          details: result.details || {},
+          status: "error",
+          latency,
+          timestamp: new Date(),
+        });
+      }
+
       res.json({
         success: true,
         data: {
@@ -214,7 +332,6 @@ class ProviderController {
           status: config.status,
           latency,
           timestamp: new Date(),
-          baseUrl: config.baseUrl,
         },
       });
     } catch (error) {
@@ -428,6 +545,7 @@ class ProviderController {
       openai: require("../services/openaiService"),
       ollama: require("../services/ollamaService"),
       openrouter: require("../services/openrouterService"),
+      mistral: require("../services/mistralService"), // Add Mistral
     };
 
     const ServiceClass = services[providerName];
@@ -469,6 +587,7 @@ class ProviderController {
       openai: require("../services/openaiService"),
       ollama: require("../services/ollamaService"),
       openrouter: require("../services/openrouterService"),
+      mistral: require("../services/mistralService"), // Add Mistral
     };
 
     const ServiceClass = services[providerName];

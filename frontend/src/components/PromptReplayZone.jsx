@@ -14,10 +14,22 @@ import {
 } from "@heroicons/react/24/outline";
 import { useAppStore } from "../store";
 import notificationService from "../services/notificationService";
+import { ApiService } from "../services/api";
 
 const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
   const [selectedLog, setSelectedLog] = useState(log);
   const { notificationSettings } = useAppStore();
+  const [providers, setProviders] = useState({});
+  const [availableModels, setAvailableModels] = useState([]);
+  const [replayParams, setReplayParams] = useState({
+    temperature: 0.7,
+    maxTokens: 1000,
+    provider: "ollama",
+    model: "mistral:latest",
+  });
+  const [replayResult, setReplayResult] = useState(null);
+  const [isReplaying, setIsReplaying] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -39,15 +51,31 @@ const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
       setSelectedLog(log);
     }
   }, [log]);
-  const [replayParams, setReplayParams] = useState({
-    temperature: 0.7,
-    maxTokens: 1000,
-    provider: "ollama",
-    model: "mistral:latest",
-  });
-  const [replayResult, setReplayResult] = useState(null);
-  const [isReplaying, setIsReplaying] = useState(false);
-  const [showComparison, setShowComparison] = useState(false);
+
+  // Fetch all providers and their availableModels on mount
+  useEffect(() => {
+    ApiService.getProviders().then((res) => {
+      if (res.success && res.data) {
+        setProviders(res.data);
+      }
+    });
+  }, []);
+
+  // Update availableModels when provider changes
+  useEffect(() => {
+    if (providers[replayParams.provider]) {
+      const models = providers[replayParams.provider].availableModels || [];
+      setAvailableModels(models);
+      // If current model is not in the list, default to the first
+      if (!models.includes(replayParams.model)) {
+        setReplayParams((prev) => ({ ...prev, model: models[0] || "" }));
+      }
+    } else {
+      setAvailableModels([]);
+      setReplayParams((prev) => ({ ...prev, model: "" }));
+    }
+  }, [replayParams.provider, providers]);
+
   const handleReplay = async () => {
     if (!selectedLog) return;
 
@@ -136,14 +164,21 @@ const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
     }
   };
 
+  // Improved similarity: Jaccard index on unique words, punctuation removed
   const calculateSimilarity = (original, replayed) => {
     if (!original || !replayed) return 0;
-    const words1 = original.toLowerCase().split(" ");
-    const words2 = replayed.toLowerCase().split(" ");
-    const intersection = words1.filter((word) => words2.includes(word));
-    return Math.round(
-      (intersection.length / Math.max(words1.length, words2.length)) * 100
-    );
+    // Remove punctuation and lowercase
+    const clean = (str) =>
+      str
+        .toLowerCase()
+        .replace(/[.,/#!$%^&*;:{}=\\\-_`~()\[\]\"']/g, "")
+        .split(/\s+/)
+        .filter(Boolean);
+    const set1 = new Set(clean(original));
+    const set2 = new Set(clean(replayed));
+    const intersection = new Set([...set1].filter((x) => set2.has(x)));
+    const union = new Set([...set1, ...set2]);
+    return union.size === 0 ? 0 : Math.round((intersection.size / union.size) * 100);
   };
 
   const copyToClipboard = (text) => {
@@ -442,50 +477,49 @@ const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
                         setReplayParams({
                           ...replayParams,
                           provider: e.target.value,
+                          // Reset model to first available for new provider
+                          model:
+                            providers[e.target.value]?.availableModels?.[0] ||
+                            "",
                         })
                       }
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium text-sm sm:text-base"
                     >
-                      <option value="openai">OpenAI</option>
-                      <option value="ollama">Ollama</option>
-                      <option value="mistral">Mistral</option>
-                      <option value="openrouter">OpenRouter</option>
+                      {Object.keys(providers).map((prov) => (
+                        <option key={prov} value={prov}>
+                          {providers[prov].name}
+                        </option>
+                      ))}
                     </select>
-                  </div>{" "}
-                  {/* Model Selection */}{" "}
+                  </div>
+                  {/* Model Selection */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
                       Model
                     </label>
-                    {replayParams.provider === "ollama" ? (
-                      <select
-                        value={replayParams.model}
-                        onChange={(e) =>
-                          setReplayParams({
-                            ...replayParams,
-                            model: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium text-sm sm:text-base"
-                      >
-                        <option value="mistral:latest">Mistral Latest</option>
-                        <option value="phi3:mini">Phi3 Mini</option>
-                        <option value="gemma3:4b-it-qat">Gemma3 4B</option>
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        value={replayParams.model}
-                        onChange={(e) =>
-                          setReplayParams({
-                            ...replayParams,
-                            model: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium text-sm sm:text-base"
-                        placeholder="e.g., gpt-3.5-turbo"
-                      />
-                    )}
+                    <select
+                      value={replayParams.model}
+                      onChange={(e) =>
+                        setReplayParams({
+                          ...replayParams,
+                          model: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium text-sm sm:text-base"
+                      disabled={availableModels.length === 0}
+                    >
+                      {availableModels.length === 0 ? (
+                        <option value="" disabled>
+                          No models available – check API key
+                        </option>
+                      ) : (
+                        availableModels.map((model) => (
+                          <option key={model} value={model}>
+                            {model}
+                          </option>
+                        ))
+                      )}
+                    </select>
                   </div>{" "}
                   {/* Temperature */}
                   <div>
@@ -534,7 +568,7 @@ const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
                   {/* Replay Button */}
                   <button
                     onClick={handleReplay}
-                    disabled={!selectedLog || isReplaying}
+                    disabled={!selectedLog || isReplaying || !replayParams.model || availableModels.length === 0}
                     className="w-full flex items-center justify-center space-x-2 px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm sm:text-base"
                   >
                     {isReplaying ? (

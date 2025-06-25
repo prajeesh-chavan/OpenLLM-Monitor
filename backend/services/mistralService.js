@@ -1,6 +1,7 @@
 const axios = require("axios");
-const { estimateCost } = require("../utils/costEstimator");
-const { countTokens } = require("../utils/tokenCounter");
+const costEstimator = require("../utils/costEstimator");
+const tokenCounter = require("../utils/tokenCounter");
+const ProviderSettings = require("../models/ProviderSettings");
 
 /**
  * Mistral AI Service
@@ -20,10 +21,17 @@ class MistralService {
     ];
   }
 
+  async getApiKey() {
+    // Always get the latest key from DB
+    const settings = await ProviderSettings.findOne({ provider: "mistral" });
+    return settings?.apiKey || process.env.MISTRAL_API_KEY;
+  }
+
   /**
    * Test connection to Mistral AI
    */
   async testConnection(apiKey) {
+    if (!apiKey) apiKey = await this.getApiKey();
     try {
       const response = await axios.get(`${this.baseURL}/models`, {
         headers: {
@@ -32,16 +40,20 @@ class MistralService {
         },
         timeout: 10000,
       });
-
       return {
         success: true,
         models: response.data.data?.map((model) => model.id) || this.models,
         message: "Connected successfully",
       };
     } catch (error) {
+      console.error(
+        "Mistral connection error:",
+        error.response?.data || error.message
+      );
       return {
         success: false,
         error: error.response?.data?.message || error.message,
+        details: error.response?.data || error,
         message: "Connection failed",
       };
     }
@@ -51,6 +63,7 @@ class MistralService {
    * Make a chat completion request
    */
   async chatCompletion(params, apiKey) {
+    if (!apiKey) apiKey = await this.getApiKey();
     const startTime = Date.now();
 
     try {
@@ -91,17 +104,20 @@ class MistralService {
       const promptText = params.messages.map((m) => m.content).join(" ");
       const completionText = response.data.choices?.[0]?.message?.content || "";
 
-      const promptTokens = countTokens(promptText, params.model);
-      const completionTokens = countTokens(completionText, params.model);
+      const promptTokens = tokenCounter.countTokens(promptText, params.model);
+      const completionTokens = tokenCounter.countTokens(
+        completionText,
+        params.model
+      );
       const totalTokens = promptTokens + completionTokens;
 
       // Calculate cost
-      const cost = estimateCost(
+      const cost = costEstimator.calculateCost({
         promptTokens,
         completionTokens,
-        params.model,
-        "mistral"
-      );
+        model: params.model,
+        provider: "mistral",
+      });
 
       return {
         success: true,
@@ -142,6 +158,7 @@ class MistralService {
    * Get available models
    */
   async getModels(apiKey) {
+    if (!apiKey) apiKey = await this.getApiKey();
     try {
       const response = await axios.get(`${this.baseURL}/models`, {
         headers: {
@@ -189,7 +206,8 @@ class MistralService {
     } = params;
 
     // Get API key from environment or config
-    const apiKey = process.env.MISTRAL_API_KEY;
+    let apiKey = params.apiKey;
+    if (!apiKey) apiKey = await this.getApiKey();
     if (!apiKey) {
       console.error("Mistral API key not configured");
       return {

@@ -16,6 +16,21 @@ class TokenCounter {
    * @returns {Object} Encoding object
    */
   getEncoding(model) {
+    // Map all Mistral models to gpt-3.5-turbo encoding
+    const mistralModels = [
+      "mistral-tiny",
+      "mistral-small",
+      "mistral-medium",
+      "mistral-large",
+      "mistral-large-latest",
+      "open-mistral-7b",
+      "open-mixtral-8x7b",
+      "open-mixtral-8x22b",
+    ];
+    if (mistralModels.includes(model)) {
+      model = "gpt-3.5-turbo";
+    }
+
     if (this.encodings.has(model)) {
       return this.encodings.get(model);
     }

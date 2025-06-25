@@ -86,7 +86,9 @@ class OllamaService {
       const completion = result.response || "";
 
       // Estimate completion tokens
-      const completionTokens = await tokenCounter.estimateOllamaTokens(completion);
+      const completionTokens = await tokenCounter.estimateOllamaTokens(
+        completion
+      );
       const totalTokens = promptTokens + completionTokens;
 
       const tokenUsage = {
@@ -249,8 +251,12 @@ class OllamaService {
           const latency = endTime - startTime;
 
           // Estimate tokens after stream ends
-          const promptTokens = await tokenCounter.estimateOllamaTokens(fullPrompt);
-          const completionTokens = await tokenCounter.estimateOllamaTokens(completion);
+          const promptTokens = await tokenCounter.estimateOllamaTokens(
+            fullPrompt
+          );
+          const completionTokens = await tokenCounter.estimateOllamaTokens(
+            completion
+          );
 
           resolve({
             requestId,

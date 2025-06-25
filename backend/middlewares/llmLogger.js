@@ -470,7 +470,11 @@ class LLMLogger {
     );
 
     // Calculate manually
-    const promptTokens = await tokenCounter.getTokenCount(prompt, provider, model);
+    const promptTokens = await tokenCounter.getTokenCount(
+      prompt,
+      provider,
+      model
+    );
     const completionTokens = await tokenCounter.getTokenCount(
       completion,
       provider,
