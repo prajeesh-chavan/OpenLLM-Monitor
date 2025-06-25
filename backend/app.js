@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const { createServer } = require("http");
 const socketIo = require("socket.io");
@@ -72,6 +73,20 @@ class App {
       legacyHeaders: false,
     });
     this.app.use("/api/", limiter);
+
+    // Response compression for better performance
+    this.app.use(
+      compression({
+        threshold: 1024, // Only compress responses > 1KB
+        level: 6, // Compression level (1-9, 6 is good balance)
+        filter: (req, res) => {
+          // Don't compress responses with this request header
+          if (req.headers["x-no-compression"]) return false;
+          // Use compression filter function
+          return compression.filter(req, res);
+        },
+      })
+    );
 
     // Logging
     if (config.nodeEnv === "development") {
@@ -256,7 +271,7 @@ class App {
             timestamp: new Date(),
           });
         }
-        
+
         // Serve index.html for all other routes (client-side routing)
         res.sendFile(path.join(__dirname, "public", "index.html"));
       });

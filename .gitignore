@@ -43,3 +43,4 @@ coverage/
 
 # Private documentation (keep local only)
 PRIVATE_PROJECT_DOCUMENTATION.md
+private-docs/

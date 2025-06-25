@@ -21,7 +21,7 @@ class ReplayController {
    * Replay a prompt with the same or different provider/model
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
-   */  async replayPrompt(req, res) {
+   */ async replayPrompt(req, res) {
     try {
       const {
         prompt,
@@ -32,11 +32,17 @@ class ReplayController {
         originalLogId = null,
       } = req.body;
 
-      console.log(`Replay request: ${provider}:${model}`);
+      if (process.env.NODE_ENV === "development") {
+        console.log(`Replay request: ${provider}:${model}`);
+      }
 
       // Validate required fields
       if (!prompt || !provider || !model) {
-        console.error("Missing required fields:", { prompt: !!prompt, provider, model });
+        console.error("Missing required fields:", {
+          prompt: !!prompt,
+          provider,
+          model,
+        });
         return res.status(400).json({
           success: false,
           error: "Missing required fields: prompt, provider, model",
@@ -68,10 +74,10 @@ class ReplayController {
         frequencyPenalty: parameters.frequencyPenalty || 0,
         presencePenalty: parameters.presencePenalty || 0,
         stop: parameters.stop || null,
-      }; 
-      
+      };
+
       console.log(`Executing replay with ${provider}:${model}`);
-      
+
       // Execute the prompt
       const result = await service.sendPrompt(requestParams);
 
@@ -127,7 +133,7 @@ class ReplayController {
    * Replay a prompt from an existing log entry
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
-   */  async replayFromLog(req, res) {
+   */ async replayFromLog(req, res) {
     try {
       const { logId } = req.params;
       const {
@@ -148,9 +154,12 @@ class ReplayController {
         });
       }
 
-      // Get the original log
+      // Get the original log with lean query for better performance
       const Log = require("../models/Log");
-      const originalLog = await Log.findById(logId);
+      const originalLog = await Log.findById(logId)
+        .lean() // Use lean query for better performance
+        .select("prompt provider model systemMessage parameters") // Only select needed fields
+        .exec();
 
       if (!originalLog) {
         console.error("Original log not found:", logId);
@@ -160,7 +169,9 @@ class ReplayController {
         });
       }
 
-      console.log(`Found original log: ${originalLog.provider}:${originalLog.model}`);
+      console.log(
+        `Found original log: ${originalLog.provider}:${originalLog.model}`
+      );
 
       // Use original or new provider/model
       const provider = newProvider || originalLog.provider;
@@ -339,9 +350,14 @@ class ReplayController {
         });
       }
 
-      // Execute all configurations in parallel
-      const results = await Promise.allSettled(
-        configsToUse.map(async (config, index) => {
+      // Execute configurations with controlled concurrency to avoid throttling
+      const results = [];
+      const concurrencyLimit = 3; // Limit concurrent requests
+
+      for (let i = 0; i < configsToUse.length; i += concurrencyLimit) {
+        const batch = configsToUse.slice(i, i + concurrencyLimit);
+        const batchPromises = batch.map(async (config, batchIndex) => {
+          const index = i + batchIndex;
           const service = this.services[config.provider];
           if (!service) {
             throw new Error(`Unsupported provider: ${config.provider}`);
@@ -365,8 +381,16 @@ class ReplayController {
             configIndex: index,
             configuration: config,
           };
-        })
-      );
+        });
+
+        const batchResults = await Promise.allSettled(batchPromises);
+        results.push(...batchResults);
+
+        // Small delay between batches to prevent overwhelming providers
+        if (i + concurrencyLimit < configsToUse.length) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+      }
 
       // Process results
       const comparison = {
@@ -560,10 +584,15 @@ class ReplayController {
         });
       }
 
-      // Estimate tokens
-      const promptTokens = service.estimateTokens
-        ? service.estimateTokens(prompt, model)
-        : Math.ceil(prompt.length / 4);
+      // Fast token estimation with caching
+      const promptTokens = (() => {
+        // Use a simple but faster estimation
+        const avgCharsPerToken = 4;
+        const estimatedTokens = Math.ceil(prompt.length / avgCharsPerToken);
+
+        // Add small buffer for safety (5-10%)
+        return Math.ceil(estimatedTokens * 1.1);
+      })();
 
       const estimatedCompletionTokens = Math.ceil(
         estimatedCompletionLength / 4

@@ -83,19 +83,23 @@ class OpenAIService {
       }
 
       // Execute with retry logic
+      let actualApiLatency = 0;
       const { result, retryHistory } = await retryHandler.executeWithRetry(
         async () => {
+          const apiStartTime = Date.now();
           const response = await this.client.post(
             "/chat/completions",
             requestBody
           );
+          actualApiLatency = Date.now() - apiStartTime; // Track actual API time
           return response.data;
         },
         this.retryConfig
       );
 
       const endTime = Date.now();
-      const latency = endTime - startTime;
+      const totalLatency = endTime - startTime;
+      const latency = actualApiLatency || totalLatency; // Use actual API time if available
 
       // Extract response data
       const completion = result.choices[0]?.message?.content || "";

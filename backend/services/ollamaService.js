@@ -207,6 +207,11 @@ class OllamaService {
       });
 
       return new Promise((resolve, reject) => {
+        // Add timeout for streaming operations
+        const streamTimeout = setTimeout(() => {
+          reject(new Error("Streaming request timeout after 120 seconds"));
+        }, 120000); // 2 minutes timeout
+
         response.data.on("data", (chunk) => {
           try {
             const lines = chunk
@@ -234,6 +239,7 @@ class OllamaService {
               }
 
               if (data.done) {
+                clearTimeout(streamTimeout); // Clear timeout on completion
                 const endTime = Date.now();
                 const latency = endTime - startTime;
 

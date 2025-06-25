@@ -1,0 +1,27 @@
+# Conventional Commit Format:
+#
+# <type>(optional scope): <short summary>
+#
+# Optional body:
+# - What and why
+# - Explain reasoning for code changes
+#
+# Optional footer:
+# - Related issues, breaking changes, etc.
+#
+# Types:
+# feat     - A new feature
+# fix      - A bug fix
+# docs     - Documentation only changes
+# style    - Code style (formatting, missing semicolons, etc.)
+# refactor - Code change that neither fixes a bug nor adds a feature
+# test     - Adding missing tests or correcting existing tests
+# chore    - Build process, CI/CD, tooling updates
+
+# Example:
+# feat(dashboard): add real-time log metrics viewer
+#
+# Implements socket.io-based stream viewer for LLM logs.
+# Enables better observability of inference behavior.
+#
+# Closes #42

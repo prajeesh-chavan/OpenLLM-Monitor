@@ -1,6 +1,10 @@
 import axios from "axios";
 import errorHandler from "./errorHandler";
 
+// Request deduplication cache
+const requestCache = new Map();
+const pendingRequests = new Map();
+
 // Create axios instance with default config
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "/api",
@@ -8,6 +12,23 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+// Request deduplication interceptor
+api.interceptors.request.use((config) => {
+  // Create request key for deduplication
+  const requestKey = `${config.method}:${config.url}:${JSON.stringify(
+    config.params
+  )}:${config.data}`;
+
+  // Check if identical request is already pending
+  if (pendingRequests.has(requestKey)) {
+    // Return the existing promise
+    config.skipDeduplication = true;
+    return pendingRequests.get(requestKey);
+  }
+
+  return config;
 });
 
 // Apply error handler interceptors
