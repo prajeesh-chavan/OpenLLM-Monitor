@@ -49,6 +49,24 @@ class ProviderController {
         status: "unknown",
         enabled: true,
       },
+      gemini: {
+        name: "Gemini (Google)",
+        baseUrl: config.providers.gemini.baseUrl,
+        hasApiKey: !!config.providers.gemini.apiKey,
+        models: ["gemini-2.0-flash"],
+        features: ["chat", "completion"],
+        status: "unknown",
+        enabled: true,
+      },
+      grok: {
+        name: "Grok (xAI)",
+        baseUrl: config.providers.grok.baseUrl,
+        hasApiKey: !!config.providers.grok.apiKey,
+        models: ["grok-1"],
+        features: ["chat", "completion"],
+        status: "unknown",
+        enabled: true,
+      },
     };
     // Load Mistral API key from DB if present
     this.loadMistralApiKey();
@@ -546,6 +564,8 @@ class ProviderController {
       ollama: require("../services/ollamaService"),
       openrouter: require("../services/openrouterService"),
       mistral: require("../services/mistralService"), // Add Mistral
+      gemini: require("../services/geminiService"),
+      grok: require("../services/grokService"),
     };
 
     const ServiceClass = services[providerName];
@@ -588,6 +608,8 @@ class ProviderController {
       ollama: require("../services/ollamaService"),
       openrouter: require("../services/openrouterService"),
       mistral: require("../services/mistralService"), // Add Mistral
+      gemini: require("../services/geminiService"),
+      grok: require("../services/grokService"),
     };
 
     const ServiceClass = services[providerName];
@@ -719,12 +741,16 @@ class ProviderController {
       const OpenAIService = require("../services/openaiService");
       const OpenRouterService = require("../services/openrouterService");
       const mistralService = require("../services/mistralService");
+      const GeminiService = require("../services/geminiService");
+      const GrokService = require("../services/grokService");
 
       const services = {
         openai: new OpenAIService(),
         ollama: new OllamaService(),
         openrouter: new OpenRouterService(),
         mistral: mistralService,
+        gemini: new GeminiService(),
+        grok: new GrokService(),
       };
 
       const service = services[provider];

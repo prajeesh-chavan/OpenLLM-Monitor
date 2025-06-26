@@ -2,6 +2,8 @@ const OpenAIService = require("../services/openaiService");
 const OllamaService = require("../services/ollamaService");
 const OpenRouterService = require("../services/openrouterService");
 const mistralService = require("../services/mistralService");
+const GeminiService = require("../services/geminiService");
+const GrokService = require("../services/grokService");
 const { v4: uuidv4 } = require("uuid");
 
 /**
@@ -14,6 +16,8 @@ class ReplayController {
       ollama: new OllamaService(),
       openrouter: new OpenRouterService(),
       mistral: mistralService, // Use the already instantiated service
+      gemini: new GeminiService(), // Gemini (Google)
+      grok: new GrokService(), // Grok (xAI)
     };
   }
 

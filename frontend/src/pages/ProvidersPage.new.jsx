@@ -47,6 +47,8 @@ const ProvidersPage = () => {
       openrouter: "🛣️",
       google: "🔍",
       cohere: "🌊",
+      gemini: "🔷", // Gemini (Google)
+      grok: "🦾", // Grok (xAI)
     };
     return logos[providerId] || "🔧";
   };
@@ -60,6 +62,8 @@ const ProvidersPage = () => {
       openrouter: "from-blue-500 to-cyan-600",
       google: "from-red-500 to-pink-600",
       cohere: "from-indigo-500 to-purple-600",
+      gemini: "from-blue-400 to-cyan-500", // Gemini (Google)
+      grok: "from-gray-800 to-gray-600", // Grok (xAI)
     };
     return colors[providerId] || "from-gray-500 to-gray-600";
   };

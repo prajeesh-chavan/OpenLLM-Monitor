@@ -30,6 +30,16 @@ const config = {
     ollama: {
       baseUrl: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
     },
+    gemini: {
+      apiKey: process.env.GEMINI_API_KEY,
+      baseUrl:
+        process.env.GEMINI_BASE_URL ||
+        "https://generativelanguage.googleapis.com/v1beta/models",
+    },
+    grok: {
+      apiKey: process.env.GROK_API_KEY,
+      baseUrl: process.env.GROK_BASE_URL || "https://api.grok.x.ai/v1",
+    },
   },
 
   // CORS
