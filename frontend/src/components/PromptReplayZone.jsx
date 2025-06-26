@@ -178,9 +178,7 @@ const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
     const set2 = new Set(clean(replayed));
     const intersection = new Set([...set1].filter((x) => set2.has(x)));
     const union = new Set([...set1, ...set2]);
-    return union.size === 0
-      ? 0
-      : Math.round((intersection.size / union.size) * 100);
+    return union.size === 0 ? 0 : Math.round((intersection.size / union.size) * 100);
   };
 
   const copyToClipboard = (text) => {
@@ -570,12 +568,7 @@ const PromptReplayZone = ({ isOpen, onClose, log = null }) => {
                   {/* Replay Button */}
                   <button
                     onClick={handleReplay}
-                    disabled={
-                      !selectedLog ||
-                      isReplaying ||
-                      !replayParams.model ||
-                      availableModels.length === 0
-                    }
+                    disabled={!selectedLog || isReplaying || !replayParams.model || availableModels.length === 0}
                     className="w-full flex items-center justify-center space-x-2 px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm sm:text-base"
                   >
                     {isReplaying ? (

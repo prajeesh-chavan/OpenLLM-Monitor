@@ -1,0 +1,19 @@
+{
+  "name": "openllm-monitor-proxies",
+  "version": "1.0.0",
+  "description": "API proxy servers for OpenLLM Monitor",
+  "main": "index.js",
+  "scripts": {
+    "start:openai": "node scripts/openai-proxy-server.js",
+    "start:ollama": "node scripts/ollama-proxy-server.js",
+    "start:all": "concurrently \"npm run start:openai\" \"npm run start:ollama\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "body-parser": "^1.20.2",
+    "concurrently": "^8.2.1",
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6"
+  }
+}
