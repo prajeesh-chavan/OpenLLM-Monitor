@@ -5,14 +5,14 @@ const providerController = require("../controllers/providerController");
 /**
  * @route   GET /api/providers
  * @desc    Get all provider configurations
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.get("/", (req, res) => providerController.getAllProviders(req, res));
 
 /**
  * @route   GET /api/providers/stats
  * @desc    Get provider usage statistics
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.get("/stats", (req, res) =>
   providerController.getProviderStats(req, res)
@@ -21,7 +21,7 @@ router.get("/stats", (req, res) =>
 /**
  * @route   GET /api/providers/recommendations
  * @desc    Get provider recommendations based on use case
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.get("/recommendations", (req, res) =>
   providerController.getRecommendations(req, res)
@@ -30,7 +30,7 @@ router.get("/recommendations", (req, res) =>
 /**
  * @route   GET /api/providers/comparison
  * @desc    Get provider comparison data (for tests)
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.get("/comparison", (req, res) => {
   // Mock response for now since this endpoint is expected by tests
@@ -62,7 +62,7 @@ router.get("/comparison", (req, res) => {
 /**
  * @route   POST /api/providers/test-connection
  * @desc    Test provider connection (legacy endpoint for tests)
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.post("/test-connection", (req, res) => {
   const { provider } = req.body;
@@ -90,7 +90,7 @@ router.post("/test-connection", (req, res) => {
 /**
  * @route   GET /api/providers/:provider
  * @desc    Get specific provider configuration
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.get("/:provider", (req, res) =>
   providerController.getProvider(req, res)
@@ -99,7 +99,7 @@ router.get("/:provider", (req, res) =>
 /**
  * @route   PUT /api/providers/:provider
  * @desc    Update provider configuration
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.put("/:provider", (req, res) =>
   providerController.updateProvider(req, res)
@@ -108,7 +108,7 @@ router.put("/:provider", (req, res) =>
 /**
  * @route   POST /api/providers/:provider/test
  * @desc    Test provider connection
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.post("/:provider/test", (req, res) =>
   providerController.testConnection(req, res)
@@ -117,7 +117,7 @@ router.post("/:provider/test", (req, res) =>
 /**
  * @route   GET /api/providers/:provider/models
  * @desc    Get available models for a provider
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.get("/:provider/models", (req, res) =>
   providerController.getModels(req, res)
@@ -126,7 +126,7 @@ router.get("/:provider/models", (req, res) =>
 /**
  * @route   POST /api/providers/:provider/complete
  * @desc    Generate completion using a provider (with logging)
- * @access  Public
+ * @access  Private (JWT required)
  */
 router.post("/:provider/complete", (req, res) =>
   providerController.generateCompletion(req, res)

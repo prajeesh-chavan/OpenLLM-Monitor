@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { authenticate } = require("../middlewares/auth");
 
 // Import route modules
 const logsRoutes = require("./logs");
@@ -8,13 +9,7 @@ const testRoutes = require("./test");
 const providersRoutes = require("./providers");
 const analyticsRoutes = require("./analytics");
 
-// Mount routes
-router.use("/logs", logsRoutes);
-router.use("/replay", replayRoutes);
-router.use("/test", testRoutes);
-router.use("/providers", providersRoutes);
-router.use("/analytics", analyticsRoutes);
-
+// Public endpoints (no auth required)
 // Health check endpoint
 router.get("/health", (req, res) => {
   res.json({
@@ -51,5 +46,12 @@ router.get("/info", (req, res) => {
     },
   });
 });
+
+// Protected endpoints (auth required)
+router.use("/logs", authenticate, logsRoutes);
+router.use("/replay", authenticate, replayRoutes);
+router.use("/test", authenticate, testRoutes);
+router.use("/providers", authenticate, providersRoutes);
+router.use("/analytics", authenticate, analyticsRoutes);
 
 module.exports = router;

@@ -7,7 +7,7 @@ const config = {
   // Server Configuration
   port: parseInt(process.env.PORT) || 3001,
   nodeEnv: process.env.NODE_ENV || "development",
-  jwtSecret: process.env.JWT_SECRET || "fallback-secret-key",
+  jwtSecret: process.env.JWT_SECRET || null,
 
   // Database
   mongoUri:
@@ -42,9 +42,9 @@ const config = {
     },
   },
 
-  // CORS
+  // CORS (supports comma-separated origins: "http://localhost:3000,http://100.x.x.x:3000")
   corsOrigins: process.env.FRONTEND_URL
-    ? [process.env.FRONTEND_URL]
+    ? process.env.FRONTEND_URL.split(",").map((url) => url.trim())
     : ["http://localhost:5173"],
 
   // Rate Limiting
@@ -69,6 +69,14 @@ if (config.isProduction) {
     console.error(
       "❌ Missing required environment variables:",
       missingVars.join(", ")
+    );
+    process.exit(1);
+  }
+
+  // Validate JWT_SECRET strength in production
+  if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
+    console.error(
+      "❌ JWT_SECRET must be at least 32 characters in production"
     );
     process.exit(1);
   }
