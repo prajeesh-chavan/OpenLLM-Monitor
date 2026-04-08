@@ -11,6 +11,8 @@ const path = require("path");
 const config = require("./config/env");
 const database = require("./config/db");
 const apiRoutes = require("./routes");
+const proxyRoutes = require("./routes/proxy");
+const proxyController = require("./controllers/proxyController");
 const llmLogger = require("./middlewares/llmLogger");
 
 /**
@@ -149,6 +151,9 @@ class App {
     // API routes - these must come before the catch-all route
     this.app.use("/api", apiRoutes);
 
+    // OpenAI-compatible proxy routes (no JWT auth - clients use provider API keys)
+    this.app.use("/v1", proxyRoutes);
+
     // Serve static files in production
     if (config.isProduction) {
       this.app.use(express.static("public"));
@@ -205,6 +210,9 @@ class App {
 
     // Pass WebSocket instance to LLM Logger for real-time updates
     llmLogger.setWebSocketInstance(this.io);
+
+    // Pass WebSocket instance to proxy controller for log broadcasting
+    proxyController.setWebSocketInstance(this.io);
 
     // Broadcast new logs to connected clients
     this.setupLogBroadcasting();

@@ -17,7 +17,7 @@ const logSchema = new mongoose.Schema(
     provider: {
       type: String,
       required: true,
-      enum: ["openai", "openrouter", "mistral", "ollama"],
+      enum: ["openai", "openrouter", "mistral", "ollama", "gemini", "grok"],
       index: true,
     },
 
