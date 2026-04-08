@@ -9,9 +9,9 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-password123}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-openllm-monitor}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:?Set MONGO_INITDB_ROOT_USERNAME in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?Set MONGO_INITDB_ROOT_PASSWORD in .env}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:?Set MONGO_INITDB_DATABASE in .env}
     volumes:
       - mongodb_data:/data/db
       - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
@@ -35,12 +35,12 @@ services:
     ports:
       - "3001:3001"
     environment:
-      MONGODB_URI: ${MONGODB_URI:-mongodb://admin:password123@mongodb:27017/openllm-monitor?authSource=admin}
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI in .env}
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3001}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
-      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       mongodb:

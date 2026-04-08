@@ -1,20 +1,31 @@
 // MongoDB initialization script
 // This script runs when the MongoDB container starts for the first time
+// Credentials are read from environment variables set in docker-compose
 
 // Switch to the openllm-monitor database
 db = db.getSiblingDB("openllm-monitor");
 
 // Create a user for the application
-db.createUser({
-  user: "openllm-user",
-  pwd: "openllm-password",
-  roles: [
-    {
-      role: "readWrite",
-      db: "openllm-monitor",
-    },
-  ],
-});
+// Uses env vars: MONGO_APP_USERNAME, MONGO_APP_PASSWORD (set via docker-compose)
+const appUser = process.env.MONGO_APP_USERNAME || "openllm-user";
+const appPassword = process.env.MONGO_APP_PASSWORD;
+
+if (!appPassword) {
+  print("WARNING: MONGO_APP_PASSWORD not set. Skipping app user creation.");
+  print("Set MONGO_APP_PASSWORD environment variable for secure setup.");
+} else {
+  db.createUser({
+    user: appUser,
+    pwd: appPassword,
+    roles: [
+      {
+        role: "readWrite",
+        db: "openllm-monitor",
+      },
+    ],
+  });
+  print("Created application user: " + appUser);
+}
 
 // Create collections with initial indexes
 db.createCollection("logs");
