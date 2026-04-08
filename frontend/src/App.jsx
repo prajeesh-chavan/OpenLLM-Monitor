@@ -13,6 +13,7 @@ import LogDetailPage from "./pages/LogDetailPage";
 import ReplayPage from "./pages/ReplayPage";
 import TestModelsPage from "./pages/TestModelsPage";
 import ProvidersPage from "./pages/ProvidersPage";
+import SettingsPage from "./pages/SettingsPage";
 
 // Error Pages
 import {
@@ -103,6 +104,7 @@ function App() {
           {/* Standalone Pages */}
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/providers" element={<ProvidersPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="test" element={<TestModelsPage />} />
           {/* Dashboard Routes */}
           <Route path="/" element={<DashboardLayout />}>
