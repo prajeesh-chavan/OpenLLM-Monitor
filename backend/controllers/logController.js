@@ -1,5 +1,6 @@
 const Log = require("../models/Log");
 const { v4: uuidv4 } = require("uuid");
+const config = require("../config/env");
 
 /**
  * Log controller for handling LLM request logs
@@ -53,10 +54,12 @@ class LogController {
       }
 
       if (search) {
+        // Escape regex special characters to prevent NoSQL injection
+        const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         filter.$or = [
-          { prompt: { $regex: search, $options: "i" } },
-          { completion: { $regex: search, $options: "i" } },
-          { model: { $regex: search, $options: "i" } },
+          { prompt: { $regex: escapedSearch, $options: "i" } },
+          { completion: { $regex: escapedSearch, $options: "i" } },
+          { model: { $regex: escapedSearch, $options: "i" } },
         ];
       }
 
@@ -99,7 +102,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to fetch logs",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -140,7 +143,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to fetch log",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -169,7 +172,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to create log",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -205,7 +208,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to update log",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -238,7 +241,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to delete log",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -331,7 +334,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to fetch statistics",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -390,7 +393,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to fetch model comparison",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -465,7 +468,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to fetch error analysis",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -517,8 +520,20 @@ class LogController {
         log.error?.message || "",
       ]);
 
+      // Escape CSV fields to prevent formula injection (=, +, -, @, \t, \r)
+      const escapeCSVField = (field) => {
+        const str = String(field == null ? "" : field);
+        // Escape double quotes by doubling them
+        const escaped = str.replace(/"/g, '""');
+        // Prefix with single quote if starts with formula-trigger characters
+        if (/^[=+\-@\t\r]/.test(escaped)) {
+          return `"'${escaped}"`;
+        }
+        return `"${escaped}"`;
+      };
+
       const csvContent = [csvHeaders, ...csvRows]
-        .map((row) => row.map((field) => `"${field}"`).join(","))
+        .map((row) => row.map((field) => escapeCSVField(field)).join(","))
         .join("\n");
 
       res.setHeader("Content-Type", "text/csv");
@@ -529,7 +544,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to export logs",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -569,7 +584,7 @@ class LogController {
       res.status(500).json({
         success: false,
         error: "Failed to delete logs",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }

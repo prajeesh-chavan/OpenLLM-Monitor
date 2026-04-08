@@ -5,6 +5,7 @@ const mistralService = require("../services/mistralService");
 const GeminiService = require("../services/geminiService");
 const GrokService = require("../services/grokService");
 const { v4: uuidv4 } = require("uuid");
+const config = require("../config/env");
 
 /**
  * Replay controller for re-executing stored prompts
@@ -129,7 +130,7 @@ class ReplayController {
       res.status(500).json({
         success: false,
         error: "Failed to replay prompt",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -207,7 +208,7 @@ class ReplayController {
       res.status(500).json({
         success: false,
         error: "Failed to replay from log",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -313,7 +314,7 @@ class ReplayController {
         res.status(500).json({
           success: false,
           error: "Failed to stream replay",
-          details: error.message,
+          details: config.isDevelopment ? error.message : undefined,
         });
       }
     }
@@ -463,7 +464,7 @@ class ReplayController {
       res.status(500).json({
         success: false,
         error: "Failed to compare replays",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -517,7 +518,7 @@ class ReplayController {
       res.status(500).json({
         success: false,
         error: "Failed to get available models",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -554,7 +555,7 @@ class ReplayController {
       res.status(500).json({
         success: false,
         error: "Failed to test connection",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -633,7 +634,7 @@ class ReplayController {
       res.status(500).json({
         success: false,
         error: "Failed to get cost estimate",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
