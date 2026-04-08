@@ -81,8 +81,8 @@ class ProviderController {
           settings.baseUrl || this.providerConfigs.mistral.baseUrl;
         this.providerConfigs.mistral.enabled =
           settings.enabled !== undefined ? settings.enabled : true;
-        // Optionally, you can store the key in memory if needed for requests
-        this.providerConfigs.mistral._apiKey = settings.apiKey;
+        // Decrypt the API key for runtime use
+        this.providerConfigs.mistral._apiKey = settings.getDecryptedApiKey();
       }
     } catch (err) {
       console.warn("Could not load Mistral API key from DB:", err.message);
@@ -150,7 +150,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Failed to get providers",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -226,7 +226,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Failed to get provider",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -285,7 +285,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Failed to update provider",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -316,7 +316,7 @@ class ProviderController {
           provider: "mistral",
         });
         if (settings && settings.apiKey) {
-          testApiKey = settings.apiKey;
+          testApiKey = settings.getDecryptedApiKey();
         }
       }
       if (baseUrl) config.baseUrl = baseUrl;
@@ -357,7 +357,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Connection test failed",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -393,7 +393,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Failed to get models",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -496,7 +496,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Failed to get provider statistics",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -525,7 +525,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Failed to get recommendations",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
@@ -787,7 +787,7 @@ class ProviderController {
       res.status(500).json({
         success: false,
         error: "Failed to generate completion",
-        details: error.message,
+        details: config.isDevelopment ? error.message : undefined,
       });
     }
   }
