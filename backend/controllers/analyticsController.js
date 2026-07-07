@@ -1,741 +1,113 @@
-const Log = require("../models/Log");
+const ApiResponse = require("../utils/apiResponse");
+const AnalyticsService = require("../services/analyticsService");
 
-/**
- * Analytics Controller
- * Handles analytics and statistics endpoints
- */
-
-/**
- * Get overall statistics
- */
 const getStats = async (req, res) => {
   try {
-    const { timeRange = "24h" } = req.query;
-
-    // Calculate date range
-    const now = new Date();
-    let startDate;
-
-    switch (timeRange) {
-      case "1h":
-        startDate = new Date(now.getTime() - 60 * 60 * 1000);
-        break;
-      case "6h":
-        startDate = new Date(now.getTime() - 6 * 60 * 60 * 1000);
-        break;
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case "30d":
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    } // Aggregate statistics
-    const stats = await Log.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalRequests: { $sum: 1 },
-          successfulRequests: {
-            $sum: { $cond: [{ $eq: ["$status", "success"] }, 1, 0] },
-          },
-          errorRequests: {
-            $sum: { $cond: [{ $ne: ["$status", "success"] }, 1, 0] },
-          },
-          rateLimitedRequests: {
-            $sum: { $cond: [{ $eq: ["$status", "rate_limited"] }, 1, 0] },
-          },
-          timeoutRequests: {
-            $sum: { $cond: [{ $eq: ["$status", "timeout"] }, 1, 0] },
-          },
-          generalErrorRequests: {
-            $sum: { $cond: [{ $eq: ["$status", "error"] }, 1, 0] },
-          },
-          totalRetryAttempts: { $sum: "$retryAttempts" },
-          requestsWithRetries: {
-            $sum: { $cond: [{ $gt: ["$retryAttempts", 0] }, 1, 0] },
-          },
-          avgResponseTime: { $avg: "$latency" },
-          totalCost: { $sum: "$cost.totalCost" },
-          totalTokens: { $sum: "$tokenUsage.totalTokens" },
-          promptTokens: { $sum: "$tokenUsage.promptTokens" },
-          completionTokens: { $sum: "$tokenUsage.completionTokens" },
-          providers: { $addToSet: "$provider" },
-        },
-      },
-    ]);
-    const result = stats[0] || {
-      totalRequests: 0,
-      successfulRequests: 0,
-      errorRequests: 0,
-      rateLimitedRequests: 0,
-      timeoutRequests: 0,
-      generalErrorRequests: 0,
-      totalRetryAttempts: 0,
-      requestsWithRetries: 0,
-      avgResponseTime: 0,
-      totalCost: 0,
-      totalTokens: 0,
-      promptTokens: 0,
-      completionTokens: 0,
-      providers: [],
-    };
-
-    // Calculate rates
-    const successRate =
-      result.totalRequests > 0
-        ? (result.successfulRequests / result.totalRequests) * 100
-        : 0;
-
-    const errorRate =
-      result.totalRequests > 0
-        ? (result.errorRequests / result.totalRequests) * 100
-        : 0;
-
-    const retryRate =
-      result.totalRequests > 0
-        ? (result.requestsWithRetries / result.totalRequests) * 100
-        : 0;
-    res.json({
-      success: true,
-      data: {
-        overview: {
-          totalRequests: result.totalRequests,
-          successfulRequests: result.successfulRequests,
-          errorRequests: result.errorRequests,
-          successRate: Math.round(successRate * 100) / 100,
-          errorRate: Math.round(errorRate * 100) / 100,
-          retryRate: Math.round(retryRate * 100) / 100,
-          avgDuration: Math.round(result.avgResponseTime || 0),
-          totalCost: Math.round(result.totalCost * 10000) / 10000,
-          totalTokens: result.totalTokens,
-          promptTokens: result.promptTokens,
-          completionTokens: result.completionTokens,
-          activeProviders: result.providers.length,
-          // Additional error breakdown
-          rateLimitedRequests: result.rateLimitedRequests,
-          timeoutRequests: result.timeoutRequests,
-          generalErrorRequests: result.generalErrorRequests,
-          // Retry statistics
-          totalRetryAttempts: result.totalRetryAttempts,
-          requestsWithRetries: result.requestsWithRetries,
-          avgRetriesPerFailedRequest:
-            result.requestsWithRetries > 0
-              ? Math.round(
-                  (result.totalRetryAttempts / result.requestsWithRetries) * 100
-                ) / 100
-              : 0,
-        },
-        providerStats: result.providers,
-        modelStats: [],
-        timeRangeStats: {
-          timeRange,
-          generatedAt: new Date().toISOString(),
-        },
-      },
-    });
+    const timeRange = req.query.timeRange || "24h";
+    const data = await AnalyticsService.getStats(timeRange);
+    return ApiResponse.success(res, data);
   } catch (error) {
     console.error("Error fetching stats:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch statistics",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to fetch statistics", 500, error.message);
   }
 };
 
-/**
- * Get request volume over time
- */
 const getRequestVolume = async (req, res) => {
   try {
-    const { timeRange = "24h", interval = "1h" } = req.query;
-
-    // Calculate date range
-    const now = new Date();
-    let startDate, groupBy;
-
-    switch (timeRange) {
-      case "1h":
-        startDate = new Date(now.getTime() - 60 * 60 * 1000);
-        groupBy = {
-          $dateToString: { format: "%Y-%m-%d %H:%M", date: "$createdAt" },
-        };
-        break;
-      case "6h":
-        startDate = new Date(now.getTime() - 6 * 60 * 60 * 1000);
-        groupBy = {
-          $dateToString: { format: "%Y-%m-%d %H:00", date: "$createdAt" },
-        };
-        break;
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        groupBy = {
-          $dateToString: { format: "%Y-%m-%d %H:00", date: "$createdAt" },
-        };
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
-        break;
-      case "30d":
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
-        break;
-      default:
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        groupBy = {
-          $dateToString: { format: "%Y-%m-%d %H:00", date: "$createdAt" },
-        };
-    }
-    const volume = await Log.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-        },
-      },
-      {
-        $group: {
-          _id: groupBy,
-          requests: { $sum: 1 },
-          errors: { $sum: { $cond: [{ $ne: ["$status", "success"] }, 1, 0] } },
-          totalTokens: { $sum: "$tokenUsage.totalTokens" },
-          promptTokens: { $sum: "$tokenUsage.promptTokens" },
-          completionTokens: { $sum: "$tokenUsage.completionTokens" },
-        },
-      },
-      {
-        $sort: { _id: 1 },
-      },
-      {
-        $project: {
-          createdAt: "$_id",
-          requests: 1,
-          errors: 1,
-          totalTokens: 1,
-          promptTokens: 1,
-          completionTokens: 1,
-          _id: 0,
-        },
-      },
-    ]);
-    res.json({
-      success: true,
-      data: {
-        hourlyStats: volume,
-        requestVolume: volume.length,
-        tokenUsage: {
-          total: volume.reduce((acc, curr) => acc + (curr.totalTokens || 0), 0),
-          prompt: volume.reduce(
-            (acc, curr) => acc + (curr.promptTokens || 0),
-            0
-          ),
-          completion: volume.reduce(
-            (acc, curr) => acc + (curr.completionTokens || 0),
-            0
-          ),
-        },
-        timeRange,
-        generatedAt: new Date().toISOString(),
-      },
-    });
+    const timeRange = req.query.timeRange || "24h";
+    const data = await AnalyticsService.getRequestVolume(timeRange);
+    return ApiResponse.success(res, data);
   } catch (error) {
     console.error("Error fetching request volume:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch request volume",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to fetch request volume", 500, error.message);
   }
 };
 
-/**
- * Get provider distribution
- */
 const getProviderDistribution = async (req, res) => {
   try {
-    const { timeRange = "24h" } = req.query;
-
-    // Calculate date range
-    const now = new Date();
-    let startDate;
-
-    switch (timeRange) {
-      case "1h":
-        startDate = new Date(now.getTime() - 60 * 60 * 1000);
-        break;
-      case "6h":
-        startDate = new Date(now.getTime() - 6 * 60 * 60 * 1000);
-        break;
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case "30d":
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    }
-
-    const distribution = await Log.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-        },
-      },
-      {
-        $group: {
-          _id: "$provider",
-          count: { $sum: 1 },
-          avgResponseTime: { $avg: "$latency" },
-          totalCost: { $sum: "$cost.totalCost" },
-          successRate: {
-            $avg: { $cond: [{ $eq: ["$status", "success"] }, 1, 0] },
-          },
-        },
-      },
-      {
-        $project: {
-          name: "$_id",
-          value: "$count",
-          count: 1,
-          avgResponseTime: { $round: ["$avgResponseTime", 2] },
-          totalCost: { $round: ["$totalCost", 4] },
-          successRate: { $round: [{ $multiply: ["$successRate", 100] }, 2] },
-          _id: 0,
-        },
-      },
-      {
-        $sort: { count: -1 },
-      },
-    ]);
-
-    res.json({
-      success: true,
-      data: {
-        providerComparison: distribution,
-        modelComparison: distribution.map((p) => ({
-          provider: p._id,
-          models: p.models || [],
-        })),
-        timeRange,
-        generatedAt: new Date().toISOString(),
-      },
-    });
+    const timeRange = req.query.timeRange || "24h";
+    const data = await AnalyticsService.getProviderDistribution(timeRange);
+    return ApiResponse.success(res, data);
   } catch (error) {
     console.error("Error fetching provider distribution:", error);
-    res.status(500).json({
-      error: "Failed to fetch provider distribution",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to fetch provider distribution", 500, error.message);
   }
 };
 
-/**
- * Get model performance comparison
- */
 const getModelPerformance = async (req, res) => {
   try {
-    const { timeRange = "24h" } = req.query;
-
-    // Calculate date range
-    const now = new Date();
-    let startDate;
-
-    switch (timeRange) {
-      case "1h":
-        startDate = new Date(now.getTime() - 60 * 60 * 1000);
-        break;
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case "30d":
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    }
-
-    const performance = await Log.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-        },
-      },
-      {
-        $group: {
-          _id: "$model",
-          provider: { $first: "$provider" },
-          requestCount: { $sum: 1 },
-          avgDuration: { $avg: "$latency" },
-          successRate: {
-            $avg: { $cond: [{ $eq: ["$status", "success"] }, 100, 0] },
-          },
-          avgCost: { $avg: "$cost.totalCost" },
-          totalTokens: { $sum: "$tokenUsage.total" },
-        },
-      },
-      {
-        $project: {
-          model: "$_id",
-          provider: 1,
-          requestCount: 1,
-          avgDuration: { $round: ["$avgDuration", 2] },
-          successRate: { $round: ["$successRate", 2] },
-          avgCost: { $round: ["$avgCost", 6] },
-          totalTokens: 1,
-          _id: 0,
-        },
-      },
-      {
-        $sort: { requestCount: -1 },
-      },
-      {
-        $limit: 20,
-      },
-    ]);
-
-    res.json({
-      success: true,
-      data: {
-        responseTime:
-          performance.reduce(
-            (acc, curr) => acc + (curr.avgResponseTime || 0),
-            0
-          ) / performance.length || 0,
-        errorRate:
-          performance.reduce((acc, curr) => acc + (curr.errorRate || 0), 0) /
-            performance.length || 0,
-        latencyDistribution: performance,
-        timeRange,
-        generatedAt: new Date().toISOString(),
-      },
-    });
+    const timeRange = req.query.timeRange || "24h";
+    const data = await AnalyticsService.getModelPerformance(timeRange);
+    return ApiResponse.success(res, data);
   } catch (error) {
     console.error("Error fetching model performance:", error);
-    res.status(500).json({
-      error: "Failed to fetch model performance",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to fetch model performance", 500, error.message);
   }
 };
 
-/**
- * Get cost analysis over time
- */
 const getCostAnalysis = async (req, res) => {
   try {
-    const { timeRange = "24h" } = req.query;
-
-    // Calculate date range and grouping
-    const now = new Date();
-    let startDate, groupBy;
-
-    switch (timeRange) {
-      case "1h":
-        startDate = new Date(now.getTime() - 60 * 60 * 1000);
-        groupBy = {
-          $dateToString: { format: "%Y-%m-%d %H:%M", date: "$createdAt" },
-        };
-        break;
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        groupBy = {
-          $dateToString: { format: "%Y-%m-%d %H:00", date: "$createdAt" },
-        };
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
-        break;
-      case "30d":
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        groupBy = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
-        break;
-      default:
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        groupBy = {
-          $dateToString: { format: "%Y-%m-%d %H:00", date: "$createdAt" },
-        };
-    }
-
-    const costAnalysis = await Log.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-          "cost.totalCost": { $exists: true, $ne: null },
-        },
-      },
-      {
-        $group: {
-          _id: groupBy,
-          cost: { $sum: "$cost.totalCost" },
-          requests: { $sum: 1 },
-          inputTokens: { $sum: "$tokenUsage.prompt" },
-          outputTokens: { $sum: "$tokenUsage.completion" },
-        },
-      },
-      {
-        $sort: { _id: 1 },
-      },
-      {
-        $project: {
-          createdAt: "$_id",
-          cost: { $round: ["$cost", 6] },
-          requests: 1,
-          inputTokens: 1,
-          outputTokens: 1,
-          _id: 0,
-        },
-      },
-    ]);
-    res.json({
-      success: true,
-      data: {
-        totalCost: costAnalysis.reduce(
-          (acc, curr) => acc + (curr.cost || 0),
-          0
-        ),
-        costByProvider: costAnalysis,
-        costByModel: costAnalysis,
-        costTrend: costAnalysis,
-        costBreakdown: costAnalysis,
-        timeRange,
-        generatedAt: new Date().toISOString(),
-      },
-    });
+    const timeRange = req.query.timeRange || "24h";
+    const data = await AnalyticsService.getCostAnalysis(timeRange);
+    return ApiResponse.success(res, data);
   } catch (error) {
     console.error("Error fetching cost analysis:", error);
-    res.status(500).json({
-      error: "Failed to fetch cost analysis",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to fetch cost analysis", 500, error.message);
   }
 };
 
-/**
- * Get error analytics
- */
 const getErrorAnalytics = async (req, res) => {
   try {
-    const { timeRange = "24h" } = req.query;
-    const now = new Date();
-    let startDate;
-
-    switch (timeRange) {
-      case "1h":
-        startDate = new Date(now.getTime() - 60 * 60 * 1000);
-        break;
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    }
-
-    const errorStats = await Log.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-          status: "error",
-        },
-      },
-      {
-        $group: {
-          _id: "$error.code",
-          count: { $sum: 1 },
-          errorMessages: { $addToSet: "$error.message" },
-        },
-      },
-    ]);
-
-    const totalRequests = await Log.countDocuments({
-      createdAt: { $gte: startDate },
-    });
-
-    const totalErrors = await Log.countDocuments({
-      createdAt: { $gte: startDate },
-      status: "error",
-    });
-
-    const errorRate =
-      totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0;
-    res.json({
-      success: true,
-      data: {
-        errorRate: Math.round(errorRate * 100) / 100,
-        totalErrors,
-        errorsByType: errorStats,
-        errorsByProvider: errorStats,
-        errorBreakdown: errorStats,
-        timeRange,
-        generatedAt: new Date().toISOString(),
-      },
-    });
+    const timeRange = req.query.timeRange || "24h";
+    const data = await AnalyticsService.getErrorAnalytics(timeRange);
+    return ApiResponse.success(res, data);
   } catch (error) {
     console.error("Error fetching error analytics:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch error analytics",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to fetch error analytics", 500, error.message);
   }
 };
 
-/**
- * Get trend analysis
- */
 const getTrends = async (req, res) => {
   try {
-    const { timeRange = "7d" } = req.query;
-    const now = new Date();
-    let startDate;
-
-    switch (timeRange) {
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case "30d":
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    }
-
-    // Simplified trend analysis - can be expanded
-    const trends = await Log.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$createdAt",
-            },
-          },
-          requests: { $sum: 1 },
-          avgLatency: { $avg: "$latency" },
-          totalCost: { $sum: "$cost.totalCost" },
-        },
-      },
-      {
-        $sort: { _id: 1 },
-      },
-    ]);
-    res.json({
-      success: true,
-      data: {
-        insights: "Request volume and performance trends over time",
-        patterns: trends,
-        predictions: "Based on current data, trends are stable",
-        trends,
-        timeRange,
-        generatedAt: new Date().toISOString(),
-      },
-    });
+    const timeRange = req.query.timeRange || "7d";
+    const data = await AnalyticsService.getTrends(timeRange);
+    return ApiResponse.success(res, data);
   } catch (error) {
     console.error("Error fetching trends:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch trends",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to fetch trends", 500, error.message);
   }
 };
 
-/**
- * Export analytics data
- */
 const exportAnalytics = async (req, res) => {
   try {
-    const { format = "json", timeRange = "24h" } = req.query;
-    const now = new Date();
-    let startDate;
-
-    switch (timeRange) {
-      case "1h":
-        startDate = new Date(now.getTime() - 60 * 60 * 1000);
-        break;
-      case "24h":
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case "7d":
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    }
-
-    const logs = await Log.find({
-      createdAt: { $gte: startDate },
-    }).select(
-      "requestId provider model prompt completion latency cost status createdAt"
-    );
+    const format = req.query.format || "json";
+    const timeRange = req.query.timeRange || "24h";
+    const logs = await AnalyticsService.exportAnalytics(timeRange);
 
     if (format === "csv") {
       const csvData = logs.map((log) => ({
         requestId: log.requestId,
         provider: log.provider,
         model: log.model,
-        prompt: log.prompt.substring(0, 100) + "...",
+        prompt: (log.prompt || "").substring(0, 100) + "...",
         latency: log.latency,
-        cost: log.cost.totalCost,
+        cost: log.cost?.totalCost || 0,
         status: log.status,
         createdAt: log.createdAt.toISOString(),
       }));
 
       res.setHeader("Content-Type", "text/csv");
-      res.setHeader(
-        "Content-Disposition",
-        'attachment; filename="analytics.csv"'
-      );
-      res.send(
+      res.setHeader("Content-Disposition", 'attachment; filename="analytics.csv"');
+      return res.send(
         "requestId,provider,model,prompt,latency,cost,status,createdAt\n" +
           csvData.map((row) => Object.values(row).join(",")).join("\n")
       );
-    } else {
-      res.json({
-        success: true,
-        data: {
-          analytics: logs,
-          exportedAt: new Date().toISOString(),
-          format,
-          timeRange,
-        },
-      });
     }
+
+    return ApiResponse.success(res, { analytics: logs, format, timeRange, exportedAt: new Date().toISOString() });
   } catch (error) {
     console.error("Error exporting analytics:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to export analytics",
-      message: error.message,
-    });
+    return ApiResponse.error(res, "Failed to export analytics", 500, error.message);
   }
 };
 

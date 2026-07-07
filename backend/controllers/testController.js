@@ -6,6 +6,7 @@ const costEstimator = require("../utils/costEstimator");
 const tokenCounter = require("../utils/tokenCounter");
 const retryHandler = require("../utils/retryHandler");
 const Log = require("../models/Log");
+const ApiResponse = require("../utils/apiResponse");
 
 /**
  * Test Controller
@@ -37,10 +38,7 @@ class TestController {
 
       // Validate required fields
       if (!prompt || !provider || !model) {
-        return res.status(400).json({
-          success: false,
-          error: "Missing required fields: prompt, provider, model",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt, provider, model");
       }
 
       const startTime = Date.now();
@@ -73,10 +71,7 @@ class TestController {
           service = this.services.openrouter;
           break;
         default:
-          return res.status(400).json({
-            success: false,
-            error: `Unsupported provider: ${provider}`,
-          });
+          return ApiResponse.badRequest(res, `Unsupported provider: ${provider}`);
       } // Execute the request with retry logic
       const { result } = await retryHandler.executeWithRetry(
         () => service.sendPrompt(requestParams),
@@ -125,18 +120,15 @@ class TestController {
 
       await logEntry.save();
 
-      res.json({
-        success: true,
-        data: {
-          requestId,
-          provider,
-          model,
-          response: result.completion || result.response,
-          tokenUsage,
-          cost,
-          duration,
-          timestamp: new Date().toISOString(),
-        },
+      return ApiResponse.success(res, {
+        requestId,
+        provider,
+        model,
+        response: result.completion || result.response,
+        tokenUsage,
+        cost,
+        duration,
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       console.error("Test prompt error:", error);
@@ -162,12 +154,7 @@ class TestController {
         console.error("Failed to log test error:", logError);
       }
 
-      res.status(500).json({
-        success: false,
-        error: error.message || "Failed to test prompt",
-        details:
-          process.env.NODE_ENV === "development" ? error.stack : undefined,
-      });
+      return ApiResponse.error(res, error.message || "Failed to test prompt", 500, process.env.NODE_ENV === "development" ? error.stack : undefined);
     }
   }
 
@@ -183,10 +170,7 @@ class TestController {
       } = req.body;
 
       if (!prompt || !models || !Array.isArray(models) || models.length === 0) {
-        return res.status(400).json({
-          success: false,
-          error: "Missing required fields: prompt, models (array)",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt, models (array)");
       }
 
       const results = [];
@@ -296,26 +280,20 @@ class TestController {
 
       const totalDuration = Date.now() - startTime;
 
-      res.json({
-        success: true,
-        data: {
-          prompt,
-          results,
-          totalDuration,
-          timestamp: new Date().toISOString(),
-          summary: {
-            total: models.length,
-            successful: results.filter((r) => r.status === "success").length,
-            failed: results.filter((r) => r.status === "error").length,
-          },
+      return ApiResponse.success(res, {
+        prompt,
+        results,
+        totalDuration,
+        timestamp: new Date().toISOString(),
+        summary: {
+          total: models.length,
+          successful: results.filter((r) => r.status === "success").length,
+          failed: results.filter((r) => r.status === "error").length,
         },
       });
     } catch (error) {
       console.error("Compare models error:", error);
-      res.status(500).json({
-        success: false,
-        error: error.message || "Failed to compare models",
-      });
+      return ApiResponse.error(res, error.message || "Failed to compare models", 500);
     }
   }
 
@@ -367,17 +345,10 @@ class TestController {
         console.warn("Could not fetch Ollama models:", error.message);
       }
 
-      res.json({
-        success: true,
-        data: models,
-        timestamp: new Date().toISOString(),
-      });
+      return ApiResponse.success(res, models);
     } catch (error) {
       console.error("Get available models error:", error);
-      res.status(500).json({
-        success: false,
-        error: error.message || "Failed to get available models",
-      });
+      return ApiResponse.error(res, error.message || "Failed to get available models", 500);
     }
   }
 
@@ -389,10 +360,7 @@ class TestController {
       const { prompt, provider, model, maxTokens = 1000 } = req.body;
 
       if (!prompt || !provider || !model) {
-        return res.status(400).json({
-          success: false,
-          error: "Missing required fields: prompt, provider, model",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt, provider, model");
       }
       const promptTokens = tokenCounter.countTokens(prompt);
       const estimatedCompletionTokens = Math.min(maxTokens, promptTokens * 0.5); // Rough estimate
@@ -405,27 +373,21 @@ class TestController {
 
       const cost = costEstimator.calculateCost(provider, model, tokenUsage);
 
-      res.json({
-        success: true,
-        data: {
-          prompt,
+      return ApiResponse.success(res, {
+        prompt,
+        provider,
+        model,
+        tokenUsage,
+        estimatedCost: cost,
+        breakdown: costEstimator.getCostBreakdown?.(
           provider,
           model,
-          tokenUsage,
-          estimatedCost: cost,
-          breakdown: costEstimator.getCostBreakdown?.(
-            provider,
-            model,
-            tokenUsage
-          ),
-        },
+          tokenUsage
+        ),
       });
     } catch (error) {
       console.error("Cost estimate error:", error);
-      res.status(500).json({
-        success: false,
-        error: error.message || "Failed to estimate cost",
-      });
+      return ApiResponse.error(res, error.message || "Failed to estimate cost", 500);
     }
   }
 
@@ -504,31 +466,25 @@ class TestController {
         console.warn("Could not estimate cost:", costError);
       }
 
-      res.json({
-        success: true,
-        data: {
-          valid: errors.length === 0,
-          errors,
-          warnings,
-          recommendations: [
-            ...(prompt && prompt.length < 50
-              ? ["Consider adding more context to your prompt"]
-              : []),
-            ...(temperature === undefined
-              ? ["Setting temperature can improve response quality"]
-              : []),
-            ...(maxTokens === undefined
-              ? ["Setting max tokens helps control response length"]
-              : []),
-          ],
-        },
+      return ApiResponse.success(res, {
+        valid: errors.length === 0,
+        errors,
+        warnings,
+        recommendations: [
+          ...(prompt && prompt.length < 50
+            ? ["Consider adding more context to your prompt"]
+            : []),
+          ...(temperature === undefined
+            ? ["Setting temperature can improve response quality"]
+            : []),
+          ...(maxTokens === undefined
+            ? ["Setting max tokens helps control response length"]
+            : []),
+        ],
       });
     } catch (error) {
       console.error("Validate config error:", error);
-      res.status(500).json({
-        success: false,
-        error: error.message || "Failed to validate configuration",
-      });
+      return ApiResponse.error(res, error.message || "Failed to validate configuration", 500);
     }
   }
 }

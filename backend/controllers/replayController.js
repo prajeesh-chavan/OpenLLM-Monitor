@@ -5,6 +5,7 @@ const mistralService = require("../services/mistralService");
 const GeminiService = require("../services/geminiService");
 const GrokService = require("../services/grokService");
 const { v4: uuidv4 } = require("uuid");
+const ApiResponse = require("../utils/apiResponse");
 
 /**
  * Replay controller for re-executing stored prompts
@@ -47,20 +48,14 @@ class ReplayController {
           provider,
           model,
         });
-        return res.status(400).json({
-          success: false,
-          error: "Missing required fields: prompt, provider, model",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt, provider, model");
       }
 
       // Get the appropriate service
       const service = this.services[provider];
       if (!service) {
         console.error(`Unsupported provider: ${provider}`);
-        return res.status(400).json({
-          success: false,
-          error: `Unsupported provider: ${provider}`,
-        });
+        return ApiResponse.badRequest(res, `Unsupported provider: ${provider}`);
       }
 
       // Generate request ID
@@ -90,13 +85,7 @@ class ReplayController {
       // Check if the service returned an error
       if (result.status === "error") {
         console.error("Service returned error:", result.error);
-        return res.status(500).json({
-          success: false,
-          error: "Failed to execute prompt",
-          details: result.error?.message || "Unknown service error",
-          provider,
-          model,
-        });
+        return ApiResponse.error(res, "Failed to execute prompt", 500, result.error?.message || "Unknown service error");
       }
 
       // Add replay metadata
@@ -120,17 +109,10 @@ class ReplayController {
 
       console.log(`Replay successful for ${provider}:${model}`);
 
-      res.json({
-        success: true,
-        data: responseData,
-      });
+      return ApiResponse.success(res, responseData);
     } catch (error) {
       console.error("Error replaying prompt:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to replay prompt",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to replay prompt", 500, error.message);
     }
   }
   /**
@@ -152,10 +134,7 @@ class ReplayController {
       const mongoose = require("mongoose");
       if (!mongoose.Types.ObjectId.isValid(logId)) {
         console.error("Invalid log ID format:", logId);
-        return res.status(400).json({
-          success: false,
-          error: "Invalid log ID format",
-        });
+        return ApiResponse.badRequest(res, "Invalid log ID format");
       }
 
       // Get the original log with lean query for better performance
@@ -167,10 +146,7 @@ class ReplayController {
 
       if (!originalLog) {
         console.error("Original log not found:", logId);
-        return res.status(404).json({
-          success: false,
-          error: "Original log not found",
-        });
+        return ApiResponse.notFound(res, "Original log not found");
       }
 
       console.log(
@@ -204,11 +180,7 @@ class ReplayController {
       return this.replayPrompt(req, res);
     } catch (error) {
       console.error("Error replaying from log:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to replay from log",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to replay from log", 500, error.message);
     }
   }
 
@@ -229,19 +201,13 @@ class ReplayController {
 
       // Validate required fields
       if (!prompt || !provider || !model) {
-        return res.status(400).json({
-          success: false,
-          error: "Missing required fields: prompt, provider, model",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt, provider, model");
       }
 
       // Get the appropriate service
       const service = this.services[provider];
       if (!service) {
-        return res.status(400).json({
-          success: false,
-          error: `Unsupported provider: ${provider}`,
-        });
+        return ApiResponse.badRequest(res, `Unsupported provider: ${provider}`);
       }
 
       // Set up SSE headers
@@ -310,11 +276,7 @@ class ReplayController {
     } catch (error) {
       console.error("Error streaming replay:", error);
       if (!res.headersSent) {
-        res.status(500).json({
-          success: false,
-          error: "Failed to stream replay",
-          details: error.message,
-        });
+        return ApiResponse.error(res, "Failed to stream replay", 500, error.message);
       }
     }
   }
@@ -340,18 +302,11 @@ class ReplayController {
         configurations.length > 0 ? configurations : providers;
 
       if (!prompt || !configsToUse || configsToUse.length === 0) {
-        return res.status(400).json({
-          success: false,
-          error:
-            "Missing required fields: prompt and configurations/providers array",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt and configurations/providers array");
       }
 
       if (configsToUse.length > 5) {
-        return res.status(400).json({
-          success: false,
-          error: "Maximum 5 configurations allowed for comparison",
-        });
+        return ApiResponse.badRequest(res, "Maximum 5 configurations allowed for comparison");
       }
 
       // Execute configurations with controlled concurrency to avoid throttling
@@ -454,17 +409,10 @@ class ReplayController {
         };
       }
 
-      res.json({
-        success: true,
-        data: comparison,
-      });
+      return ApiResponse.success(res, comparison);
     } catch (error) {
       console.error("Error comparing replays:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to compare replays",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to compare replays", 500, error.message);
     }
   }
 
@@ -479,12 +427,9 @@ class ReplayController {
       if (provider && this.services[provider]) {
         // Get models for specific provider
         const models = await this.services[provider].listModels();
-        res.json({
-          success: true,
-          data: {
-            models: models,
-            [provider]: models, // Keep both formats for compatibility
-          },
+        return ApiResponse.success(res, {
+          models: models,
+          [provider]: models, // Keep both formats for compatibility
         });
       } else {
         // Get models for all providers
@@ -504,21 +449,14 @@ class ReplayController {
           })
         );
 
-        res.json({
-          success: true,
-          data: {
-            models: allModels, // For test compatibility
-            ...allModels, // Keep individual provider fields
-          },
+        return ApiResponse.success(res, {
+          models: allModels, // For test compatibility
+          ...allModels, // Keep individual provider fields
         });
       }
     } catch (error) {
       console.error("Error getting available models:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to get available models",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to get available models", 500, error.message);
     }
   }
 
@@ -533,29 +471,19 @@ class ReplayController {
 
       const service = this.services[provider];
       if (!service) {
-        return res.status(400).json({
-          success: false,
-          error: `Unsupported provider: ${provider}`,
-        });
+        return ApiResponse.badRequest(res, `Unsupported provider: ${provider}`);
       }
 
       const isConnected = await service.testConnection();
 
-      res.json({
-        success: true,
-        data: {
-          provider,
-          connected: isConnected,
-          timestamp: new Date(),
-        },
+      return ApiResponse.success(res, {
+        provider,
+        connected: isConnected,
+        timestamp: new Date(),
       });
     } catch (error) {
       console.error("Error testing connection:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to test connection",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to test connection", 500, error.message);
     }
   }
 
@@ -574,18 +502,12 @@ class ReplayController {
       } = req.body;
 
       if (!prompt || !provider || !model) {
-        return res.status(400).json({
-          success: false,
-          error: "Missing required fields: prompt, provider, model",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt, provider, model");
       }
 
       const service = this.services[provider];
       if (!service) {
-        return res.status(400).json({
-          success: false,
-          error: `Unsupported provider: ${provider}`,
-        });
+        return ApiResponse.badRequest(res, `Unsupported provider: ${provider}`);
       }
 
       // Fast token estimation with caching
@@ -610,31 +532,24 @@ class ReplayController {
         promptTokens,
         estimatedCompletionTokens,
       });
-      res.json({
-        success: true,
-        data: {
-          prompt: prompt.substring(0, 100) + (prompt.length > 100 ? "..." : ""),
-          provider,
-          model,
-          tokenEstimate: {
-            promptTokens,
-            estimatedCompletionTokens,
-            totalTokens: promptTokens + estimatedCompletionTokens,
-          },
-          costEstimate,
-          // Add fields expected by tests
-          estimatedCost: costEstimate.totalCost,
+      return ApiResponse.success(res, {
+        prompt: prompt.substring(0, 100) + (prompt.length > 100 ? "..." : ""),
+        provider,
+        model,
+        tokenEstimate: {
           promptTokens,
-          maxCompletionTokens: estimatedCompletionTokens,
+          estimatedCompletionTokens,
+          totalTokens: promptTokens + estimatedCompletionTokens,
         },
+        costEstimate,
+        // Add fields expected by tests
+        estimatedCost: costEstimate.totalCost,
+        promptTokens,
+        maxCompletionTokens: estimatedCompletionTokens,
       });
     } catch (error) {
       console.error("Error getting cost estimate:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to get cost estimate",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to get cost estimate", 500, error.message);
     }
   }
 }

@@ -1,5 +1,6 @@
 const Log = require("../models/Log");
 const { v4: uuidv4 } = require("uuid");
+const ApiResponse = require("../utils/apiResponse");
 
 /**
  * Log controller for handling LLM request logs
@@ -80,68 +81,36 @@ class LogController {
       const hasNextPage = parseInt(page) < totalPages;
       const hasPrevPage = parseInt(page) > 1;
 
-      res.json({
-        success: true,
-        data: {
-          logs,
-          pagination: {
-            currentPage: parseInt(page),
-            totalPages,
-            totalCount,
-            hasNextPage,
-            hasPrevPage,
-            limit: parseInt(limit),
-          },
-        },
+      return ApiResponse.paginated(res, { logs }, {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalCount,
+        totalPages,
       });
     } catch (error) {
       console.error("Error getting logs:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to fetch logs",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to fetch logs", 500, error.message);
     }
   }
 
-  /**
-   * Get a single log by ID
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */ async getLogById(req, res) {
+  async getLogById(req, res) {
     try {
       const { id } = req.params;
 
-      // Validate MongoDB ObjectId
       if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-        return res.status(400).json({
-          success: false,
-          error: "Invalid log ID format",
-        });
+        return ApiResponse.badRequest(res, "Invalid log ID format");
       }
 
       const log = await Log.findById(id).lean();
 
       if (!log) {
-        return res.status(404).json({
-          success: false,
-          error: "Log not found",
-        });
+        return ApiResponse.notFound(res, "Log not found");
       }
 
-      res.json({
-        success: true,
-        data: {
-          log: log,
-        },
-      });
+      return ApiResponse.success(res, { log });
     } catch (error) {
       console.error("Error getting log:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to fetch log",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to fetch log", 500, error.message);
     }
   }
 
@@ -160,25 +129,13 @@ class LogController {
       const log = new Log(logData);
       await log.save();
 
-      res.status(201).json({
-        success: true,
-        data: log,
-      });
+      return ApiResponse.created(res, log);
     } catch (error) {
       console.error("Error creating log:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to create log",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to create log", 500, error.message);
     }
   }
 
-  /**
-   * Update a log entry
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
   async updateLog(req, res) {
     try {
       const { id } = req.params;
@@ -190,31 +147,16 @@ class LogController {
       });
 
       if (!log) {
-        return res.status(404).json({
-          success: false,
-          error: "Log not found",
-        });
+        return ApiResponse.notFound(res, "Log not found");
       }
 
-      res.json({
-        success: true,
-        data: log,
-      });
+      return ApiResponse.success(res, log);
     } catch (error) {
       console.error("Error updating log:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to update log",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to update log", 500, error.message);
     }
   }
 
-  /**
-   * Delete a log entry
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
   async deleteLog(req, res) {
     try {
       const { id } = req.params;
@@ -222,24 +164,13 @@ class LogController {
       const log = await Log.findByIdAndDelete(id);
 
       if (!log) {
-        return res.status(404).json({
-          success: false,
-          error: "Log not found",
-        });
+        return ApiResponse.notFound(res, "Log not found");
       }
-      res.json({
-        success: true,
-        data: {
-          message: "Log deleted successfully",
-        },
-      });
+
+      return ApiResponse.success(res, { message: "Log deleted successfully" });
     } catch (error) {
       console.error("Error deleting log:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to delete log",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to delete log", 500, error.message);
     }
   }
 
@@ -309,38 +240,26 @@ class LogController {
         { $sort: { "_id.date": 1, "_id.hour": 1 } },
       ]);
 
-      res.json({
-        success: true,
-        data: {
-          overview: {
-            totalRequests,
-            successfulRequests,
-            successRate: Math.round(successRate * 100) / 100,
-            totalCost: totalCost[0]?.total || 0,
-            avgLatency: Math.round(avgLatency[0]?.avg || 0),
-          },
-          providerStats,
-          costAnalysis,
-          recentActivity,
-          hourlyStats,
-          timeframe: `${timeframe} hours`,
+      return ApiResponse.success(res, {
+        overview: {
+          totalRequests,
+          successfulRequests,
+          successRate: Math.round(successRate * 100) / 100,
+          totalCost: totalCost[0]?.total || 0,
+          avgLatency: Math.round(avgLatency[0]?.avg || 0),
         },
+        providerStats,
+        costAnalysis,
+        recentActivity,
+        hourlyStats,
+        timeframe: `${timeframe} hours`,
       });
     } catch (error) {
       console.error("Error getting stats:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to fetch statistics",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to fetch statistics", 500, error.message);
     }
   }
 
-  /**
-   * Get model performance comparison
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
   async getModelComparison(req, res) {
     try {
       const { timeframe = 24 } = req.query;
@@ -378,28 +297,16 @@ class LogController {
         { $sort: { requestCount: -1 } },
       ]);
 
-      res.json({
-        success: true,
-        data: {
-          models: modelStats,
-          timeframe: `${timeframe} hours`,
-        },
+      return ApiResponse.success(res, {
+        models: modelStats,
+        timeframe: `${timeframe} hours`,
       });
     } catch (error) {
       console.error("Error getting model comparison:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to fetch model comparison",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to fetch model comparison", 500, error.message);
     }
   }
 
-  /**
-   * Get error analysis
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
   async getErrorAnalysis(req, res) {
     try {
       const { timeframe = 24 } = req.query;
@@ -452,29 +359,17 @@ class LogController {
         },
       ]);
 
-      res.json({
-        success: true,
-        data: {
-          errorBreakdown: errorStats,
-          retryAnalysis: retryStats,
-          timeframe: `${timeframe} hours`,
-        },
+      return ApiResponse.success(res, {
+        errorBreakdown: errorStats,
+        retryAnalysis: retryStats,
+        timeframe: `${timeframe} hours`,
       });
     } catch (error) {
       console.error("Error getting error analysis:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to fetch error analysis",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to fetch error analysis", 500, error.message);
     }
   }
 
-  /**
-   * Export logs to CSV
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
   async exportLogs(req, res) {
     try {
       const { startDate, endDate, provider, model, status } = req.query;
@@ -523,22 +418,13 @@ class LogController {
 
       res.setHeader("Content-Type", "text/csv");
       res.setHeader("Content-Disposition", "attachment; filename=llm-logs.csv");
-      res.send(csvContent);
+      return res.send(csvContent);
     } catch (error) {
       console.error("Error exporting logs:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to export logs",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to export logs", 500, error.message);
     }
   }
 
-  /**
-   * Delete multiple logs
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
   async deleteLogs(req, res) {
     try {
       const { ids, olderThan } = req.body;
@@ -550,27 +436,17 @@ class LogController {
       } else if (olderThan) {
         deleteQuery.createdAt = { $lt: new Date(olderThan) };
       } else {
-        return res.status(400).json({
-          success: false,
-          error: "Must provide either ids array or olderThan date",
-        });
+        return ApiResponse.badRequest(res, "Must provide either ids array or olderThan date");
       }
 
       const result = await Log.deleteMany(deleteQuery);
-      res.json({
-        success: true,
-        data: {
-          deletedCount: result.deletedCount,
-          message: `Deleted ${result.deletedCount} logs`,
-        },
+      return ApiResponse.success(res, {
+        deletedCount: result.deletedCount,
+        message: `Deleted ${result.deletedCount} logs`,
       });
     } catch (error) {
       console.error("Error deleting logs:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to delete logs",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to delete logs", 500, error.message);
     }
   }
 }

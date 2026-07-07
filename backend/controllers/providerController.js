@@ -1,5 +1,6 @@
 const config = require("../config/env");
 const ProviderSettings = require("../models/ProviderSettings");
+const ApiResponse = require("../utils/apiResponse");
 
 /**
  * Provider controller for managing LLM provider configurations
@@ -141,17 +142,10 @@ class ProviderController {
         }
       }
 
-      res.json({
-        success: true,
-        data: providers,
-      });
+      return ApiResponse.success(res, providers);
     } catch (error) {
       console.error("Error getting providers:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to get providers",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to get providers", 500, error.message);
     }
   }
 
@@ -165,10 +159,7 @@ class ProviderController {
       const { provider } = req.params;
 
       if (!this.providerConfigs[provider]) {
-        return res.status(404).json({
-          success: false,
-          error: "Provider not found",
-        });
+        return ApiResponse.notFound(res, "Provider not found");
       }
 
       const providerConfig = { ...this.providerConfigs[provider] };
@@ -217,17 +208,10 @@ class ProviderController {
         providerConfig.availableModels = providerConfig.models || [];
       }
 
-      res.json({
-        success: true,
-        data: providerConfig,
-      });
+      return ApiResponse.success(res, providerConfig);
     } catch (error) {
       console.error("Error getting provider:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to get provider",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to get provider", 500, error.message);
     }
   }
 
@@ -242,10 +226,7 @@ class ProviderController {
       const { apiKey, baseUrl, enabled = true } = req.body;
 
       if (!this.providerConfigs[provider]) {
-        return res.status(404).json({
-          success: false,
-          error: "Provider not found",
-        });
+        return ApiResponse.notFound(res, "Provider not found");
       }
 
       // Update configuration
@@ -275,18 +256,10 @@ class ProviderController {
       // Update stored configuration
       this.providerConfigs[provider] = updatedConfig;
 
-      res.json({
-        success: true,
-        data: updatedConfig,
-        message: "Provider configuration updated successfully",
-      });
+      return ApiResponse.success(res, { ...updatedConfig, message: "Provider configuration updated successfully" });
     } catch (error) {
       console.error("Error updating provider:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to update provider",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to update provider", 500, error.message);
     }
   }
 
@@ -301,10 +274,7 @@ class ProviderController {
       const { apiKey, baseUrl } = req.body;
 
       if (!this.providerConfigs[provider]) {
-        return res.status(404).json({
-          success: false,
-          error: "Provider not found",
-        });
+        return ApiResponse.notFound(res, "Provider not found");
       }
 
       const config = { ...this.providerConfigs[provider] };
@@ -332,33 +302,19 @@ class ProviderController {
       const latency = Date.now() - startTime;
 
       if (result && result.success === false) {
-        return res.status(400).json({
-          success: false,
-          error: result.error || "Connection failed",
-          details: result.details || {},
-          status: "error",
-          latency,
-          timestamp: new Date(),
-        });
+        return ApiResponse.error(res, result.error || "Connection failed", 400, { ...result.details, status: "error", latency });
       }
 
-      res.json({
-        success: true,
-        data: {
-          provider,
-          connected: config.status === "connected",
-          status: config.status,
-          latency,
-          timestamp: new Date(),
-        },
+      return ApiResponse.success(res, {
+        provider,
+        connected: config.status === "connected",
+        status: config.status,
+        latency,
+        timestamp: new Date(),
       });
     } catch (error) {
       console.error("Error testing connection:", error);
-      res.status(500).json({
-        success: false,
-        error: "Connection test failed",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Connection test failed", 500, error.message);
     }
   }
 
@@ -372,29 +328,19 @@ class ProviderController {
       const { provider } = req.params;
 
       if (!this.providerConfigs[provider]) {
-        return res.status(404).json({
-          success: false,
-          error: "Provider not found",
-        });
+        return ApiResponse.notFound(res, "Provider not found");
       }
 
       const models = await this.getProviderModels(provider);
 
-      res.json({
-        success: true,
-        data: {
-          provider,
-          models,
-          timestamp: new Date(),
-        },
+      return ApiResponse.success(res, {
+        provider,
+        models,
+        timestamp: new Date(),
       });
     } catch (error) {
       console.error("Error getting models:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to get models",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to get models", 500, error.message);
     }
   }
 
@@ -406,42 +352,39 @@ class ProviderController {
     try {
       // For test environment, return mock data
       if (process.env.NODE_ENV === "test" || !process.env.MONGODB_URI) {
-        return res.json({
-          success: true,
-          data: {
-            overview: {
-              totalRequests: 1250,
-              totalProviders: 4,
-              avgLatency: 287,
-              totalCost: 12.45,
-            },
-            providers: [
-              {
-                name: "openai",
-                requests: 650,
-                successRate: 98.5,
-                avgLatency: 245,
-              },
-              {
-                name: "ollama",
-                requests: 350,
-                successRate: 95.2,
-                avgLatency: 150,
-              },
-              {
-                name: "mistral",
-                requests: 180,
-                successRate: 97.1,
-                avgLatency: 320,
-              },
-              {
-                name: "openrouter",
-                requests: 70,
-                successRate: 94.3,
-                avgLatency: 410,
-              },
-            ],
+        return ApiResponse.success(res, {
+          overview: {
+            totalRequests: 1250,
+            totalProviders: 4,
+            avgLatency: 287,
+            totalCost: 12.45,
           },
+          providers: [
+            {
+              name: "openai",
+              requests: 650,
+              successRate: 98.5,
+              avgLatency: 245,
+            },
+            {
+              name: "ollama",
+              requests: 350,
+              successRate: 95.2,
+              avgLatency: 150,
+            },
+            {
+              name: "mistral",
+              requests: 180,
+              successRate: 97.1,
+              avgLatency: 320,
+            },
+            {
+              name: "openrouter",
+              requests: 70,
+              successRate: 94.3,
+              avgLatency: 410,
+            },
+          ],
         });
       }
 
@@ -484,20 +427,13 @@ class ProviderController {
         config: this.providerConfigs[stat._id] || null,
       }));
 
-      res.json({
-        success: true,
-        data: {
-          stats: enrichedStats,
-          timeframe: `${timeframe} hours`,
-        },
+      return ApiResponse.success(res, {
+        stats: enrichedStats,
+        timeframe: `${timeframe} hours`,
       });
     } catch (error) {
       console.error("Error getting provider stats:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to get provider statistics",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to get provider statistics", 500, error.message);
     }
   }
 
@@ -512,21 +448,14 @@ class ProviderController {
 
       const recommendations = this.getProviderRecommendations(useCase);
 
-      res.json({
-        success: true,
-        data: {
-          useCase,
-          recommendations,
-          timestamp: new Date(),
-        },
+      return ApiResponse.success(res, {
+        useCase,
+        recommendations,
+        timestamp: new Date(),
       });
     } catch (error) {
       console.error("Error getting recommendations:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to get recommendations",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to get recommendations", 500, error.message);
     }
   }
 
@@ -730,10 +659,7 @@ class ProviderController {
 
       // Validate required fields
       if (!prompt || !model) {
-        return res.status(400).json({
-          success: false,
-          error: "Missing required fields: prompt, model",
-        });
+        return ApiResponse.badRequest(res, "Missing required fields: prompt, model");
       }
 
       // Import services dynamically to avoid circular dependencies
@@ -755,10 +681,7 @@ class ProviderController {
 
       const service = services[provider];
       if (!service) {
-        return res.status(400).json({
-          success: false,
-          error: `Unsupported provider: ${provider}`,
-        });
+        return ApiResponse.badRequest(res, `Unsupported provider: ${provider}`);
       }
 
       // Generate request ID
@@ -778,17 +701,10 @@ class ProviderController {
       // Execute the prompt
       const result = await service.sendPrompt(requestParams);
 
-      res.json({
-        success: true,
-        data: result,
-      });
+      return ApiResponse.success(res, result);
     } catch (error) {
       console.error("Error generating completion:", error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to generate completion",
-        details: error.message,
-      });
+      return ApiResponse.error(res, "Failed to generate completion", 500, error.message);
     }
   }
 }
