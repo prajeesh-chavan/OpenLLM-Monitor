@@ -1,14 +1,10 @@
 const config = require("../config/env");
-const ProviderSettings = require("../models/ProviderSettings");
 const ApiResponse = require("../utils/apiResponse");
 const logger = require("../utils/logger");
+const apiKeyService = require("../services/apiKeyService");
 
-/**
- * Provider controller for managing LLM provider configurations
- */
 class ProviderController {
   constructor() {
-    // Store runtime provider configurations
     this.providerConfigs = {
       openai: {
         name: "OpenAI",
@@ -23,7 +19,7 @@ class ProviderController {
         name: "OpenRouter",
         baseUrl: config.providers.openrouter.baseUrl,
         hasApiKey: !!config.providers.openrouter.apiKey,
-        models: [], // Will be fetched dynamically
+        models: [],
         features: ["chat", "completion", "streaming", "multi-model"],
         status: "unknown",
         enabled: true,
@@ -32,12 +28,7 @@ class ProviderController {
         name: "Mistral AI",
         baseUrl: config.providers.mistral.baseUrl,
         hasApiKey: !!config.providers.mistral.apiKey,
-        models: [
-          "mistral-tiny",
-          "mistral-small",
-          "mistral-medium",
-          "mistral-large",
-        ],
+        models: ["mistral-tiny", "mistral-small", "mistral-medium", "mistral-large"],
         features: ["chat", "completion"],
         status: "unknown",
         enabled: true,
@@ -45,8 +36,8 @@ class ProviderController {
       ollama: {
         name: "Ollama (Local)",
         baseUrl: config.providers.ollama.baseUrl,
-        hasApiKey: false, // Ollama doesn't use API keys
-        models: [], // Will be fetched dynamically
+        hasApiKey: false,
+        models: [],
         features: ["chat", "completion", "streaming", "local"],
         status: "unknown",
         enabled: true,
@@ -70,24 +61,22 @@ class ProviderController {
         enabled: true,
       },
     };
-    // Load Mistral API key from DB if present
-    this.loadMistralApiKey();
+    this._init();
   }
 
-  async loadMistralApiKey() {
+  async _init() {
     try {
-      const settings = await ProviderSettings.findOne({ provider: "mistral" });
-      if (settings && settings.apiKey) {
-        this.providerConfigs.mistral.hasApiKey = true;
-        this.providerConfigs.mistral.baseUrl =
-          settings.baseUrl || this.providerConfigs.mistral.baseUrl;
-        this.providerConfigs.mistral.enabled =
-          settings.enabled !== undefined ? settings.enabled : true;
-        // Optionally, you can store the key in memory if needed for requests
-        this.providerConfigs.mistral._apiKey = settings.apiKey;
+      await apiKeyService.loadAll();
+      const allKeys = apiKeyService.getAll();
+      for (const [provider, cfg] of Object.entries(allKeys)) {
+        if (this.providerConfigs[provider]) {
+          this.providerConfigs[provider].hasApiKey = !!cfg.apiKey;
+          if (cfg.baseUrl) this.providerConfigs[provider].baseUrl = cfg.baseUrl;
+          this.providerConfigs[provider].enabled = cfg.enabled;
+        }
       }
     } catch (err) {
-      logger.warn("Could not load Mistral API key from DB: " + err.message);
+      logger.warn({ err }, "Could not load API keys from database");
     }
   }
 
@@ -232,7 +221,6 @@ class ProviderController {
         return ApiResponse.notFound(res, "Provider not found");
       }
 
-      // Update configuration
       const updatedConfig = { ...this.providerConfigs[provider] };
 
       if (baseUrl) {
@@ -241,22 +229,13 @@ class ProviderController {
 
       if (apiKey !== undefined) {
         updatedConfig.hasApiKey = !!apiKey;
-        // Save API key to DB for Mistral only
-        if (provider === "mistral") {
-          await ProviderSettings.findOneAndUpdate(
-            { provider: "mistral" },
-            { apiKey, baseUrl, enabled, updatedAt: new Date() },
-            { upsert: true, new: true }
-          );
-        }
+        await apiKeyService.save(provider, { apiKey, baseUrl, enabled });
       }
 
       updatedConfig.enabled = enabled;
 
-      // Test the new configuration
       await this.testProviderConnection(provider, updatedConfig, apiKey);
 
-      // Update stored configuration
       this.providerConfigs[provider] = updatedConfig;
 
       return ApiResponse.success(res, { ...updatedConfig, message: "Provider configuration updated successfully" });
@@ -280,28 +259,13 @@ class ProviderController {
         return ApiResponse.notFound(res, "Provider not found");
       }
 
-      const config = { ...this.providerConfigs[provider] };
-      let testApiKey = apiKey;
-      if (provider === "mistral" && !testApiKey) {
-        // Always fetch the latest API key from DB for Mistral
-        const ProviderSettings = require("../models/ProviderSettings");
-        const settings = await ProviderSettings.findOne({
-          provider: "mistral",
-        });
-        if (settings && settings.apiKey) {
-          testApiKey = settings.apiKey;
-        }
-      }
-      if (baseUrl) config.baseUrl = baseUrl;
-      if (testApiKey !== undefined) config.hasApiKey = !!testApiKey;
+      const testCfg = { ...this.providerConfigs[provider] };
+      const effectiveApiKey = apiKey || apiKeyService.getEffectiveApiKey(provider);
+      if (baseUrl) testCfg.baseUrl = baseUrl;
+      testCfg.hasApiKey = !!effectiveApiKey;
 
-      // Test connection
       const startTime = Date.now();
-      const result = await this.testProviderConnection(
-        provider,
-        config,
-        testApiKey
-      );
+      const result = await this.testProviderConnection(provider, testCfg, effectiveApiKey);
       const latency = Date.now() - startTime;
 
       if (result && result.success === false) {
@@ -310,8 +274,8 @@ class ProviderController {
 
       return ApiResponse.success(res, {
         provider,
-        connected: config.status === "connected",
-        status: config.status,
+        connected: testCfg.status === "connected",
+        status: testCfg.status,
         latency,
         timestamp: new Date(),
       });

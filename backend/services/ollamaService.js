@@ -1,30 +1,22 @@
 const axios = require("axios");
 const config = require("../config/env");
 const tokenCounter = require("../utils/tokenCounter");
-const costEstimator = require("../utils/costEstimator");
 const retryHandler = require("../utils/retryHandler");
 const logger = require("../utils/logger");
+const BaseProviderService = require("./BaseProviderService");
 
-/**
- * Ollama service wrapper for local LLM models
- */
-class OllamaService {
+class OllamaService extends BaseProviderService {
   constructor() {
-    this.baseUrl = config.providers.ollama.baseUrl;
-    this.defaultModel = "llama2";
-
-    // Create axios instance with default config
+    super("ollama", {
+      baseUrl: config.providers.ollama.baseUrl,
+      apiKey: null,
+      defaultModel: "llama2",
+    });
     this.client = axios.create({
       baseURL: this.baseUrl,
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "OpenLLM-Monitor/1.0",
-      },
-      timeout: 120000, // 2 minutes for local models
+      headers: { "Content-Type": "application/json", "User-Agent": "OpenLLM-Monitor/1.0" },
+      timeout: 120000,
     });
-
-    // Get provider-specific retry config
-    this.retryConfig = retryHandler.getProviderRetryConfig("ollama");
   }
 
   /**

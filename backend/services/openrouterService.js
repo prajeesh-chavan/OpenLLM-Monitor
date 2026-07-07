@@ -1,20 +1,17 @@
 const axios = require("axios");
 const config = require("../config/env");
 const tokenCounter = require("../utils/tokenCounter");
-const costEstimator = require("../utils/costEstimator");
 const retryHandler = require("../utils/retryHandler");
 const logger = require("../utils/logger");
+const BaseProviderService = require("./BaseProviderService");
 
-/**
- * OpenRouter service wrapper
- */
-class OpenRouterService {
+class OpenRouterService extends BaseProviderService {
   constructor() {
-    this.baseUrl = config.providers.openrouter.baseUrl;
-    this.apiKey = config.providers.openrouter.apiKey;
-    this.defaultModel = "openai/gpt-3.5-turbo";
-
-    // Create axios instance with default config
+    super("openrouter", {
+      baseUrl: config.providers.openrouter.baseUrl,
+      apiKey: config.providers.openrouter.apiKey,
+      defaultModel: "openai/gpt-3.5-turbo",
+    });
     this.client = axios.create({
       baseURL: this.baseUrl,
       headers: {
@@ -24,11 +21,8 @@ class OpenRouterService {
         "X-Title": "OpenLLM Monitor",
         "User-Agent": "OpenLLM-Monitor/1.0",
       },
-      timeout: 60000, // 60 seconds
+      timeout: 60000,
     });
-
-    // Get provider-specific retry config
-    this.retryConfig = retryHandler.getProviderRetryConfig("openrouter");
   }
 
   /**

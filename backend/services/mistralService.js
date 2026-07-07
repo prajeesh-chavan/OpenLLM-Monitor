@@ -1,16 +1,16 @@
 const axios = require("axios");
-const costEstimator = require("../utils/costEstimator");
 const tokenCounter = require("../utils/tokenCounter");
 const ProviderSettings = require("../models/ProviderSettings");
 const logger = require("../utils/logger");
+const BaseProviderService = require("./BaseProviderService");
 
-/**
- * Mistral AI Service
- * Handles interactions with Mistral AI API
- */
-class MistralService {
+class MistralService extends BaseProviderService {
   constructor() {
-    this.baseURL = "https://api.mistral.ai/v1";
+    super("mistral", {
+      baseUrl: "https://api.mistral.ai/v1",
+      apiKey: null,
+      defaultModel: "mistral-small",
+    });
     this.models = [
       "mistral-tiny",
       "mistral-small",
@@ -34,7 +34,7 @@ class MistralService {
   async testConnection(apiKey) {
     if (!apiKey) apiKey = await this.getApiKey();
     try {
-      const response = await axios.get(`${this.baseURL}/models`, {
+      const response = await axios.get(`${this.baseUrl}/models`, {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
@@ -84,7 +84,7 @@ class MistralService {
       });
 
       const response = await axios.post(
-        `${this.baseURL}/chat/completions`,
+        `${this.baseUrl}/chat/completions`,
         requestBody,
         {
           headers: {
@@ -158,7 +158,7 @@ class MistralService {
   async getModels(apiKey) {
     if (!apiKey) apiKey = await this.getApiKey();
     try {
-      const response = await axios.get(`${this.baseURL}/models`, {
+      const response = await axios.get(`${this.baseUrl}/models`, {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",

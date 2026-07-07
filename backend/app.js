@@ -12,6 +12,7 @@ const database = require("./config/db");
 const apiRoutes = require("./routes");
 const llmLogger = require("./middlewares/llmLogger");
 const logger = require("./utils/logger");
+const AppError = require("./utils/AppError");
 
 /**
  * OpenLLM Monitor Express Application
@@ -292,22 +293,28 @@ class App {
 
     // Global error handler
     this.app.use((error, req, res, next) => {
-      logger.error({ err: error, requestId: req.requestId }, "Global error handler");
-
-      if (error.code === "ECONNABORTED") {
-        return;
-      }
+      if (error.code === "ECONNABORTED") return;
 
       const statusCode = error.statusCode || error.status || 500;
-      const message = error.message || "Internal server error";
+      const message = error.isOperational ? error.message : "Internal server error";
 
-      res.status(statusCode).json({
+      if (!error.isOperational) {
+        logger.error({ err: error, requestId: req.requestId }, "Unexpected error");
+      } else {
+        logger.warn({ err: error, requestId: req.requestId }, "Operational error");
+      }
+
+      const body = {
         success: false,
         error: message,
         requestId: req.requestId,
-        timestamp: new Date(),
-        ...(config.isDevelopment && { stack: error.stack }),
-      });
+        timestamp: new Date().toISOString(),
+      };
+
+      if (error.details) body.details = error.details;
+      if (config.isDevelopment) body.stack = error.stack;
+
+      res.status(statusCode).json(body);
     });
 
     process.on("unhandledRejection", (reason) => {
