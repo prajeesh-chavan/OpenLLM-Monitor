@@ -1,6 +1,7 @@
 const config = require("../config/env");
 const ProviderSettings = require("../models/ProviderSettings");
 const ApiResponse = require("../utils/apiResponse");
+const logger = require("../utils/logger");
 
 /**
  * Provider controller for managing LLM provider configurations
@@ -86,7 +87,7 @@ class ProviderController {
         this.providerConfigs.mistral._apiKey = settings.apiKey;
       }
     } catch (err) {
-      console.warn("Could not load Mistral API key from DB:", err.message);
+      logger.warn("Could not load Mistral API key from DB: " + err.message);
     }
   }
 
@@ -145,7 +146,7 @@ class ProviderController {
 
       return ApiResponse.success(res, providers);
     } catch (error) {
-      console.error("Error getting providers:", error);
+      logger.error({ err: error }, "Error getting providers");
       return ApiResponse.error(res, "Failed to get providers", 500, error.message);
     }
   }
@@ -174,7 +175,7 @@ class ProviderController {
           const models = await this.getProviderModels(provider);
           providerConfig.models = models;
         } catch (error) {
-          console.warn(`Failed to get models for ${provider}:`, error.message);
+          logger.warn(`Failed to get models for ${provider}: ` + error.message);
         }
       }
 
@@ -212,7 +213,7 @@ class ProviderController {
 
       return ApiResponse.success(res, providerConfig);
     } catch (error) {
-      console.error("Error getting provider:", error);
+      logger.error({ err: error }, "Error getting provider");
       return ApiResponse.error(res, "Failed to get provider", 500, error.message);
     }
   }
@@ -260,7 +261,7 @@ class ProviderController {
 
       return ApiResponse.success(res, { ...updatedConfig, message: "Provider configuration updated successfully" });
     } catch (error) {
-      console.error("Error updating provider:", error);
+      logger.error({ err: error }, "Error updating provider");
       return ApiResponse.error(res, "Failed to update provider", 500, error.message);
     }
   }
@@ -315,7 +316,7 @@ class ProviderController {
         timestamp: new Date(),
       });
     } catch (error) {
-      console.error("Error testing connection:", error);
+      logger.error({ err: error }, "Error testing connection");
       return ApiResponse.error(res, "Connection test failed", 500, error.message);
     }
   }
@@ -341,7 +342,7 @@ class ProviderController {
         timestamp: new Date(),
       });
     } catch (error) {
-      console.error("Error getting models:", error);
+      logger.error({ err: error }, "Error getting models");
       return ApiResponse.error(res, "Failed to get models", 500, error.message);
     }
   }
@@ -434,7 +435,7 @@ class ProviderController {
         timeframe: `${timeframe} hours`,
       });
     } catch (error) {
-      console.error("Error getting provider stats:", error);
+      logger.error({ err: error }, "Error getting provider stats");
       return ApiResponse.error(res, "Failed to get provider statistics", 500, error.message);
     }
   }
@@ -456,7 +457,7 @@ class ProviderController {
         timestamp: new Date(),
       });
     } catch (error) {
-      console.error("Error getting recommendations:", error);
+      logger.error({ err: error }, "Error getting recommendations");
       return ApiResponse.error(res, "Failed to get recommendations", 500, error.message);
     }
   }
@@ -552,7 +553,7 @@ class ProviderController {
       const service = new ServiceClass();
       return await service.listModels();
     } catch (error) {
-      console.warn(`Failed to get models for ${providerName}:`, error.message);
+      logger.warn(`Failed to get models for ${providerName}: ` + error.message);
       return this.providerConfigs[providerName]?.models || [];
     }
   }
@@ -705,7 +706,7 @@ class ProviderController {
 
       return ApiResponse.success(res, result);
     } catch (error) {
-      console.error("Error generating completion:", error);
+      logger.error({ err: error }, "Error generating completion");
       return ApiResponse.error(res, "Failed to generate completion", 500, error.message);
     }
   }

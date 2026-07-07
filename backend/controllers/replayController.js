@@ -6,6 +6,7 @@ const GeminiService = require("../services/geminiService");
 const GrokService = require("../services/grokService");
 const { v4: uuidv4 } = require("uuid");
 const ApiResponse = require("../utils/apiResponse");
+const logger = require("../utils/logger");
 
 /**
  * Replay controller for re-executing stored prompts
@@ -38,23 +39,19 @@ class ReplayController {
       } = req.body;
 
       if (process.env.NODE_ENV === "development") {
-        console.log(`Replay request: ${provider}:${model}`);
+        logger.debug(`Replay request: ${provider}:${model}`);
       }
 
       // Validate required fields
       if (!prompt || !provider || !model) {
-        console.error("Missing required fields:", {
-          prompt: !!prompt,
-          provider,
-          model,
-        });
+        logger.error({ missingFields: { prompt: !!prompt, provider, model } }, "Missing required fields");
         return ApiResponse.badRequest(res, "Missing required fields: prompt, provider, model");
       }
 
       // Get the appropriate service
       const service = this.services[provider];
       if (!service) {
-        console.error(`Unsupported provider: ${provider}`);
+        logger.error(`Unsupported provider: ${provider}`);
         return ApiResponse.badRequest(res, `Unsupported provider: ${provider}`);
       }
 
@@ -75,16 +72,16 @@ class ReplayController {
         stop: parameters.stop || null,
       };
 
-      console.log(`Executing replay with ${provider}:${model}`);
+      logger.info(`Executing replay with ${provider}:${model}`);
 
       // Execute the prompt
       const result = await service.sendPrompt(requestParams);
 
-      console.log(`Replay result status: ${result.status}`);
+      logger.info(`Replay result status: ${result.status}`);
 
       // Check if the service returned an error
       if (result.status === "error") {
-        console.error("Service returned error:", result.error);
+        logger.error({ err: result.error }, "Service returned error");
         return ApiResponse.error(res, "Failed to execute prompt", 500, result.error?.message || "Unknown service error");
       }
 
@@ -107,11 +104,11 @@ class ReplayController {
         duration: result.latency, // Map latency to duration for tests
       };
 
-      console.log(`Replay successful for ${provider}:${model}`);
+      logger.info(`Replay successful for ${provider}:${model}`);
 
       return ApiResponse.success(res, responseData);
     } catch (error) {
-      console.error("Error replaying prompt:", error);
+      logger.error({ err: error }, "Error replaying prompt");
       return ApiResponse.error(res, "Failed to replay prompt", 500, error.message);
     }
   }
@@ -128,12 +125,12 @@ class ReplayController {
         parameters: newParameters = {},
       } = req.body;
 
-      console.log(`Replay from log: ${logId}`);
+      logger.info(`Replay from log: ${logId}`);
 
       // Validate ObjectId format
       const mongoose = require("mongoose");
       if (!mongoose.Types.ObjectId.isValid(logId)) {
-        console.error("Invalid log ID format:", logId);
+        logger.error({ logId }, "Invalid log ID format");
         return ApiResponse.badRequest(res, "Invalid log ID format");
       }
 
@@ -145,19 +142,17 @@ class ReplayController {
         .exec();
 
       if (!originalLog) {
-        console.error("Original log not found:", logId);
+        logger.error({ logId }, "Original log not found");
         return ApiResponse.notFound(res, "Original log not found");
       }
 
-      console.log(
-        `Found original log: ${originalLog.provider}:${originalLog.model}`
-      );
+      logger.info(`Found original log: ${originalLog.provider}:${originalLog.model}`);
 
       // Use original or new provider/model
       const provider = newProvider || originalLog.provider;
       const model = newModel || originalLog.model;
 
-      console.log(`Replaying with: ${provider}:${model}`);
+      logger.info(`Replaying with: ${provider}:${model}`);
 
       // Merge parameters
       const parameters = {
@@ -179,7 +174,7 @@ class ReplayController {
       req.body = replayData;
       return this.replayPrompt(req, res);
     } catch (error) {
-      console.error("Error replaying from log:", error);
+      logger.error({ err: error }, "Error replaying from log");
       return ApiResponse.error(res, "Failed to replay from log", 500, error.message);
     }
   }
@@ -274,7 +269,7 @@ class ReplayController {
         res.end();
       }
     } catch (error) {
-      console.error("Error streaming replay:", error);
+      logger.error({ err: error }, "Error streaming replay");
       if (!res.headersSent) {
         return ApiResponse.error(res, "Failed to stream replay", 500, error.message);
       }
@@ -411,7 +406,7 @@ class ReplayController {
 
       return ApiResponse.success(res, comparison);
     } catch (error) {
-      console.error("Error comparing replays:", error);
+      logger.error({ err: error }, "Error comparing replays");
       return ApiResponse.error(res, "Failed to compare replays", 500, error.message);
     }
   }
@@ -441,10 +436,7 @@ class ReplayController {
               allModels[providerName] = await service.listModels();
             } catch (error) {
               allModels[providerName] = [];
-              console.warn(
-                `Failed to get models for ${providerName}:`,
-                error.message
-              );
+              logger.warn({ providerName, errMsg: error.message }, `Failed to get models for ${providerName}`);
             }
           })
         );
@@ -455,7 +447,7 @@ class ReplayController {
         });
       }
     } catch (error) {
-      console.error("Error getting available models:", error);
+      logger.error({ err: error }, "Error getting available models");
       return ApiResponse.error(res, "Failed to get available models", 500, error.message);
     }
   }
@@ -482,7 +474,7 @@ class ReplayController {
         timestamp: new Date(),
       });
     } catch (error) {
-      console.error("Error testing connection:", error);
+      logger.error({ err: error }, "Error testing connection");
       return ApiResponse.error(res, "Failed to test connection", 500, error.message);
     }
   }
@@ -548,7 +540,7 @@ class ReplayController {
         maxCompletionTokens: estimatedCompletionTokens,
       });
     } catch (error) {
-      console.error("Error getting cost estimate:", error);
+      logger.error({ err: error }, "Error getting cost estimate");
       return ApiResponse.error(res, "Failed to get cost estimate", 500, error.message);
     }
   }

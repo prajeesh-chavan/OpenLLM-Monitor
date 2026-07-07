@@ -1,5 +1,6 @@
 const ApiResponse = require("../utils/apiResponse");
 const AnalyticsService = require("../services/analyticsService");
+const logger = require("../utils/logger");
 
 const getStats = async (req, res) => {
   try {
@@ -7,7 +8,7 @@ const getStats = async (req, res) => {
     const data = await AnalyticsService.getStats(timeRange);
     return ApiResponse.success(res, data);
   } catch (error) {
-    console.error("Error fetching stats:", error);
+    logger.error({ err: error }, "Error fetching stats");
     return ApiResponse.error(res, "Failed to fetch statistics", 500, error.message);
   }
 };
@@ -18,7 +19,7 @@ const getRequestVolume = async (req, res) => {
     const data = await AnalyticsService.getRequestVolume(timeRange);
     return ApiResponse.success(res, data);
   } catch (error) {
-    console.error("Error fetching request volume:", error);
+    logger.error({ err: error }, "Error fetching request volume");
     return ApiResponse.error(res, "Failed to fetch request volume", 500, error.message);
   }
 };
@@ -29,7 +30,7 @@ const getProviderDistribution = async (req, res) => {
     const data = await AnalyticsService.getProviderDistribution(timeRange);
     return ApiResponse.success(res, data);
   } catch (error) {
-    console.error("Error fetching provider distribution:", error);
+    logger.error({ err: error }, "Error fetching provider distribution");
     return ApiResponse.error(res, "Failed to fetch provider distribution", 500, error.message);
   }
 };
@@ -40,7 +41,7 @@ const getModelPerformance = async (req, res) => {
     const data = await AnalyticsService.getModelPerformance(timeRange);
     return ApiResponse.success(res, data);
   } catch (error) {
-    console.error("Error fetching model performance:", error);
+    logger.error({ err: error }, "Error fetching model performance");
     return ApiResponse.error(res, "Failed to fetch model performance", 500, error.message);
   }
 };
@@ -51,7 +52,7 @@ const getCostAnalysis = async (req, res) => {
     const data = await AnalyticsService.getCostAnalysis(timeRange);
     return ApiResponse.success(res, data);
   } catch (error) {
-    console.error("Error fetching cost analysis:", error);
+    logger.error({ err: error }, "Error fetching cost analysis");
     return ApiResponse.error(res, "Failed to fetch cost analysis", 500, error.message);
   }
 };
@@ -62,7 +63,7 @@ const getErrorAnalytics = async (req, res) => {
     const data = await AnalyticsService.getErrorAnalytics(timeRange);
     return ApiResponse.success(res, data);
   } catch (error) {
-    console.error("Error fetching error analytics:", error);
+    logger.error({ err: error }, "Error fetching error analytics");
     return ApiResponse.error(res, "Failed to fetch error analytics", 500, error.message);
   }
 };
@@ -73,7 +74,7 @@ const getTrends = async (req, res) => {
     const data = await AnalyticsService.getTrends(timeRange);
     return ApiResponse.success(res, data);
   } catch (error) {
-    console.error("Error fetching trends:", error);
+    logger.error({ err: error }, "Error fetching trends");
     return ApiResponse.error(res, "Failed to fetch trends", 500, error.message);
   }
 };
@@ -106,7 +107,7 @@ const exportAnalytics = async (req, res) => {
 
     return ApiResponse.success(res, { analytics: logs, format, timeRange, exportedAt: new Date().toISOString() });
   } catch (error) {
-    console.error("Error exporting analytics:", error);
+    logger.error({ err: error }, "Error exporting analytics");
     return ApiResponse.error(res, "Failed to export analytics", 500, error.message);
   }
 };

@@ -2,6 +2,7 @@ const Log = require("../models/Log");
 const tokenCounter = require("../utils/tokenCounter");
 const costEstimator = require("../utils/costEstimator");
 const { v4: uuidv4 } = require("uuid");
+const logger = require("../utils/logger");
 
 /**
  * Middleware to log LLM API requests and responses
@@ -464,10 +465,7 @@ class LLMLogger {
       });
     }
 
-    console.log(
-      "Response Data for Token Usage:",
-      JSON.stringify(responseData, null, 2)
-    );
+      logger.debug({ responseData }, "Response data for token usage");
 
     // Calculate manually
     const promptTokens = await tokenCounter.getTokenCount(
@@ -525,7 +523,7 @@ class LLMLogger {
           data: log.toObject(),
           timestamp: new Date(),
         });
-        console.log("📡 Emitted new-log WebSocket event");
+        logger.debug("Emitted new-log WebSocket event");
       }
     } catch (error) {
       console.error("Failed to save log to database:", error);

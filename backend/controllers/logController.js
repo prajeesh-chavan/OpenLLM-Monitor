@@ -1,6 +1,7 @@
 const Log = require("../models/Log");
 const { v4: uuidv4 } = require("uuid");
 const ApiResponse = require("../utils/apiResponse");
+const logger = require("../utils/logger");
 
 /**
  * Log controller for handling LLM request logs
@@ -88,7 +89,7 @@ class LogController {
         totalPages,
       });
     } catch (error) {
-      console.error("Error getting logs:", error);
+      logger.error({ err: error }, "Error getting logs");
       return ApiResponse.error(res, "Failed to fetch logs", 500, error.message);
     }
   }
@@ -109,7 +110,7 @@ class LogController {
 
       return ApiResponse.success(res, { log });
     } catch (error) {
-      console.error("Error getting log:", error);
+      logger.error({ err: error }, "Error getting log");
       return ApiResponse.error(res, "Failed to fetch log", 500, error.message);
     }
   }
@@ -131,7 +132,7 @@ class LogController {
 
       return ApiResponse.created(res, log);
     } catch (error) {
-      console.error("Error creating log:", error);
+      logger.error({ err: error }, "Error creating log");
       return ApiResponse.error(res, "Failed to create log", 500, error.message);
     }
   }
@@ -152,7 +153,7 @@ class LogController {
 
       return ApiResponse.success(res, log);
     } catch (error) {
-      console.error("Error updating log:", error);
+      logger.error({ err: error }, "Error updating log");
       return ApiResponse.error(res, "Failed to update log", 500, error.message);
     }
   }
@@ -169,7 +170,7 @@ class LogController {
 
       return ApiResponse.success(res, { message: "Log deleted successfully" });
     } catch (error) {
-      console.error("Error deleting log:", error);
+      logger.error({ err: error }, "Error deleting log");
       return ApiResponse.error(res, "Failed to delete log", 500, error.message);
     }
   }
@@ -255,7 +256,7 @@ class LogController {
         timeframe: `${timeframe} hours`,
       });
     } catch (error) {
-      console.error("Error getting stats:", error);
+      logger.error({ err: error }, "Error getting stats");
       return ApiResponse.error(res, "Failed to fetch statistics", 500, error.message);
     }
   }
@@ -302,7 +303,7 @@ class LogController {
         timeframe: `${timeframe} hours`,
       });
     } catch (error) {
-      console.error("Error getting model comparison:", error);
+      logger.error({ err: error }, "Error getting model comparison");
       return ApiResponse.error(res, "Failed to fetch model comparison", 500, error.message);
     }
   }
@@ -365,7 +366,7 @@ class LogController {
         timeframe: `${timeframe} hours`,
       });
     } catch (error) {
-      console.error("Error getting error analysis:", error);
+      logger.error({ err: error }, "Error getting error analysis");
       return ApiResponse.error(res, "Failed to fetch error analysis", 500, error.message);
     }
   }
@@ -420,7 +421,7 @@ class LogController {
       res.setHeader("Content-Disposition", "attachment; filename=llm-logs.csv");
       return res.send(csvContent);
     } catch (error) {
-      console.error("Error exporting logs:", error);
+      logger.error({ err: error }, "Error exporting logs");
       return ApiResponse.error(res, "Failed to export logs", 500, error.message);
     }
   }
@@ -445,7 +446,7 @@ class LogController {
         message: `Deleted ${result.deletedCount} logs`,
       });
     } catch (error) {
-      console.error("Error deleting logs:", error);
+      logger.error({ err: error }, "Error deleting logs");
       return ApiResponse.error(res, "Failed to delete logs", 500, error.message);
     }
   }

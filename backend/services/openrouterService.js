@@ -3,6 +3,7 @@ const config = require("../config/env");
 const tokenCounter = require("../utils/tokenCounter");
 const costEstimator = require("../utils/costEstimator");
 const retryHandler = require("../utils/retryHandler");
+const logger = require("../utils/logger");
 
 /**
  * OpenRouter service wrapper
@@ -229,7 +230,7 @@ class OpenRouterService {
         })) || []
       );
     } catch (error) {
-      console.error("Error listing OpenRouter models:", error.message);
+      logger.error("Error listing OpenRouter models: " + error.message);
       return [];
     }
   }
@@ -244,7 +245,7 @@ class OpenRouterService {
       const models = await this.listModels();
       return models.find((model) => model.id === modelId) || null;
     } catch (error) {
-      console.error("Error getting model info:", error.message);
+      logger.error("Error getting model info: " + error.message);
       return null;
     }
   }
@@ -264,7 +265,7 @@ class OpenRouterService {
         rateLimit: response.data.rate_limit,
       };
     } catch (error) {
-      console.error("Error getting OpenRouter account info:", error.message);
+      logger.error("Error getting OpenRouter account info: " + error.message);
       return null;
     }
   }
@@ -287,7 +288,7 @@ class OpenRouterService {
         cost: response.data.cost,
       };
     } catch (error) {
-      console.error("Error getting generation info:", error.message);
+      logger.error("Error getting generation info: " + error.message);
       return null;
     }
   }
@@ -301,7 +302,7 @@ class OpenRouterService {
       await this.client.get("/models");
       return true;
     } catch (error) {
-      console.error("OpenRouter connection test failed:", error.message);
+      logger.error("OpenRouter connection test failed: " + error.message);
       return false;
     }
   }
@@ -331,7 +332,7 @@ class OpenRouterService {
         )
         .slice(0, 10);
     } catch (error) {
-      console.error("Error getting popular models:", error.message);
+      logger.error("Error getting popular models: " + error.message);
       return [];
     }
   }

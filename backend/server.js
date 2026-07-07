@@ -1,6 +1,7 @@
 const App = require("./app");
 const config = require("./config/env");
 const database = require("./config/db");
+const logger = require("./utils/logger");
 
 /**
  * OpenLLM Monitor Server
@@ -16,68 +17,45 @@ class Server {
    */
   async start() {
     try {
-      // Connect to database
-      console.log("🔌 Connecting to database...");
+      logger.info("Connecting to database...");
       await database.connect();
 
-      // Start HTTP server
       this.server = this.app.getServer();
 
       this.server.listen(this.port, () => {
-        console.log(`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                           OpenLLM Monitor Server                             ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║  🚀 Server running on port ${this.port.toString().padEnd(52)}                ║
-║  🌐 Environment: ${config.nodeEnv.toUpperCase().padEnd(59)}                  ║
-║  📊 Database: ${database.getConnectionStatus().padEnd(62)}                   ║
-║  🔗 API Base URL: http://localhost:${this.port}/api${" ".repeat(37)}         ║
-║  📡 WebSocket: http://localhost:${this.port}${" ".repeat(42)}                ║
-║  📚 API Info: http://localhost:${this.port}/api/info${" ".repeat(35)}        ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-🎯 Ready to monitor LLM requests!
-
-Supported Providers:
-  • OpenAI (GPT-3.5, GPT-4)
-  • OpenRouter (Multi-model access)
-  • Mistral AI (Mistral models)
-  • Ollama (Local models)
-
-Features:
-  ✅ Real-time request logging
-  ✅ Prompt replay & comparison
-  ✅ Cost tracking & analysis
-  ✅ Performance monitoring
-  ✅ Error analysis & debugging
-  ✅ WebSocket real-time updates
-
-Environment Configuration:
-  • Node.js: ${process.version}
-  • MongoDB: ${database.mongoUri}
-  • CORS Origins: ${config.corsOrigins.join(", ")}
-  • Rate Limiting: ${config.rateLimit.maxRequests} requests per ${
-          config.rateLimit.windowMs / 1000 / 60
-        } minutes
-
-🔧 To configure providers, visit: http://localhost:${this.port}/api/providers
-📖 For API documentation, visit: http://localhost:${this.port}/api/info
-        `);
+        logger.info({
+          port: this.port,
+          environment: config.nodeEnv,
+          database: database.getConnectionStatus(),
+          apiUrl: `http://localhost:${this.port}/api`,
+          wsUrl: `http://localhost:${this.port}`,
+          providers: ["OpenAI", "OpenRouter", "Mistral AI", "Ollama", "Gemini", "Grok"],
+          features: [
+            "Real-time request logging",
+            "Prompt replay & comparison",
+            "Cost tracking & analysis",
+            "Performance monitoring",
+            "Error analysis & debugging",
+            "WebSocket real-time updates",
+          ],
+          nodeVersion: process.version,
+          corsOrigins: config.corsOrigins,
+          rateLimit: `${config.rateLimit.maxRequests} requests per ${config.rateLimit.windowMs / 1000 / 60} minutes`,
+        }, "OpenLLM Monitor Server started");
 
         this.displayProviderStatus();
       });
 
-      // Handle server errors
       this.server.on("error", (error) => {
         if (error.code === "EADDRINUSE") {
-          console.error(`❌ Port ${this.port} is already in use`);
+          logger.fatal({ port: this.port }, "Port is already in use");
           process.exit(1);
         } else {
-          console.error("❌ Server error:", error);
+          logger.fatal({ err: error }, "Server error");
         }
       });
     } catch (error) {
-      console.error("❌ Failed to start server:", error);
+      logger.fatal({ err: error }, "Failed to start server");
       process.exit(1);
     }
   }

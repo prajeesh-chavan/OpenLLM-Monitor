@@ -3,6 +3,7 @@ const config = require("../config/env");
 const tokenCounter = require("../utils/tokenCounter");
 const costEstimator = require("../utils/costEstimator");
 const retryHandler = require("../utils/retryHandler");
+const logger = require("../utils/logger");
 
 /**
  * OpenAI service wrapper
@@ -224,7 +225,7 @@ class OpenAIService {
           ownedBy: model.owned_by,
         }));
     } catch (error) {
-      console.error("Error listing OpenAI models:", error.message);
+      logger.error("Error listing OpenAI models: " + error.message);
       return [];
     }
   }
@@ -238,7 +239,7 @@ class OpenAIService {
       await this.client.get("/models");
       return true;
     } catch (error) {
-      console.error("OpenAI connection test failed:", error.message);
+      logger.error("OpenAI connection test failed: " + error.message);
       return false;
     }
   }

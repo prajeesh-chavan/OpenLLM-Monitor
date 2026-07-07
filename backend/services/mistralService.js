@@ -2,6 +2,7 @@ const axios = require("axios");
 const costEstimator = require("../utils/costEstimator");
 const tokenCounter = require("../utils/tokenCounter");
 const ProviderSettings = require("../models/ProviderSettings");
+const logger = require("../utils/logger");
 
 /**
  * Mistral AI Service
@@ -46,10 +47,7 @@ class MistralService {
         message: "Connected successfully",
       };
     } catch (error) {
-      console.error(
-        "Mistral connection error:",
-        error.response?.data || error.message
-      );
+      logger.error({ err: error }, "Mistral connection error");
       return {
         success: false,
         error: error.response?.data?.message || error.message,
@@ -209,7 +207,7 @@ class MistralService {
     let apiKey = params.apiKey;
     if (!apiKey) apiKey = await this.getApiKey();
     if (!apiKey) {
-      console.error("Mistral API key not configured");
+      logger.error("Mistral API key not configured");
       return {
         requestId,
         provider: "mistral",

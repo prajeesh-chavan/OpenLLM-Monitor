@@ -3,6 +3,7 @@ const config = require("../config/env");
 const tokenCounter = require("../utils/tokenCounter");
 const costEstimator = require("../utils/costEstimator");
 const retryHandler = require("../utils/retryHandler");
+const logger = require("../utils/logger");
 
 /**
  * Ollama service wrapper for local LLM models
@@ -241,7 +242,7 @@ class OllamaService {
               }
             }
           } catch (parseError) {
-            console.error("Error parsing Ollama stream chunk:", parseError);
+            logger.error({ err: parseError }, "Error parsing Ollama stream chunk");
           }
         });
 
@@ -340,7 +341,7 @@ class OllamaService {
         })) || []
       );
     } catch (error) {
-      console.error("Error listing Ollama models:", error.message);
+      logger.error("Error listing Ollama models: " + error.message);
       return [];
     }
   }
@@ -377,7 +378,7 @@ class OllamaService {
               resolve(true);
             }
           } catch (parseError) {
-            console.error("Error parsing pull progress:", parseError);
+            logger.error({ err: parseError }, "Error parsing pull progress");
           }
         });
 
@@ -386,7 +387,7 @@ class OllamaService {
         });
       });
     } catch (error) {
-      console.error("Error pulling Ollama model:", error.message);
+      logger.error("Error pulling Ollama model: " + error.message);
       return false;
     }
   }
@@ -401,7 +402,7 @@ class OllamaService {
       await this.client.delete("/api/delete", { data: { name: modelName } });
       return true;
     } catch (error) {
-      console.error("Error deleting Ollama model:", error.message);
+      logger.error("Error deleting Ollama model: " + error.message);
       return false;
     }
   }
@@ -415,7 +416,7 @@ class OllamaService {
       const response = await this.client.get("/api/tags");
       return response.status === 200;
     } catch (error) {
-      console.error("Ollama connection test failed:", error.message);
+      logger.error("Ollama connection test failed: " + error.message);
       return false;
     }
   }

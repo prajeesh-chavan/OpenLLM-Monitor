@@ -7,6 +7,7 @@ const tokenCounter = require("../utils/tokenCounter");
 const retryHandler = require("../utils/retryHandler");
 const Log = require("../models/Log");
 const ApiResponse = require("../utils/apiResponse");
+const logger = require("../utils/logger");
 
 /**
  * Test Controller
@@ -131,7 +132,7 @@ class TestController {
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
-      console.error("Test prompt error:", error);
+      logger.error({ err: error }, "Test prompt error");
 
       // Log the failed test
       try {
@@ -151,7 +152,7 @@ class TestController {
         });
         await logEntry.save();
       } catch (logError) {
-        console.error("Failed to log test error:", logError);
+        logger.error({ err: logError }, "Failed to log test error");
       }
 
       return ApiResponse.error(res, error.message || "Failed to test prompt", 500, process.env.NODE_ENV === "development" ? error.stack : undefined);
@@ -267,7 +268,7 @@ class TestController {
 
           await logEntry.save();
         } catch (error) {
-          console.error(`Model ${provider}/${model} failed:`, error);
+          logger.error({ err: error }, `Model ${provider}/${model} failed`);
           results.push({
             provider,
             model,
@@ -292,7 +293,7 @@ class TestController {
         },
       });
     } catch (error) {
-      console.error("Compare models error:", error);
+      logger.error({ err: error }, "Compare models error");
       return ApiResponse.error(res, error.message || "Failed to compare models", 500);
     }
   }
@@ -342,12 +343,12 @@ class TestController {
           models.ollama = ollamaModels.map((model) => model.name || model);
         }
       } catch (error) {
-        console.warn("Could not fetch Ollama models:", error.message);
+        logger.warn("Could not fetch Ollama models: " + error.message);
       }
 
       return ApiResponse.success(res, models);
     } catch (error) {
-      console.error("Get available models error:", error);
+      logger.error({ err: error }, "Get available models error");
       return ApiResponse.error(res, error.message || "Failed to get available models", 500);
     }
   }
@@ -386,7 +387,7 @@ class TestController {
         ),
       });
     } catch (error) {
-      console.error("Cost estimate error:", error);
+      logger.error({ err: error }, "Cost estimate error");
       return ApiResponse.error(res, error.message || "Failed to estimate cost", 500);
     }
   }
@@ -463,7 +464,7 @@ class TestController {
           warnings.push(`Estimated cost is high: $${estimatedCost.toFixed(4)}`);
         }
       } catch (costError) {
-        console.warn("Could not estimate cost:", costError);
+        logger.warn({ err: costError }, "Could not estimate cost");
       }
 
       return ApiResponse.success(res, {
@@ -483,7 +484,7 @@ class TestController {
         ],
       });
     } catch (error) {
-      console.error("Validate config error:", error);
+      logger.error({ err: error }, "Validate config error");
       return ApiResponse.error(res, error.message || "Failed to validate configuration", 500);
     }
   }

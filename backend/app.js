@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-const morgan = require("morgan");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const { createServer } = require("http");
@@ -12,6 +11,7 @@ const config = require("./config/env");
 const database = require("./config/db");
 const apiRoutes = require("./routes");
 const llmLogger = require("./middlewares/llmLogger");
+const logger = require("./utils/logger");
 
 /**
  * OpenLLM Monitor Express Application
@@ -88,12 +88,18 @@ class App {
       })
     );
 
-    // Logging
-    if (config.nodeEnv === "development") {
-      this.app.use(morgan("dev"));
-    } else {
-      this.app.use(morgan("combined"));
-    }
+    // Structured logging with pino
+    this.app.use((req, res, next) => {
+      const start = Date.now();
+      res.on("finish", () => {
+        logger.info({
+          req,
+          res,
+          responseTime: Date.now() - start,
+        });
+      });
+      next();
+    });
 
     // Body parsing
     this.app.use(express.json({ limit: "10mb" }));
@@ -159,23 +165,20 @@ class App {
    * Initialize WebSocket for real-time updates
    */ initializeWebSocket() {
     this.io.on("connection", (socket) => {
-      console.log(`Client connected: ${socket.id}`);
+      logger.debug({ socketId: socket.id }, "Client connected");
 
-      // Join room for real-time log updates
       socket.on("join-logs", () => {
         socket.join("logs");
-        console.log(`Client ${socket.id} joined logs room`);
+        logger.debug({ socketId: socket.id }, "Client joined logs room");
       });
 
-      // Join room for provider status updates
       socket.on("join-providers", () => {
         socket.join("providers");
-        console.log(`Client ${socket.id} joined providers room`);
+        logger.debug({ socketId: socket.id }, "Client joined providers room");
       });
 
-      // Handle disconnection
       socket.on("disconnect", () => {
-        console.log(`Client disconnected: ${socket.id}`);
+        logger.debug({ socketId: socket.id }, "Client disconnected");
       });
 
       // Send initial connection confirmation
@@ -212,7 +215,7 @@ class App {
       });
 
       changeStream.on("error", (error) => {
-        console.error("MongoDB Change Stream error:", error);
+        logger.error({ err: error }, "MongoDB Change Stream error");
       });
     }
 
@@ -240,7 +243,7 @@ class App {
             lastLogTime = newLogs[newLogs.length - 1].createdAt;
           }
         } catch (error) {
-          console.error("Error checking for new logs:", error);
+          logger.error({ err: error }, "Error checking for new logs");
         }
       }, 2000); // Check every 2 seconds
     }
@@ -289,9 +292,8 @@ class App {
 
     // Global error handler
     this.app.use((error, req, res, next) => {
-      console.error("Global error handler:", error);
+      logger.error({ err: error, requestId: req.requestId }, "Global error handler");
 
-      // Don't log client aborted connections
       if (error.code === "ECONNABORTED") {
         return;
       }
@@ -308,23 +310,18 @@ class App {
       });
     });
 
-    // Handle unhandled promise rejections
-    process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
-      // Don't exit the process in production
+    process.on("unhandledRejection", (reason) => {
+      logger.error({ reason }, "Unhandled Rejection");
       if (config.isDevelopment) {
         process.exit(1);
       }
     });
 
-    // Handle uncaught exceptions
     process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
-      // Graceful shutdown
+      logger.fatal({ err: error }, "Uncaught Exception");
       this.gracefulShutdown("UNCAUGHT_EXCEPTION");
     });
 
-    // Handle shutdown signals
     process.on("SIGTERM", () => this.gracefulShutdown("SIGTERM"));
     process.on("SIGINT", () => this.gracefulShutdown("SIGINT"));
   }
@@ -334,29 +331,23 @@ class App {
    * @param {string} signal - Shutdown signal
    */
   async gracefulShutdown(signal) {
-    console.log(`\nReceived ${signal}. Starting graceful shutdown...`);
+    logger.info({ signal }, "Starting graceful shutdown");
 
-    // Stop accepting new connections
     this.server.close(() => {
-      console.log("HTTP server closed");
+      logger.info("HTTP server closed");
     });
 
-    // Close WebSocket connections
     this.io.close(() => {
-      console.log("WebSocket server closed");
+      logger.info("WebSocket server closed");
     });
 
     try {
-      // Close database connection
       await database.disconnect();
-
-      // Clean up active requests
       llmLogger.cleanupActiveRequests(0);
-
-      console.log("Graceful shutdown completed");
+      logger.info("Graceful shutdown completed");
       process.exit(0);
     } catch (error) {
-      console.error("Error during graceful shutdown:", error);
+      logger.error({ err: error }, "Error during graceful shutdown");
       process.exit(1);
     }
   }
