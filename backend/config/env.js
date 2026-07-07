@@ -8,6 +8,7 @@ const config = {
   port: parseInt(process.env.PORT) || 3001,
   nodeEnv: process.env.NODE_ENV || "development",
   jwtSecret: process.env.JWT_SECRET || "fallback-secret-key",
+  encryptionKey: process.env.ENCRYPTION_KEY,
 
   // Database
   mongoUri:
@@ -54,6 +55,8 @@ const config = {
   },
 
   // Development settings
+  logRetentionDays: parseInt(process.env.LOG_RETENTION_DAYS, 10) || 90,
+
   isDevelopment: process.env.NODE_ENV === "development",
   isProduction: process.env.NODE_ENV === "production",
 };

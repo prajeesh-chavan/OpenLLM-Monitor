@@ -1,30 +1,26 @@
 const mongoose = require("mongoose");
+const config = require("../config/env");
 
 /**
  * Log schema for storing LLM request/response data
  */
 const logSchema = new mongoose.Schema(
   {
-    // Request Information
     requestId: {
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
 
-    // Provider & Model
     provider: {
       type: String,
       required: true,
-      enum: ["openai", "openrouter", "mistral", "ollama"],
-      index: true,
+      enum: ["openai", "openrouter", "mistral", "ollama", "gemini", "grok"],
     },
 
     model: {
       type: String,
       required: true,
-      index: true,
     },
 
     // Prompt & Response
@@ -56,9 +52,8 @@ const logSchema = new mongoose.Schema(
 
     // Performance Metrics
     latency: {
-      type: Number, // milliseconds
+      type: Number,
       required: true,
-      index: true,
     },
 
     // Token Usage
@@ -81,8 +76,9 @@ const logSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ["success", "error", "timeout", "rate_limited"],
-      index: true,
     },
+
+
 
     // Error Information
     error: {
@@ -125,11 +121,9 @@ const logSchema = new mongoose.Schema(
       },
     ],
 
-    // Timestamps
     createdAt: {
       type: Date,
       default: Date.now,
-      index: true,
     },
 
     updatedAt: {
@@ -145,10 +139,21 @@ const logSchema = new mongoose.Schema(
 
 // Indexes for performance
 logSchema.index({ createdAt: -1 });
-logSchema.index({ provider: 1, model: 1 });
+logSchema.index({ provider: 1, createdAt: -1 });
+logSchema.index({ provider: 1, model: 1, createdAt: -1 });
 logSchema.index({ status: 1, createdAt: -1 });
 logSchema.index({ "tokenUsage.totalTokens": -1 });
 logSchema.index({ "cost.totalCost": -1 });
+logSchema.index({ userId: 1, createdAt: -1 });
+
+// TTL index: auto-delete logs older than configured retention period
+logSchema.index(
+  { createdAt: 1 },
+  {
+    expireAfterSeconds: config.logRetentionDays * 86400,
+    partialFilterExpression: { status: { $ne: "error" } },
+  }
+);
 
 // Virtual for total request time including retries
 logSchema.virtual("totalRequestTime").get(function () {
