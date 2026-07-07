@@ -1,46 +1,34 @@
 const axios = require("axios");
 const config = require("../config/env");
 const retryHandler = require("../utils/retryHandler");
+const tokenCounter = require("../utils/tokenCounter");
+const BaseProviderService = require("./BaseProviderService");
 
-/**
- * Gemini service wrapper for Google Gemini API
- */
-class GeminiService {
+class GeminiService extends BaseProviderService {
   constructor() {
-    this.baseUrl =
-      config.providers.gemini.baseUrl ||
-      "https://generativelanguage.googleapis.com/v1beta/models";
-    this.apiKey = config.providers.gemini.apiKey;
-    this.defaultModel = "gemini-pro";
+    super("gemini", {
+      baseUrl: config.providers.gemini.baseUrl || "https://generativelanguage.googleapis.com/v1beta/models",
+      apiKey: config.providers.gemini.apiKey,
+      defaultModel: "gemini-pro",
+    });
     this.client = axios.create({
       baseURL: this.baseUrl,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       timeout: 60000,
     });
-    this.retryConfig = retryHandler.getProviderRetryConfig("gemini");
   }
 
   async sendPrompt(params) {
-    const {
-      prompt,
-      model = this.defaultModel,
-      systemMessage = "",
-      temperature = 0.7,
-      maxTokens = 1024,
-      requestId,
-    } = params;
     const startTime = Date.now();
     try {
       const requestBody = {
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        contents: [{ role: "user", parts: [{ text: params.prompt }] }],
         generationConfig: {
-          temperature,
-          maxOutputTokens: maxTokens,
+          temperature: params.temperature ?? 0.7,
+          maxOutputTokens: params.maxTokens || 1024,
         },
       };
-      const url = `/${model}:generateContent?key=${this.apiKey}`;
+      const url = `/${params.model || this.defaultModel}:generateContent?key=${this.apiKey}`;
       const { result, retryHistory } = await retryHandler.executeWithRetry(
         async () => {
           const response = await this.client.post(url, requestBody);
@@ -48,48 +36,20 @@ class GeminiService {
         },
         this.retryConfig
       );
-      const endTime = Date.now();
-      const latency = endTime - startTime;
-      const completion =
-        result.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      return {
-        requestId,
-        provider: "gemini",
-        model,
-        prompt,
-        completion,
-        systemMessage,
-        parameters: { temperature, maxTokens },
-        tokenUsage: {},
-        cost: {},
-        latency,
-        retryHistory,
-        status: "success",
-        rawResponse: result,
-        finishReason: result.candidates?.[0]?.finishReason || "stop",
+      const latency = Date.now() - startTime;
+      const completion = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      const tokenUsage = {
+        promptTokens: result.usageMetadata?.promptTokenCount || tokenCounter.countTokens(params.prompt, params.model),
+        completionTokens: result.usageMetadata?.candidatesTokenCount || tokenCounter.countTokens(completion, params.model),
+        totalTokens: result.usageMetadata?.totalTokenCount || 0,
       };
+      tokenUsage.totalTokens = tokenUsage.totalTokens || tokenUsage.promptTokens + tokenUsage.completionTokens;
+      return this.buildSendResult(
+        params, completion, tokenUsage, null, latency, retryHistory, result,
+        result.candidates?.[0]?.finishReason || "stop"
+      );
     } catch (error) {
-      const endTime = Date.now();
-      const latency = endTime - startTime;
-      return {
-        requestId,
-        provider: "gemini",
-        model,
-        prompt,
-        completion: "",
-        systemMessage,
-        parameters: { temperature, maxTokens },
-        tokenUsage: {},
-        cost: {},
-        latency,
-        retryHistory: error.retryHistory || [],
-        status: "error",
-        error: {
-          message: error.message,
-          code: error.code || error.response?.status,
-          details: error.response?.data || {},
-        },
-      };
+      return this.buildErrorResult(params, error, Date.now() - startTime);
     }
   }
 
@@ -97,33 +57,18 @@ class GeminiService {
     try {
       const url = `/list?key=${this.apiKey}`;
       const response = await this.client.get(url);
-      return (
-        response.data.models?.map((model) => ({
-          id: model.name,
-          name: model.displayName || model.name,
-        })) || []
-      );
-    } catch (error) {
+      return response.data.models?.map((model) => ({
+        id: model.name,
+        name: model.displayName || model.name,
+      })) || [];
+    } catch {
       return [];
     }
   }
 
-  async testConnection() {
-    try {
-      const models = await this.listModels();
-      return models.length > 0;
-    } catch {
-      return false;
-    }
-  }
-
-  updateApiKey(apiKey) {
-    this.apiKey = apiKey;
-  }
-
   updateBaseUrl(baseUrl) {
-    this.baseUrl = baseUrl;
-    this.client.defaults.baseURL = baseUrl;
+    super.updateBaseUrl(baseUrl);
+    this.client.defaults.baseURL = this.baseUrl;
   }
 }
 
