@@ -1,28 +1,36 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { render, screen, act } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
 import { useAppStore, useLogsStore } from "../store";
 
-// Mock the store
 vi.mock("../store", () => ({
   useAppStore: vi.fn(),
   useLogsStore: vi.fn(),
 }));
 
-// Mock the components
-vi.mock("../components/StatCards", () => ({
-  default: () => <div data-testid="stat-cards">StatCards Component</div>,
+vi.mock("../components/SummaryStatsPanel", () => ({
+  default: () => <div data-testid="summary-stats">SummaryStatsPanel</div>,
 }));
 
-vi.mock("../components/DashboardCharts", () => ({
-  default: () => (
-    <div data-testid="dashboard-charts">DashboardCharts Component</div>
-  ),
+vi.mock("../components/VisualizationSection", () => ({
+  default: () => <div data-testid="visualization-section">VisualizationSection</div>,
 }));
 
 vi.mock("../components/LogTable", () => ({
   default: () => <div data-testid="log-table">LogTable Component</div>,
+}));
+
+vi.mock("../components/PromptReplayZone", () => ({
+  default: () => null,
+}));
+
+vi.mock("../components/KeyboardShortcuts", () => ({
+  default: () => null,
+}));
+
+vi.mock("../components/LiveFeedMode", () => ({
+  default: () => null,
 }));
 
 const renderDashboard = () => {
@@ -33,88 +41,57 @@ const renderDashboard = () => {
   );
 };
 
+const mockAppStore = {
+  fetchStats: vi.fn(),
+  openLogDetailsModal: vi.fn(),
+  loading: false,
+};
+const mockLogsStore = {
+  logs: [],
+  fetchLogs: vi.fn(),
+};
+
+const mockSetTimeout = () => vi.spyOn(globalThis, "setTimeout").mockImplementation((cb) => cb());
+
 describe("Dashboard", () => {
-  const mockStore = {
-    stats: {
-      totalRequests: 100,
-      avgResponseTime: 1500,
-      totalCost: 2.5,
-      activeProviders: 3,
-      successRate: 95.5,
-      errorRate: 4.5,
-    },
-    loading: false,
-    error: null,
-    fetchStats: vi.fn(),
-  };
-
-  const mockLogsStore = {
-    logs: [
-      {
-        _id: "1",
-        provider: "openai",
-        model: "gpt-3.5-turbo",
-        status: "success",
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    loading: false,
-    error: null,
-    fetchLogs: vi.fn(),
-  };
-
   beforeEach(() => {
-    useAppStore.mockReturnValue(mockStore);
+    useAppStore.mockReturnValue(mockAppStore);
     useLogsStore.mockReturnValue(mockLogsStore);
   });
-  it("should render dashboard title", () => {
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("should show loading screen initially", () => {
     renderDashboard();
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Monitor your LLM API usage and performance in real-time"
-      )
+      screen.getByText("Initializing your AI monitoring dashboard...")
     ).toBeInTheDocument();
   });
-  it("should render all dashboard components", () => {
+
+  it("should render dashboard content after loading", async () => {
+    mockSetTimeout();
     renderDashboard();
-    expect(screen.getByTestId("stat-cards")).toBeInTheDocument();
-    expect(screen.getByText("Recent Activity")).toBeInTheDocument();
+    await act(async () => {});
     expect(screen.getByText("Quick Actions")).toBeInTheDocument();
+    expect(screen.getByTestId("summary-stats")).toBeInTheDocument();
+    expect(screen.getByTestId("log-table")).toBeInTheDocument();
+    expect(screen.getByTestId("visualization-section")).toBeInTheDocument();
   });
 
   it("should fetch stats on mount", () => {
     renderDashboard();
-    expect(mockStore.fetchStats).toHaveBeenCalled();
-  });
-  it("should show no activity message when no logs", () => {
-    useLogsStore.mockReturnValue({
-      logs: [], // Explicitly set empty logs array
-    });
-
-    renderDashboard();
-    expect(screen.getByText("No activity yet")).toBeInTheDocument();
-    expect(
-      screen.getByText("Start making LLM requests to see activity here")
-    ).toBeInTheDocument();
+    expect(mockAppStore.fetchStats).toHaveBeenCalled();
   });
 
-  it("should show logs when available", () => {
-    useLogsStore.mockReturnValue({
-      logs: [
-        {
-          id: "1",
-          provider: "openai",
-          model: "gpt-3.5-turbo",
-          timestamp: "2023-01-01T00:00:00Z",
-          status: "success",
-          duration: 1000,
-          tokenUsage: { total: 100 },
-        },
-      ],
-    });
-
+  it("should show quick action links", async () => {
+    mockSetTimeout();
     renderDashboard();
-    expect(screen.getByText("openai • gpt-3.5-turbo")).toBeInTheDocument();
+    await act(async () => {});
+    expect(screen.getByText("Test Models")).toBeInTheDocument();
+    expect(screen.getAllByText("Replay").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Analytics").length).toBeGreaterThan(0);
+    expect(screen.getByText("Providers")).toBeInTheDocument();
   });
 });

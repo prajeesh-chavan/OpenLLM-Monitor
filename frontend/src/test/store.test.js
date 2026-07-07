@@ -2,10 +2,13 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useStatsStore } from "../store";
 
-// Mock API service
+const { mockGet } = vi.hoisted(() => ({
+  mockGet: vi.fn(),
+}));
+
 vi.mock("../services/api", () => ({
   default: {
-    get: vi.fn(),
+    get: mockGet,
   },
 }));
 
@@ -13,7 +16,7 @@ import ApiService from "../services/api";
 
 describe("useStatsStore", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("should have initial state", () => {
@@ -27,6 +30,7 @@ describe("useStatsStore", () => {
 
   it("should fetch stats successfully", async () => {
     const mockStatsData = {
+      success: true,
       data: {
         overview: { totalRequests: 100 },
         providerStats: [],
@@ -35,6 +39,7 @@ describe("useStatsStore", () => {
     };
 
     const mockUsageData = {
+      success: true,
       data: {
         recentActivity: [],
         hourlyStats: [],
@@ -43,6 +48,7 @@ describe("useStatsStore", () => {
     };
 
     const mockPerformanceData = {
+      success: true,
       data: {
         responseTime: [],
         errorRate: [],
@@ -50,6 +56,7 @@ describe("useStatsStore", () => {
     };
 
     const mockCostsData = {
+      success: true,
       data: {
         costAnalysis: [],
       },
@@ -69,13 +76,26 @@ describe("useStatsStore", () => {
 
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBe(null);
-    expect(result.current.stats).toEqual(mockStatsData.data);
+    expect(result.current.stats).toEqual({
+      ...mockStatsData.data,
+      requestVolume: [],
+      responseTime: [],
+      providerDistribution: [],
+      statusDistribution: [
+        { status: "success", count: 0 },
+        { status: "error", count: 0 },
+      ],
+      tokenUsage: [],
+      costAnalysis: [],
+      modelPerformance: [],
+      errorRate: [],
+    });
     expect(result.current.overview).toEqual(mockStatsData.data.overview);
   });
 
   it("should handle fetch stats error", async () => {
     const errorMessage = "Network error";
-    ApiService.get.mockRejectedValue(new Error(errorMessage));
+    ApiService.get.mockReturnValue(Promise.reject(new Error(errorMessage)));
 
     const { result } = renderHook(() => useStatsStore());
 
