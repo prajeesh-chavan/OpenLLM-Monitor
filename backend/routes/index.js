@@ -6,8 +6,10 @@ const replayRoutes = require("./replay");
 const testRoutes = require("./test");
 const providersRoutes = require("./providers");
 const analyticsRoutes = require("./analytics");
+const authRoutes = require("./auth");
 
 // Mount routes under /api/ (legacy, backward compatible)
+router.use("/auth", authRoutes);
 router.use("/logs", logsRoutes);
 router.use("/replay", replayRoutes);
 router.use("/test", testRoutes);
@@ -15,6 +17,7 @@ router.use("/providers", providersRoutes);
 router.use("/analytics", analyticsRoutes);
 
 // Mount routes under /api/v1/ (versioned)
+router.use("/v1/auth", authRoutes);
 router.use("/v1/logs", logsRoutes);
 router.use("/v1/replay", replayRoutes);
 router.use("/v1/test", testRoutes);
@@ -54,6 +57,7 @@ router.get("/info", (req, res) => {
         legacy: "/api",
       },
       endpoints: {
+        auth: "/api/auth",
         logs: "/api/logs",
         replay: "/api/replay",
         test: "/api/test",
