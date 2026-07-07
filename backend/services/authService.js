@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const config = require("../config/env");
 const logger = require("../utils/logger");
+const AppError = require("../utils/AppError");
 
 const ACCESS_TOKEN_EXPIRY = "15m";
 const REFRESH_TOKEN_EXPIRY = "7d";
@@ -42,7 +43,7 @@ class AuthService {
   async register({ email, password, name }) {
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
-      throw Object.assign(new Error("Email already registered"), { statusCode: 409 });
+      throw new AppError("Email already registered", 409);
     }
 
     const user = await User.create({ email, password, name });
@@ -60,16 +61,16 @@ class AuthService {
   async login({ email, password }) {
     const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
     if (!user) {
-      throw Object.assign(new Error("Invalid email or password"), { statusCode: 401 });
+      throw new AppError("Invalid email or password", 401);
     }
 
     if (!user.isActive) {
-      throw Object.assign(new Error("Account is deactivated"), { statusCode: 403 });
+      throw new AppError("Account is deactivated", 403);
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      throw Object.assign(new Error("Invalid email or password"), { statusCode: 401 });
+      throw new AppError("Invalid email or password", 401);
     }
 
     const accessToken = this.generateAccessToken(user);
@@ -87,16 +88,16 @@ class AuthService {
   async refresh(refreshToken) {
     const decoded = this.verifyRefreshToken(refreshToken);
     if (!decoded) {
-      throw Object.assign(new Error("Invalid refresh token"), { statusCode: 401 });
+      throw new AppError("Invalid refresh token", 401);
     }
 
     const user = await User.findById(decoded.userId);
     if (!user || !user.isActive) {
-      throw Object.assign(new Error("User not found or inactive"), { statusCode: 401 });
+      throw new AppError("User not found or inactive", 401);
     }
 
     if (user.refreshToken !== refreshToken) {
-      throw Object.assign(new Error("Refresh token has been revoked"), { statusCode: 401 });
+      throw new AppError("Refresh token has been revoked", 401);
     }
 
     const newAccessToken = this.generateAccessToken(user);
@@ -116,7 +117,7 @@ class AuthService {
   async getProfile(userId) {
     const user = await User.findById(userId);
     if (!user) {
-      throw Object.assign(new Error("User not found"), { statusCode: 404 });
+      throw new AppError("User not found", 404);
     }
     return user.toPublicJSON();
   }
