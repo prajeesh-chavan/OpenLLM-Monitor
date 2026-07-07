@@ -13,6 +13,8 @@ import LogDetailPage from "./pages/LogDetailPage";
 import ReplayPage from "./pages/ReplayPage";
 import TestModelsPage from "./pages/TestModelsPage";
 import ProvidersPage from "./pages/ProvidersPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 // Error Pages
 import {
@@ -24,6 +26,7 @@ import {
 
 // Components
 import ErrorBoundary from "./components/ErrorBoundary";
+import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 
 // Services
 import wsService from "./services/websocket";
@@ -96,16 +99,19 @@ function App() {
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50">
         <Routes>
+          {/* Auth Pages */}
+          <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+          <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
           {/* Error Pages */}
           <Route path="/error/429" element={<RateLimitErrorPage />} />
           <Route path="/error/500" element={<ServerErrorPage />} />
-          <Route path="/error/network" element={<NetworkErrorPage />} />{" "}
+          <Route path="/error/network" element={<NetworkErrorPage />} />
           {/* Standalone Pages */}
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/providers" element={<ProvidersPage />} />
-          <Route path="test" element={<TestModelsPage />} />
+          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+          <Route path="/providers" element={<ProtectedRoute><ProvidersPage /></ProtectedRoute>} />
+          <Route path="test" element={<ProtectedRoute><TestModelsPage /></ProtectedRoute>} />
           {/* Dashboard Routes */}
-          <Route path="/" element={<DashboardLayout />}>
+          <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="logs" element={<LogsPage />} />
