@@ -3,6 +3,7 @@ const tokenCounter = require("../utils/tokenCounter");
 const costEstimator = require("../utils/costEstimator");
 const { v4: uuidv4 } = require("uuid");
 const logger = require("../utils/logger");
+const evalConfig = require("../config/evaluation");
 
 /**
  * Middleware to log LLM API requests and responses
@@ -511,10 +512,15 @@ class LLMLogger {
   /**
    * Save log to database
    * @param {Object} logData - Log data to save
-   */ async saveLog(logData) {
+   */   async saveLog(logData) {
     try {
       const log = new Log(logData);
       await log.save();
+
+      // Trigger auto-evaluation asynchronously (non-blocking)
+      if (evalConfig.autoEvaluate && log.status === "success" && log.completion) {
+        this.triggerAutoEvaluation(log);
+      }
 
       // Emit WebSocket event for real-time updates
       if (this.io) {
@@ -528,6 +534,16 @@ class LLMLogger {
     } catch (error) {
       console.error("Failed to save log to database:", error);
       // Optionally implement fallback logging (file, etc.)
+    }
+  }
+
+  async triggerAutoEvaluation(log) {
+    try {
+      const evaluationService = require("../services/evaluation/EvaluationService");
+      await evaluationService.evaluate(log);
+      logger.debug({ logId: log._id }, "Auto-evaluation completed");
+    } catch (error) {
+      logger.warn({ err: error, logId: log._id }, "Auto-evaluation failed");
     }
   }
 

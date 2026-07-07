@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   ChartBarIcon,
+  CheckBadgeIcon,
   ClockIcon,
   CogIcon,
   DocumentTextIcon,
@@ -15,6 +16,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
   { name: "Logs", href: "/logs", icon: DocumentTextIcon },
   { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
+  { name: "Evaluations", href: "/evaluations", icon: CheckBadgeIcon },
   { name: "Replay", href: "/replay", icon: PlayIcon },
   { name: "Test Models", href: "/test", icon: BeakerIcon },
   { name: "Providers", href: "/providers", icon: ServerIcon },

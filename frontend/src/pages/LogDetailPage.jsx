@@ -12,16 +12,22 @@ import {
   CurrencyDollarIcon,
   EyeIcon,
   DocumentDuplicateIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 import { useLogsStore } from "../store";
+import { useEvaluationStore } from "../store/evaluationStore";
+import EvaluationScoreBadge from "../components/evaluation/EvaluationScoreBadge";
+import EvaluationBreakdown from "../components/evaluation/EvaluationBreakdown";
 import { formatDistanceToNow } from "date-fns";
 
 const LogDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { fetchLogById } = useLogsStore();
+  const { evaluations, fetchEvaluations, runEvaluation } = useEvaluationStore();
   const [log, setLog] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [evalLoading, setEvalLoading] = useState(false);
   const [copying, setCopying] = useState(false);
   const [activeTab, setActiveTab] = useState("request");
 
@@ -41,6 +47,25 @@ const LogDetailPage = () => {
       loadLog();
     }
   }, [id, fetchLogById]);
+
+  useEffect(() => {
+    if (id) {
+      fetchEvaluations({ logId: id, limit: 50 });
+    }
+  }, [id, fetchEvaluations]);
+
+  const handleRunEvaluation = async () => {
+    if (!id) return;
+    setEvalLoading(true);
+    try {
+      await runEvaluation(id);
+      await fetchEvaluations({ logId: id, limit: 50 });
+    } catch (error) {
+      console.error("Evaluation failed:", error);
+    } finally {
+      setEvalLoading(false);
+    }
+  };
 
   const handleCopyAsCode = async (language = "javascript") => {
     if (!log) return;
@@ -175,7 +200,9 @@ print(json.dumps(data, indent=2))`;
     { id: "request", label: "Request", icon: CodeBracketIcon },
     { id: "response", label: "Response", icon: DocumentDuplicateIcon },
     { id: "metrics", label: "Metrics", icon: CpuChipIcon },
+    { id: "quality", label: "Quality", icon: ChartBarIcon },
   ];
+
 
   return (
     <div className="space-y-6">
@@ -405,6 +432,46 @@ print(json.dumps(data, indent=2))`;
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {activeTab === "quality" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">
+                  Quality Evaluation
+                </h3>
+                {log?.status === "success" && log?.completion && (
+                  <button
+                    onClick={handleRunEvaluation}
+                    disabled={evalLoading}
+                    className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-lg transition-colors"
+                  >
+                    <ChartBarIcon className={`h-4 w-4 mr-2 ${evalLoading ? "animate-spin" : ""}`} />
+                    {evalLoading ? "Evaluating..." : "Run Evaluation"}
+                  </button>
+                )}
+              </div>
+
+              {evaluations.length === 0 ? (
+                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-8 text-center">
+                  <ChartBarIcon className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-400">
+                    {log?.status === "success" && log?.completion
+                      ? "No evaluations yet. Click 'Run Evaluation' to assess response quality."
+                      : "Evaluations are only available for successful requests with a response."}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {evaluations.map((evaluation) => (
+                    <EvaluationBreakdown
+                      key={evaluation._id}
+                      evaluation={evaluation}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

@@ -15,6 +15,8 @@ import TestModelsPage from "./pages/TestModelsPage";
 import ProvidersPage from "./pages/ProvidersPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import EvaluationsPage from "./pages/EvaluationsPage";
+import EvaluationDetailPage from "./pages/EvaluationDetailPage";
 
 // Error Pages
 import {
@@ -110,6 +112,8 @@ function App() {
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/providers" element={<ProtectedRoute><ProvidersPage /></ProtectedRoute>} />
           <Route path="test" element={<ProtectedRoute><TestModelsPage /></ProtectedRoute>} />
+          <Route path="/evaluations" element={<ProtectedRoute><EvaluationsPage /></ProtectedRoute>} />
+          <Route path="/evaluations/:id" element={<ProtectedRoute><EvaluationDetailPage /></ProtectedRoute>} />
           {/* Dashboard Routes */}
           <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route index element={<Navigate to="/dashboard" replace />} />

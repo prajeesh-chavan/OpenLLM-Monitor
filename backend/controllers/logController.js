@@ -2,6 +2,7 @@ const Log = require("../models/Log");
 const { v4: uuidv4 } = require("uuid");
 const ApiResponse = require("../utils/apiResponse");
 const logger = require("../utils/logger");
+const evalConfig = require("../config/evaluation");
 
 /**
  * Log controller for handling LLM request logs
@@ -130,10 +131,25 @@ class LogController {
       const log = new Log(logData);
       await log.save();
 
+      // Trigger auto-evaluation asynchronously
+      if (evalConfig.autoEvaluate && log.status === "success" && log.completion) {
+        this.triggerAutoEvaluation(log);
+      }
+
       return ApiResponse.created(res, log);
     } catch (error) {
       logger.error({ err: error }, "Error creating log");
       return ApiResponse.error(res, "Failed to create log", 500, error.message);
+    }
+  }
+
+  async triggerAutoEvaluation(log) {
+    try {
+      const evaluationService = require("../services/evaluation/EvaluationService");
+      await evaluationService.evaluate(log);
+      logger.debug({ logId: log._id }, "Auto-evaluation completed");
+    } catch (error) {
+      logger.warn({ err: error, logId: log._id }, "Auto-evaluation failed");
     }
   }
 
