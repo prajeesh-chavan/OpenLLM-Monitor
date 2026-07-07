@@ -1,5 +1,6 @@
 import axios from "axios";
 import errorHandler from "./errorHandler";
+import { authService } from "./auth";
 
 // Request deduplication cache
 const requestCache = new Map();
@@ -14,20 +15,22 @@ const api = axios.create({
   },
 });
 
+// Auth token interceptor
+api.interceptors.request.use((config) => {
+  const token = authService.getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Request deduplication interceptor
 api.interceptors.request.use((config) => {
-  // Create request key for deduplication
-  const requestKey = `${config.method}:${config.url}:${JSON.stringify(
-    config.params
-  )}:${config.data}`;
-
-  // Check if identical request is already pending
+  const requestKey = `${config.method}:${config.url}:${JSON.stringify(config.params)}:${config.data}`;
   if (pendingRequests.has(requestKey)) {
-    // Return the existing promise
     config.skipDeduplication = true;
     return pendingRequests.get(requestKey);
   }
-
   return config;
 });
 
