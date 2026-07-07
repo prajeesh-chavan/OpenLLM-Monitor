@@ -1,25 +1,41 @@
 const express = require("express");
 const router = express.Router();
 
-// Import route modules
 const logsRoutes = require("./logs");
 const replayRoutes = require("./replay");
 const testRoutes = require("./test");
 const providersRoutes = require("./providers");
 const analyticsRoutes = require("./analytics");
 
-// Mount routes
+// Mount routes under /api/ (legacy, backward compatible)
 router.use("/logs", logsRoutes);
 router.use("/replay", replayRoutes);
 router.use("/test", testRoutes);
 router.use("/providers", providersRoutes);
 router.use("/analytics", analyticsRoutes);
 
+// Mount routes under /api/v1/ (versioned)
+router.use("/v1/logs", logsRoutes);
+router.use("/v1/replay", replayRoutes);
+router.use("/v1/test", testRoutes);
+router.use("/v1/providers", providersRoutes);
+router.use("/v1/analytics", analyticsRoutes);
+
 // Health check endpoint
 router.get("/health", (req, res) => {
   res.json({
     success: true,
     message: "OpenLLM Monitor API is running",
+    timestamp: new Date(),
+    version: "1.0.0",
+  });
+});
+
+// Versioned health check
+router.get("/v1/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "OpenLLM Monitor API v1 is running",
     timestamp: new Date(),
     version: "1.0.0",
   });
@@ -33,13 +49,18 @@ router.get("/info", (req, res) => {
       name: "OpenLLM Monitor API",
       version: "1.0.0",
       description: "Real-time LLM observability dashboard API",
+      versions: {
+        v1: "/api/v1",
+        legacy: "/api",
+      },
       endpoints: {
         logs: "/api/logs",
         replay: "/api/replay",
         test: "/api/test",
         providers: "/api/providers",
+        analytics: "/api/analytics",
       },
-      supportedProviders: ["openai", "openrouter", "mistral", "ollama"],
+      supportedProviders: ["openai", "openrouter", "mistral", "ollama", "gemini", "grok"],
       features: [
         "Request logging",
         "Prompt replay",
@@ -47,6 +68,7 @@ router.get("/info", (req, res) => {
         "Performance monitoring",
         "Error analysis",
         "Multi-provider support",
+        "Real-time WebSocket updates",
       ],
     },
   });
