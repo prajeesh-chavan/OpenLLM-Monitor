@@ -110,18 +110,19 @@ class ProviderController {
       // Always include availableModels for all providers
       for (const provider of Object.keys(providers)) {
         if (provider === "mistral") {
-          const mistralService = require("../services/mistralService");
+          const MistralService = require("../services/mistralService");
+          const mistralInstance = new MistralService();
           let models = [];
           try {
             const apiKey = providers[provider]._apiKey;
-            const result = await mistralService.getModels(apiKey);
+            const result = await mistralInstance.getModels(apiKey);
             if (result.success) {
               models = result.models.map((m) => m.id);
             } else {
-              models = mistralService.models;
+              models = mistralInstance.models;
             }
           } catch (err) {
-            models = mistralService.models;
+            models = mistralInstance.models;
           }
           providers[provider].availableModels = models;
         } else if (provider === "ollama") {
@@ -179,18 +180,19 @@ class ProviderController {
 
       // Always include availableModels for all providers
       if (provider === "mistral") {
-        const mistralService = require("../services/mistralService");
+        const MistralService = require("../services/mistralService");
+        const mistralInstance = new MistralService();
         let models = [];
         try {
           const apiKey = providerConfig._apiKey;
-          const result = await mistralService.getModels(apiKey);
+          const result = await mistralInstance.getModels(apiKey);
           if (result.success) {
             models = result.models.map((m) => m.id);
           } else {
-            models = mistralService.models;
+            models = mistralInstance.models;
           }
         } catch (err) {
-          models = mistralService.models;
+          models = mistralInstance.models;
         }
         providerConfig.availableModels = models;
       } else if (provider === "ollama") {
@@ -666,7 +668,7 @@ class ProviderController {
       const OllamaService = require("../services/ollamaService");
       const OpenAIService = require("../services/openaiService");
       const OpenRouterService = require("../services/openrouterService");
-      const mistralService = require("../services/mistralService");
+      const MistralService = require("../services/mistralService");
       const GeminiService = require("../services/geminiService");
       const GrokService = require("../services/grokService");
 
@@ -674,7 +676,7 @@ class ProviderController {
         openai: new OpenAIService(),
         ollama: new OllamaService(),
         openrouter: new OpenRouterService(),
-        mistral: mistralService,
+        mistral: new MistralService(),
         gemini: new GeminiService(),
         grok: new GrokService(),
       };

@@ -1,6 +1,6 @@
 const OpenAIService = require("../services/openaiService");
 const OllamaService = require("../services/ollamaService");
-const mistralService = require("../services/mistralService");
+const MistralService = require("../services/mistralService");
 const OpenRouterService = require("../services/openrouterService");
 const costEstimator = require("../utils/costEstimator");
 const tokenCounter = require("../utils/tokenCounter");
@@ -18,7 +18,7 @@ class TestController {
     this.services = {
       openai: new OpenAIService(),
       ollama: new OllamaService(),
-      mistral: mistralService, // Use the already instantiated service
+      mistral: new MistralService(),
       openrouter: new OpenRouterService(),
     };
   }

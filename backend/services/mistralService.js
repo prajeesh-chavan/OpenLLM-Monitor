@@ -329,4 +329,4 @@ class MistralService {
   }
 }
 
-module.exports = new MistralService();
+module.exports = MistralService;
